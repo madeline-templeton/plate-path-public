@@ -1,0 +1,41 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "debug": "tsx --inspect src/server.ts",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "d3-delaunay": "^6.0.4",
+    "dotenv": "^17.0.1",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.5.0",
+    "heap-js": "^2.7.1",
+    "node-cache": "^5.1.2",
+    "node-fetch": "^3.3.2",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.1",
+    "@types/cors": "^2.8.19",
+    "@types/d3-delaunay": "^6.0.4",
+    "@types/express": "^4.17.21",
+    "@types/geojson": "^7946.0.16",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.19.7",
+    "fast-check": "^4.3.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}
