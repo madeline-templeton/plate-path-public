@@ -17,10 +17,6 @@
     "@playwright/test": "^1.55.0",
     "axios": "^1.10.0",
     "clerk": "^0.8.3",
-<<<<<<< HEAD
-    "csv-writer": "^1.6.0",
-=======
->>>>>>> ac2f44929d35c495f97c1a9347e0f860ac88d0e3
     "date-fns": "^4.1.0",
     "firebase": "^12.2.1",
     "lodash.debounce": "^4.0.8",
@@ -36,10 +32,6 @@
   "devDependencies": {
     "@eslint/js": "^9.29.0",
     "@types/lodash.debounce": "^4.0.9",
-<<<<<<< HEAD
-    "@types/node": "^24.10.1",
-=======
->>>>>>> ac2f44929d35c495f97c1a9347e0f860ac88d0e3
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.5.2",
@@ -47,10 +39,6 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.2.0",
-<<<<<<< HEAD
-    "tsx": "^4.20.6",
-=======
->>>>>>> ac2f44929d35c495f97c1a9347e0f860ac88d0e3
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.34.1",
     "vite": "^5.0.0"
