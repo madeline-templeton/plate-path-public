@@ -1,14 +1,20 @@
-import CalendarView from "../components/calendar/CalendarView.tsx";
-import Sidebar from "../components/sidebar/Sidebar.tsx";
+import Header from "../components/header/Header";
+import Footer from "../components/footer/Footer";
+import CalendarView from "../components/calendar/CalendarView";
+import Sidebar from "../components/sidebar/Sidebar";
+import "./Home.css";
 
 export default function Home() {
   return (
-    <div style={{ display: "flex", gap: 16 }}>
-      <Sidebar />
-      <main style={{ flex: 1 }}>
-        <h1>Home</h1>
+    <div className="app-container">
+      <Header />
+      
+      <div className="main-content">
         <CalendarView />
-      </main>
+        <Sidebar />
+      </div>
+      
+      <Footer />
     </div>
   );
 }

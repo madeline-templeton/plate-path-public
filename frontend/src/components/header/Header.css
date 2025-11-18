@@ -21,3 +21,9 @@
     -1px 1px 0 #a8d5a8,
     1px 1px 0 #a8d5a8;
 }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
