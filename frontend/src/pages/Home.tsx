@@ -1,7 +1,6 @@
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
-import CalendarView from "../components/calendar/CalendarView";
-import Sidebar from "../components/sidebar/Sidebar";
+import OurStory from "./OurStory/OurStory";
 import "./Home.css";
 
 export default function Home() {
@@ -10,8 +9,7 @@ export default function Home() {
       <Header />
       
       <div className="main-content">
-        <CalendarView />
-        <Sidebar />
+        <OurStory />
       </div>
       
       <Footer />

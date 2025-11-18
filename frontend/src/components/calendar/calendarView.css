@@ -1,5 +1,5 @@
 .calendar-section {
-  flex: 1;
+  width: 100%;
   background-color: #f0faf0;
   padding: 20px;
   display: flex;
