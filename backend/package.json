@@ -15,7 +15,10 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+<<<<<<< HEAD
     "csv-writer": "^1.6.0",
+=======
+>>>>>>> ac2f44929d35c495f97c1a9347e0f860ac88d0e3
     "d3-delaunay": "^6.0.4",
     "dotenv": "^17.0.1",
     "express": "^4.21.2",
@@ -33,7 +36,10 @@
     "@types/geojson": "^7946.0.16",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.19.7",
+<<<<<<< HEAD
     "axios": "^1.10.0",
+=======
+>>>>>>> ac2f44929d35c495f97c1a9347e0f860ac88d0e3
     "fast-check": "^4.3.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
