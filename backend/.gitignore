@@ -1,2 +1,13 @@
+# From repo root to untrack frontend/node_modules and update remote
+git rm -r --cached backend/node_modules
+git commit -m "Remove tracked node_modules from repository"
+git push
+
+# If node_modules existed at repository root instead:
+git rm -r --cached node_modules
+git commit -m "Remove tracked node_modules from repository"
+git push
 node_modules
 .env
+
+meals.csv
