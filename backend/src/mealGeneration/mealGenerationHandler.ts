@@ -1,9 +1,8 @@
 import { Express, Request, Response } from "express";
 import { userConstraintsSchema } from "../../globals";
-import { success } from "zod";
+import { mealController } from "./mealGenerationController";
 
 export async function registerMealGenerationHandler(app: Express) {
-
     app.post("/api/planner/generate", async (req: Request, res: Response) => {
         try {
             const parsedConstraints = userConstraintsSchema.safeParse(req.body.constraints);
@@ -17,6 +16,11 @@ export async function registerMealGenerationHandler(app: Express) {
             }
 
             const constraints = parsedConstraints.data;
+
+            const controllerResponse = mealController(constraints);
+
+            
+
         } catch(error){
             return res.status(500).json({
                 success: false,

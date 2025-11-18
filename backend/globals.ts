@@ -2,9 +2,10 @@ import z from "zod";
 
 export const userConstraintsSchema = z.object({
     age: z.number().positive(),
+    sex: z.enum(["M", "F"]),
     height: z.object({
-        value: z.number().positive(),
-        unit: z.enum(["cm", "ft-in", "inches", "m"])
+        value: z.array(z.number().positive()),
+        unit: z.enum(["cm", "ft-in", "inch", "m"])
     }),
     weight: z.object({
         value: z.number().positive(),

@@ -1,10 +1,12 @@
-import EventCard from "./EventCard";
+import "./calendarView.css";
 
 export default function CalendarView() {
   return (
-    <div>
-      <h2>Calendar</h2>
-      <EventCard />
+    <div className="calendar-section">
+      <h1 className="section-title">Your Meal Calender</h1>
+      <div className="calendar-box">
+        <h2>Calendar goes here</h2>
+      </div>
     </div>
   );
 }

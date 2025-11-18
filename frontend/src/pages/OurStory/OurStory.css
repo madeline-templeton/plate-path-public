@@ -1,0 +1,50 @@
+.our-story-container {
+  width: 100%;
+  min-height: 120vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 140px 40px 60px 40px;
+  text-align: center;
+}
+
+.welcome-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 5rem;
+  font-weight: bold;
+  color: #2d5016;
+  margin-bottom: 40px;
+  line-height: 1.2;
+}
+
+.welcome-subtitle {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #2d5016;
+  margin-bottom: 80px;
+  line-height: 1.6;
+}
+
+.action-links {
+  margin-top: 20px;
+}
+
+.action-text {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #2d5016;
+  line-height: 1.8;
+}
+
+.link-text {
+  text-decoration: underline;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.link-text:hover {
+  opacity: 0.7;
+}
