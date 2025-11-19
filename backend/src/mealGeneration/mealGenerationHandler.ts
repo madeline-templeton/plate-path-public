@@ -17,7 +17,20 @@ export async function registerMealGenerationHandler(app: Express) {
 
             const constraints = parsedConstraints.data;
 
-            const controllerResponse = mealController(constraints);
+            const controllerResponse = await mealController(constraints);
+
+            if (controllerResponse.success && controllerResponse.planner && !controllerResponse.error){
+                return res.status(200).json({
+                    success: true,
+                    planner: controllerResponse.planner
+                })
+            } else {
+                return res.status(500).json({
+                    success: false,
+                    message: ("Error while generating a meal plan"),
+                    error: controllerResponse.error
+                })
+            }
 
             
 

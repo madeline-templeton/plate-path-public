@@ -29,6 +29,7 @@ export const recipeSchema = z.object({
 
 export const mealSchema = z.object({
     name: z.string(),
+    id: z.coerce.number(),
     category: z.string(),
     calories: z.number(),
     recipe: recipeSchema
@@ -45,11 +46,17 @@ export const daySchema = z.object({
 });
 
 export const plannerSchema = z.object({
-    id: z.string(),
+    userId: z.string(),
     startDate: z.string(),
     weeks: z.union([z.literal(1), z.literal(2), z.literal(4)]),
     meals: z.array(daySchema)
 })
+
+export const algorithmInputSchema = z.object({
+    calories: z.number(),
+    dietaryRestrictions: z.array(z.string()),
+    excludeIngredients: z.array(z.string()),
+});
 
 
 
@@ -58,3 +65,6 @@ export type Recipe = z.infer<typeof recipeSchema>;
 export type Meal = z.infer<typeof mealSchema>;
 export type Day = z.infer<typeof daySchema>;
 export type Planner = z.infer<typeof plannerSchema>;
+export type AlgorithmInput = z.infer<typeof algorithmInputSchema>;
+
+export type mealPlanningAlgorithm = (constraints: AlgorithmInput) => Promise<Meal>;
