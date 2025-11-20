@@ -32,8 +32,6 @@ export async function registerMealGenerationHandler(app: Express) {
                 })
             }
 
-            
-
         } catch(error){
             return res.status(500).json({
                 success: false,

@@ -24,9 +24,7 @@
 }
 
 .header-actions {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+  width: 213.63px
 }
 
 .nav-links {

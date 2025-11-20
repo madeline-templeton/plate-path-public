@@ -7,6 +7,7 @@ import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Home from "./pages/Home";
 import Login from "./pages/login/Login";
+import OurStory from './pages/OurStory/OurStory';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/story" element={<OurStory/>} />
           </Routes>
         </PlannerProvider>
       </AuthProvider>

@@ -1,11 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import './Header.css';
-import LoginButton from './LoginButton/LoginButton';
-import ProfileIcon from './ProfileIcon/ProfileIcon';
+import './simpleHeader.css';
 
- 
-
-export default function Header() {
+export default function SimpleHeader() {
   const navigate = useNavigate();
 
   return (
@@ -17,11 +13,8 @@ export default function Header() {
         <button className="nav-button">generate your plan</button>
         <button className="nav-button">your calender</button>
       </nav>
-      
-      <div className="header-actions">
-        <LoginButton />
-        <ProfileIcon />
-      </div>
+
+        <div className="header-actions"></div>
     </div>
   );
 }
