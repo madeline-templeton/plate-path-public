@@ -1,6 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import './OurStory.css';
 
 export default function OurStory() {
+  const navigate = useNavigate();
+
   return (
     <div className="our-story-container">
       <h1 className="welcome-title">Welcome to PlatePath!</h1>
@@ -13,7 +16,7 @@ export default function OurStory() {
       <div className="action-links">
         <p className="action-text">
           <span className="link-text">Generate your plan now</span>. Already have a plan?<br />
-          Go to your <span className="link-text">calendar</span>!
+          Go to your <span className="link-text" onClick={() => navigate('/calendar')}>calendar</span>!
         </p>
       </div>
     </div>

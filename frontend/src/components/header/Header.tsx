@@ -13,9 +13,9 @@ export default function Header() {
       <div className="logo" onClick={() => navigate("/")}>PlatePath</div>
       
       <nav className="nav-links">
-        <button className="nav-button">our story</button>
+        <button className="nav-button" onClick={() => navigate("/")}>our story</button>
         <button className="nav-button">generate your plan</button>
-        <button className="nav-button">your calender</button>
+        <button className="nav-button" onClick={() => navigate("/calendar")}>your calender</button>
       </nav>
       
       <div className="header-actions">
