@@ -15,7 +15,7 @@ export default function OurStory() {
       
       <div className="action-links">
         <p className="action-text">
-          <span className="link-text">Generate your plan now</span>. Already have a plan?<br />
+          <span className="link-text" onClick={() => navigate('/generate-plan')}>Generate your plan now</span>. Already have a plan?<br />
           Go to your <span className="link-text" onClick={() => navigate('/calendar')}>calendar</span>!
         </p>
       </div>
