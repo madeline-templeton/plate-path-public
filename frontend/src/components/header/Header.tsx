@@ -14,7 +14,7 @@ export default function Header() {
       
       <nav className="nav-links">
         <button className="nav-button" onClick={() => navigate("/")}>our story</button>
-        <button className="nav-button">generate your plan</button>
+        <button className="nav-button" onClick={() => navigate("/generate-plan")}>generate your plan</button>
         <button className="nav-button" onClick={() => navigate("/calendar")}>your calender</button>
       </nav>
       
