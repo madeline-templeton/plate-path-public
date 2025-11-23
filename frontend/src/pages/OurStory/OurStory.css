@@ -48,3 +48,64 @@
 .link-text:hover {
   opacity: 0.7;
 }
+
+/* About Us Section */
+.about-us-section {
+  margin-top: 100px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.about-us-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 2.5rem;
+  color: #000000;
+  margin-bottom: 30px;
+}
+
+/* Team Members */
+.team-members {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  margin-bottom: 50px;
+}
+
+.team-member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.member-name {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.member-photo-placeholder {
+  width: 200px;
+  height: 250px;
+  background-color: #d3d3d3;
+  border: 2px solid #000000;
+  border-radius: 8px;
+}
+
+/* Bio Text */
+.bio-text {
+  margin-top: 50px;
+  text-align: left;
+  padding: 0 20px;
+}
+
+.bio-text p {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #000000;
+  margin-bottom: 25px;
+  text-indent: 2em;
+}
