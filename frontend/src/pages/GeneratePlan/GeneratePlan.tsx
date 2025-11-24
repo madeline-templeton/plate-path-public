@@ -4,6 +4,12 @@ import Footer from '../../components/footer/Footer';
 import './GeneratePlan.css';
 
 export default function GeneratePlan() {
+  // Get current date for defaults
+  const today = new Date();
+  const currentDay = today.getDate();
+  const currentMonth = today.getMonth() + 1; // JavaScript months are 0-indexed
+  const currentYear = today.getFullYear();
+
   const [selectedAge, setSelectedAge] = useState('');
   const [heightFeet, setHeightFeet] = useState('');
   const [heightInches, setHeightInches] = useState('');
@@ -14,6 +20,11 @@ export default function GeneratePlan() {
   const [selectedActivityLevel, setSelectedActivityLevel] = useState('');
   const [selectedPlanDuration, setSelectedPlanDuration] = useState('');
   
+  // Start date dropdowns with current date as default
+  const [selectedDay, setSelectedDay] = useState(currentDay.toString());
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth.toString());
+  const [selectedYear, setSelectedYear] = useState(currentYear.toString());
+  
   // Validation errors
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [ageError, setAgeError] = useState(false);
@@ -23,6 +34,7 @@ export default function GeneratePlan() {
   const [weightGoalError, setWeightGoalError] = useState(false);
   const [activityLevelError, setActivityLevelError] = useState(false);
   const [planDurationError, setPlanDurationError] = useState(false);
+  const [startDateError, setStartDateError] = useState(false);
 
   const handleWeightChange = (value: string) => {
     setWeight(value);
@@ -57,6 +69,7 @@ export default function GeneratePlan() {
     setWeightGoalError(false);
     setActivityLevelError(false);
     setPlanDurationError(false);
+    setStartDateError(false);
 
     // Validate all required fields
     let hasErrors = false;
@@ -96,6 +109,11 @@ export default function GeneratePlan() {
 
     if (!selectedPlanDuration) {
       setPlanDurationError(true);
+      hasErrors = true;
+    }
+
+    if (!selectedDay || !selectedMonth || !selectedYear) {
+      setStartDateError(true);
       hasErrors = true;
     }
 
@@ -463,6 +481,58 @@ export default function GeneratePlan() {
             </div>
             {planDurationError && (
               <p className="field-error">must input plan duration</p>
+            )}
+          </div>
+
+          {/* Start Date Section */}
+          <div className="form-section">
+            <h2 className="section-label">Start Date</h2>
+            <div className="height-inputs">
+              <div className="height-field">
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="height-select month-select"
+                >
+                  <option value="1">January</option>
+                  <option value="2">February</option>
+                  <option value="3">March</option>
+                  <option value="4">April</option>
+                  <option value="5">May</option>
+                  <option value="6">June</option>
+                  <option value="7">July</option>
+                  <option value="8">August</option>
+                  <option value="9">September</option>
+                  <option value="10">October</option>
+                  <option value="11">November</option>
+                  <option value="12">December</option>
+                </select>
+              </div>
+              <div className="height-field">
+                <select
+                  value={selectedDay}
+                  onChange={(e) => setSelectedDay(e.target.value)}
+                  className="height-select"
+                >
+                  {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                    <option key={day} value={day}>{day}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="height-field">
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  className="height-select"
+                >
+                  {Array.from({ length: 5 }, (_, i) => currentYear + i).map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            {startDateError && (
+              <p className="field-error">must input start date</p>
             )}
           </div>
 
