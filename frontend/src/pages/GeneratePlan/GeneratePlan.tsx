@@ -12,6 +12,7 @@ export default function GeneratePlan() {
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
   const [weightError, setWeightError] = useState<'too-low' | 'too-high' | null>(null);
   const [selectedActivityLevel, setSelectedActivityLevel] = useState('');
+  const [selectedPlanDuration, setSelectedPlanDuration] = useState('');
   
   // Validation errors
   const [showValidationErrors, setShowValidationErrors] = useState(false);
@@ -21,6 +22,7 @@ export default function GeneratePlan() {
   const [weightInputError, setWeightInputError] = useState(false);
   const [weightGoalError, setWeightGoalError] = useState(false);
   const [activityLevelError, setActivityLevelError] = useState(false);
+  const [planDurationError, setPlanDurationError] = useState(false);
 
   const handleWeightChange = (value: string) => {
     setWeight(value);
@@ -54,6 +56,7 @@ export default function GeneratePlan() {
     setWeightInputError(false);
     setWeightGoalError(false);
     setActivityLevelError(false);
+    setPlanDurationError(false);
 
     // Validate all required fields
     let hasErrors = false;
@@ -88,6 +91,11 @@ export default function GeneratePlan() {
 
     if (!selectedActivityLevel) {
       setActivityLevelError(true);
+      hasErrors = true;
+    }
+
+    if (!selectedPlanDuration) {
+      setPlanDurationError(true);
       hasErrors = true;
     }
 
@@ -416,6 +424,46 @@ export default function GeneratePlan() {
                 <span>Gluten Free</span>
               </label>
             </div>
+          </div>
+
+          {/* Plan Duration Section */}
+          <div className="form-section">
+            <h2 className="section-label">Plan Duration</h2>
+            <div className="radio-group">
+              <label className="radio-option">
+                <input
+                  type="radio"
+                  name="planDuration"
+                  value="one-week"
+                  checked={selectedPlanDuration === 'one-week'}
+                  onChange={(e) => setSelectedPlanDuration(e.target.value)}
+                />
+                <span>One Week</span>
+              </label>
+              <label className="radio-option">
+                <input
+                  type="radio"
+                  name="planDuration"
+                  value="two-weeks"
+                  checked={selectedPlanDuration === 'two-weeks'}
+                  onChange={(e) => setSelectedPlanDuration(e.target.value)}
+                />
+                <span>Two Weeks</span>
+              </label>
+              <label className="radio-option">
+                <input
+                  type="radio"
+                  name="planDuration"
+                  value="four-weeks"
+                  checked={selectedPlanDuration === 'four-weeks'}
+                  onChange={(e) => setSelectedPlanDuration(e.target.value)}
+                />
+                <span>Four Weeks</span>
+              </label>
+            </div>
+            {planDurationError && (
+              <p className="field-error">must input plan duration</p>
+            )}
           </div>
 
           {/* Main Validation Error Message */}
