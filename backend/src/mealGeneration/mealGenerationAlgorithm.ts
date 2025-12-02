@@ -1,11 +1,11 @@
-import { Day, Meal } from "../../globals";
+import { calendarDate, Day, Meal } from "../../globals";
 
 export async function mealAlgorithm(
     dailyCalories: number, 
-    dietaryRestrictions: string[], excludeIngredients: string[], mealFrequency: Map<Meal, number>[]): Promise<Day>{
+    dietaryRestrictions: string[], mealFrequency: Map<Meal, number>[], date: calendarDate): Promise<Day>{
 
     return {
-        date: "Today",
+        date: date,
         breakfast: {
             name: "Rømmegrøt – Norwegian Sour Cream Porridge",
             id: 53118,
@@ -45,9 +45,11 @@ export async function mealAlgorithm(
 
 export async function mockMealAlgorithm(
     dailyCalories: number, 
-    dietaryRestrictions: string[], excludeIngredients: string[], mealFrequency: Map<Meal, number>[]): Promise<Day>{
+    dietaryRestrictions: string[], 
+    mealFrequency: Map<Meal, number>[],
+    date: calendarDate): Promise<Day>{
     return {
-        date: "Today",
+        date: date,
         breakfast: {
             name: "Rømmegrøt – Norwegian Sour Cream Porridge",
             id: 53118,

@@ -2,8 +2,48 @@ import { useState } from 'react';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import './Calendar.css';
+import { useLocation } from 'react-router-dom';
+
+interface Meal {
+  name: string;
+  id: number;
+  category: string;
+  calories: number;
+  recipe: {
+    instructions: string;
+    video: string;
+    ingredients: string;
+  };
+}
+
+interface Day {
+  date: calendarDate;
+  breakfast: Meal;
+  lunch: Meal | { main: Meal; dessert: Meal };
+  dinner: Meal | { main: Meal; dessert: Meal };
+}
+
+interface Planner {
+  userId: string;
+  startDate: {
+    day: string;
+    month: string;
+    year: string;
+  };
+  weeks: number;
+  meals: Day[];
+}
+
+interface calendarDate {
+  day: string,
+  month: string, 
+  year: string
+}
 
 export default function Calendar() {
+  const location = useLocation();
+  const planner = location.state?.planner as Planner | undefined;
+
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const year = currentDate.getFullYear();
@@ -31,8 +71,25 @@ export default function Calendar() {
     setCurrentDate(new Date(year, month + 1, 1));
   };
 
+  const getMealsForDate = (day: number) => {
+    if (!planner) return null;
+
+    const dayData = planner.meals.find(meal => 
+      meal.date.day === day.toString() &&
+      meal.date.month === (month + 1).toString() &&
+      meal.date.year === year.toString()
+    );
+    console.log(day.toString())
+    console.log((month + 1).toString())
+    console.log(year.toString())
+    
+
+    return dayData;
+  }
+
   // Generate calendar days
   const renderCalendarDays = () => {
+    console.log(planner)
     const days = [];
     
     // Empty cells for days before the month starts
@@ -42,10 +99,23 @@ export default function Calendar() {
     
     // Actual days of the month
     for (let day = 1; day <= daysInMonth; day++) {
+      const dayMeals = getMealsForDate(day);
+      console.log(dayMeals);
+
       days.push(
         <div key={day} className="calendar-day">
           <div className="day-number">{day}</div>
-          {/* Meal lines will go here later */}
+          {dayMeals && (
+            <div className="meals-list">
+              <div className="meal-item">Breakfast: {dayMeals.breakfast.name}</div>
+              <div className="meal-item">
+                Lunch: {'main' in dayMeals.lunch ? dayMeals.lunch.main.name : dayMeals.lunch.name}
+              </div>
+              <div className="meal-item">
+                Dinner: {'main' in dayMeals.dinner ? dayMeals.dinner.main.name : dayMeals.dinner.name}
+              </div>
+            </div>
+          )}
         </div>
       );
     }

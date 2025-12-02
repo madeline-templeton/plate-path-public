@@ -11,7 +11,7 @@ export async function registerMealGenerationHandler(app: Express) {
                 return res.status(400).json({
                     success: false,
                     message: "Invalid constraints provided",
-                    error: parsedConstraints.error
+                    error: parsedConstraints.error.message
                 });
             }
 

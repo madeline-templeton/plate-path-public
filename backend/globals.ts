@@ -1,21 +1,28 @@
 import z from "zod";
 
 export const userConstraintsSchema = z.object({
-    age: z.number().positive(),
+    age: z.coerce.number().positive(),
     sex: z.enum(["M", "F"]),
     height: z.object({
-        value: z.array(z.number().positive()),
+        value: z.array(z.coerce.number().positive()),
         unit: z.enum(["cm", "ft-in", "inch", "m"])
     }),
     weight: z.object({
-        value: z.number().positive(),
+        value: z.coerce.number().positive(),
         unit: z.enum(["kg", "lb"])
     }),
-    activityLevel: z.enum(["Not active", "Lightly active", "Moderately active", "Active", "Very active"]),
-    weightGoal: z.enum(["Extreme weight loss", "Weight loss", "Maintenance", "Weight gain", "Extreme weight gain"]),
+    activityLevel: z.enum(["not-active", "lightly-active", "moderately-active", "active", "very-active"]),
+    weightGoal: z.enum(["extreme-loss", "weight-loss", "maintain", "weight-gain", "extreme-gain"]),
     dietaryRestrictions: z.array(z.string()),
-    excludeIngredients: z.array(z.string()),
-    weeks: z.union([z.literal(1), z.literal(2), z.literal(4)])
+    // excludeIngredients: z.array(z.string()),
+    weeks: z.coerce.number().refine((val) => [1, 2, 4].includes(val), {
+        message: "weeks must be 1, 2, or 4"
+    }),
+    date: z.object({
+        day: z.string(),
+        month: z.string(),
+        year: z.string()
+    })
 });
 
 
@@ -39,7 +46,11 @@ export const mealSchema = z.object({
 
 
 export const daySchema = z.object({
-    date: z.string(),
+    date: z.object({
+        day: z.string(),
+        month: z.string(),
+        year: z.string()
+    }),
     breakfast: mealSchema,
     lunch: z.union([mealSchema, z.object({main: mealSchema, dessert: mealSchema})]),
     dinner: z.union([mealSchema, z.object({main: mealSchema, dessert: mealSchema})])
@@ -47,8 +58,12 @@ export const daySchema = z.object({
 
 export const plannerSchema = z.object({
     userId: z.string(),
-    startDate: z.string(),
-    weeks: z.union([z.literal(1), z.literal(2), z.literal(4)]),
+    startDate: z.object({
+        day: z.string(),
+        month: z.string(),
+        year: z.string()
+    }),
+    weeks: z.union([z.literal(1), z.literal(2), z.literal(4)]).pipe(z.coerce.number()),
     meals: z.array(daySchema)
 })
 
@@ -56,6 +71,12 @@ export const algorithmInputSchema = z.object({
     calories: z.number(),
     dietaryRestrictions: z.array(z.string()),
     excludeIngredients: z.array(z.string()),
+});
+
+export const dateSchema = z.object({
+    day: z.string(),
+    month: z.string(),
+    year: z.string()
 });
 
 
@@ -66,5 +87,6 @@ export type Meal = z.infer<typeof mealSchema>;
 export type Day = z.infer<typeof daySchema>;
 export type Planner = z.infer<typeof plannerSchema>;
 export type AlgorithmInput = z.infer<typeof algorithmInputSchema>;
+export type calendarDate = z.infer<typeof dateSchema>;
 
 export type mealPlanningAlgorithm = (constraints: AlgorithmInput) => Promise<Meal>;

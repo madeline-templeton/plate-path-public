@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
+import axios from "axios";
 import './GeneratePlan.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function GeneratePlan() {
+  const navigate = useNavigate();
+
   // Get current date for defaults
   const today = new Date();
   const currentDay = today.getDate();
@@ -12,13 +16,13 @@ export default function GeneratePlan() {
 
   const [selectedAge, setSelectedAge] = useState('');
   const [heightFeet, setHeightFeet] = useState('');
+  const [selectedSex, setSelectedSex] = useState("");
   const [heightInches, setHeightInches] = useState('');
   const [weight, setWeight] = useState('');
   const [selectedWeightGoal, setSelectedWeightGoal] = useState('');
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
-  const [weightError, setWeightError] = useState<'too-low' | 'too-high' | null>(null);
   const [selectedActivityLevel, setSelectedActivityLevel] = useState('');
-  const [selectedPlanDuration, setSelectedPlanDuration] = useState('');
+  const [selectedPlanDuration, setSelectedPlanDuration] = useState("");
   
   // Start date dropdowns with current date as default
   const [selectedDay, setSelectedDay] = useState(currentDay.toString());
@@ -27,11 +31,14 @@ export default function GeneratePlan() {
   
   // Validation errors
   const [showValidationErrors, setShowValidationErrors] = useState(false);
-  const [ageError, setAgeError] = useState(false);
+  const [ageError, setAgeError] = useState<'too-low' | 'too-high' | null>(null);
+  const [ageInputError, setAgeInputError] = useState(false);
+  const [sexError, setSexError] = useState(false);
   const [heightFeetError, setHeightFeetError] = useState(false);
   const [heightInchesError, setHeightInchesError] = useState(false);
   const [weightInputError, setWeightInputError] = useState(false);
   const [weightGoalError, setWeightGoalError] = useState(false);
+  const [weightError, setWeightError] = useState<'too-low' | 'too-high' | null>(null);
   const [activityLevelError, setActivityLevelError] = useState(false);
   const [planDurationError, setPlanDurationError] = useState(false);
   const [startDateError, setStartDateError] = useState(false);
@@ -51,6 +58,21 @@ export default function GeneratePlan() {
     }
   };
 
+  const handleAgeChange = (value: string) => {
+    setSelectedAge(value);
+    const numValue = parseFloat(value);
+    
+    if (value === '' || isNaN(numValue)) {
+      setAgeError(null);
+    } else if (numValue < 18) {
+      setAgeError('too-low');
+    } else if (numValue > 120) {
+      setAgeError('too-high');
+    } else {
+      setAgeError(null);
+    }
+  };
+
   const handleDietaryChange = (restriction: string) => {
     if (dietaryRestrictions.includes(restriction)) {
       setDietaryRestrictions(dietaryRestrictions.filter(r => r !== restriction));
@@ -59,10 +81,10 @@ export default function GeneratePlan() {
     }
   };
 
-  const handleGeneratePlan = () => {
+  const handleGeneratePlan = async () => {
     // Reset errors
     setShowValidationErrors(false);
-    setAgeError(false);
+    setAgeInputError(false);
     setHeightFeetError(false);
     setHeightInchesError(false);
     setWeightInputError(false);
@@ -70,12 +92,18 @@ export default function GeneratePlan() {
     setActivityLevelError(false);
     setPlanDurationError(false);
     setStartDateError(false);
+    setSexError(false);
 
     // Validate all required fields
     let hasErrors = false;
 
     if (!selectedAge) {
-      setAgeError(true);
+      setAgeInputError(true);
+      hasErrors = true;
+    }
+
+    if (!selectedSex) {
+      setSexError(true);
       hasErrors = true;
     }
 
@@ -122,8 +150,49 @@ export default function GeneratePlan() {
     } else {
       // Form is valid - functionality to be added later
       console.log('Form is valid, ready to generate plan');
+      await getPlan();
     }
+  
   };
+
+  const getPlan = async () => {
+    try{
+      const constraints = {
+        age: selectedAge,
+        sex: selectedSex,
+        height : {
+          value: [heightFeet, heightInches],
+          unit: "ft-in"
+        },
+        weight: {
+          value: weight,
+          unit: "lb"
+        },
+        activityLevel: selectedActivityLevel,
+        weightGoal: selectedWeightGoal,
+        dietaryRestrictions: dietaryRestrictions,
+        weeks: selectedPlanDuration,
+        date: {
+          day: selectedDay,
+          month: selectedMonth,
+          year: selectedYear
+        }
+      }
+
+      console.log(constraints)
+      const response = await axios.post("http://localhost:8080/api/planner/generate", {
+        constraints: constraints
+      });
+
+      console.log(response.data)
+      if (response.data.success && response.data.planner){
+        navigate("/calendar", {state: {planner: response.data.planner}});
+      }
+    } catch (error){
+      console.error(error);
+    }
+  }
+
 
   return (
     <>
@@ -133,71 +202,60 @@ export default function GeneratePlan() {
         
         <form className="plan-form">
           {/* Age Section */}
+          {/* Current Weight Section */}
           <div className="form-section">
             <h2 className="section-label">Age</h2>
+            <div className="weight-input">
+              <input
+                type="number"
+                value={selectedAge}
+                onChange={(e) => handleAgeChange(e.target.value)}
+                placeholder=""
+                min="18"
+                max="120"
+              />
+            </div>
+            {ageError && (
+              <div className="weight-error">
+                <p className="error-message">
+                  {ageError === 'too-low' ? 'Entered age too low' : 'Entered age too high'}
+                </p>
+                <p className="error-disclaimer">
+                  PlatePath cannot responsibly advise on dietary needs at this age
+                </p>
+              </div>
+            )}
+            {ageInputError && (
+              <p className="field-error">must input age</p>
+            )}
+          </div>
+
+          {/* Sex Section */}
+          <div className="form-section">
+            <h2 className="section-label">Sex</h2>
             <div className="radio-group">
               <label className="radio-option">
                 <input
                   type="radio"
-                  name="age"
-                  value="18-25"
-                  checked={selectedAge === '18-25'}
-                  onChange={(e) => setSelectedAge(e.target.value)}
+                  name="sex"
+                  value="M"
+                  checked={selectedSex === 'M'}
+                  onChange={(e) => setSelectedSex(e.target.value)}
                 />
-                <span>18-25</span>
+                <span>Male</span>
               </label>
               <label className="radio-option">
                 <input
                   type="radio"
-                  name="age"
-                  value="25-35"
-                  checked={selectedAge === '25-35'}
-                  onChange={(e) => setSelectedAge(e.target.value)}
+                  name="sex"
+                  value="F"
+                  checked={selectedSex === 'F'}
+                  onChange={(e) => setSelectedSex(e.target.value)}
                 />
-                <span>25-35</span>
-              </label>
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="age"
-                  value="35-45"
-                  checked={selectedAge === '35-45'}
-                  onChange={(e) => setSelectedAge(e.target.value)}
-                />
-                <span>35-45</span>
-              </label>
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="age"
-                  value="45-55"
-                  checked={selectedAge === '45-55'}
-                  onChange={(e) => setSelectedAge(e.target.value)}
-                />
-                <span>45-55</span>
-              </label>
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="age"
-                  value="55-65"
-                  checked={selectedAge === '55-65'}
-                  onChange={(e) => setSelectedAge(e.target.value)}
-                />
-                <span>55-65</span>
-              </label>
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="age"
-                  value="65+"
-                  checked={selectedAge === '65+'}
-                  onChange={(e) => setSelectedAge(e.target.value)}
-                />
-                <span>65+</span>
+                <span>Female</span>
               </label>
             </div>
-            {ageError && (
+            {sexError && (
               <p className="field-error">must input age</p>
             )}
           </div>
@@ -289,7 +347,7 @@ export default function GeneratePlan() {
                   checked={selectedWeightGoal === 'extreme-loss'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
                 />
-                <span>extreme weight loss (1-2 lbs per week)</span>
+                <span>Extreme Weight Loss (1-2 lbs per week)</span>
               </label>
               <label className="radio-option">
                 <input
@@ -299,7 +357,7 @@ export default function GeneratePlan() {
                   checked={selectedWeightGoal === 'weight-loss'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
                 />
-                <span>weight loss (0.5-1 lbs per week)</span>
+                <span>Weight Loss (0.5-1 lbs per week)</span>
               </label>
               <label className="radio-option">
                 <input
@@ -309,7 +367,7 @@ export default function GeneratePlan() {
                   checked={selectedWeightGoal === 'maintain'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
                 />
-                <span>maintain weight</span>
+                <span>Maintain Weight</span>
               </label>
               <label className="radio-option">
                 <input
@@ -319,7 +377,7 @@ export default function GeneratePlan() {
                   checked={selectedWeightGoal === 'weight-gain'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
                 />
-                <span>weight gain (0.5-1 lbs per week)</span>
+                <span>Weight Gain (0.5-1 lbs per week)</span>
               </label>
               <label className="radio-option">
                 <input
@@ -329,7 +387,7 @@ export default function GeneratePlan() {
                   checked={selectedWeightGoal === 'extreme-gain'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
                 />
-                <span>extreme weight gain (1-2 lbs per week)</span>
+                <span>Extreme Weight Gain (1-2 lbs per week)</span>
               </label>
             </div>
             {weightGoalError && (
@@ -345,51 +403,51 @@ export default function GeneratePlan() {
                 <input
                   type="radio"
                   name="activityLevel"
-                  value="no-activity"
-                  checked={selectedActivityLevel === 'no-activity'}
+                  value="not-active"
+                  checked={selectedActivityLevel === 'not-active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
                 />
-                <span>No Activity</span>
+                <span>Not Active</span>
               </label>
               <label className="radio-option">
                 <input
                   type="radio"
                   name="activityLevel"
-                  value="light-activity"
-                  checked={selectedActivityLevel === 'light-activity'}
+                  value="lightly-active"
+                  checked={selectedActivityLevel === 'lightly-active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
                 />
-                <span>Light Activity (exercise 1-3 days per week)</span>
+                <span>Lightly Active (exercise 1-3 days per week)</span>
               </label>
               <label className="radio-option">
                 <input
                   type="radio"
                   name="activityLevel"
-                  value="moderate-activity"
-                  checked={selectedActivityLevel === 'moderate-activity'}
+                  value="moderately-active"
+                  checked={selectedActivityLevel === 'moderately-active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
                 />
-                <span>Moderate Activity (exercise 3-4 times per week)</span>
+                <span>Moderately Active (exercise 3-4 times per week)</span>
               </label>
               <label className="radio-option">
                 <input
                   type="radio"
                   name="activityLevel"
-                  value="high-activity"
-                  checked={selectedActivityLevel === 'high-activity'}
+                  value="active"
+                  checked={selectedActivityLevel === 'active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
                 />
-                <span>High Activity (exercise 5-7 times per week)</span>
+                <span>Active (exercise 5-7 times per week)</span>
               </label>
               <label className="radio-option">
                 <input
                   type="radio"
                   name="activityLevel"
-                  value="extremely-high-activity"
-                  checked={selectedActivityLevel === 'extremely-high-activity'}
+                  value="very-active"
+                  checked={selectedActivityLevel === 'very-active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
                 />
-                <span>Extremely High Activity (intense exercise 5-7 times per week)</span>
+                <span>Very Active (intense exercise 5-7 times per week)</span>
               </label>
             </div>
             {activityLevelError && (
@@ -452,8 +510,8 @@ export default function GeneratePlan() {
                 <input
                   type="radio"
                   name="planDuration"
-                  value="one-week"
-                  checked={selectedPlanDuration === 'one-week'}
+                  value="1"
+                  checked={selectedPlanDuration === '1'}
                   onChange={(e) => setSelectedPlanDuration(e.target.value)}
                 />
                 <span>One Week</span>
@@ -462,8 +520,8 @@ export default function GeneratePlan() {
                 <input
                   type="radio"
                   name="planDuration"
-                  value="two-weeks"
-                  checked={selectedPlanDuration === 'two-weeks'}
+                  value="2"
+                  checked={selectedPlanDuration === '2'}
                   onChange={(e) => setSelectedPlanDuration(e.target.value)}
                 />
                 <span>Two Weeks</span>
@@ -472,8 +530,8 @@ export default function GeneratePlan() {
                 <input
                   type="radio"
                   name="planDuration"
-                  value="four-weeks"
-                  checked={selectedPlanDuration === 'four-weeks'}
+                  value="4"
+                  checked={selectedPlanDuration === '4'}
                   onChange={(e) => setSelectedPlanDuration(e.target.value)}
                 />
                 <span>Four Weeks</span>

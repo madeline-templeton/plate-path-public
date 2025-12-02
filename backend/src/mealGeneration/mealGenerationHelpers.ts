@@ -1,5 +1,4 @@
-import e from "express";
-import { UserConstraints } from "../../globals";
+import { UserConstraints, calendarDate } from "../../globals";
 
 
 
@@ -25,16 +24,16 @@ export function baseCalorieCalculator(constraints: UserConstraints): number{
     }
 
     // Normalise activity level
-    if (constraints.activityLevel === "Lightly active"){
+    if (constraints.activityLevel === "lightly-active"){
         activityLevelMultiplier = 1.375;
     }
-    else if (constraints.activityLevel === "Moderately active"){
+    else if (constraints.activityLevel === "moderately-active"){
         activityLevelMultiplier = 1.55;
     }
-    else if (constraints.activityLevel === "Active"){
+    else if (constraints.activityLevel === "active"){
         activityLevelMultiplier = 1.725;
     }
-    else if (constraints.activityLevel === "Very active"){
+    else if (constraints.activityLevel === "very-active"){
         activityLevelMultiplier = 1.9;
     }
 
@@ -48,7 +47,7 @@ export function baseCalorieCalculator(constraints: UserConstraints): number{
         calories -= 161;
     }
 
-    return calories;
+    return calories * activityLevelMultiplier;
 
 }
 
@@ -60,7 +59,7 @@ export function exerciseAdjustedCalorieCalculator(constraints: UserConstraints, 
 
     // Check all the different goals available
     switch (constraints.weightGoal){
-        case "Extreme weight loss":
+        case "extreme-loss":
             // Only subtract 50 if we are below 1600
             if (baseCalories < 1600){
                 adjustedCalories -= 50;
@@ -88,7 +87,7 @@ export function exerciseAdjustedCalorieCalculator(constraints: UserConstraints, 
             }
             break;
 
-        case "Weight loss":
+        case "weight-loss":
             // Only subtract 25 if we are below 1600
             if (baseCalories < 1600){
                 adjustedCalories -= 25;
@@ -113,7 +112,7 @@ export function exerciseAdjustedCalorieCalculator(constraints: UserConstraints, 
             }
             break;
 
-        case "Weight gain":
+        case "weight-gain":
             // Add 50 if we are below 1600
             if (baseCalories < 1600){
                 adjustedCalories += 50;
@@ -126,7 +125,7 @@ export function exerciseAdjustedCalorieCalculator(constraints: UserConstraints, 
                 adjustedCalories += 150;
             }
             break;
-        case "Extreme weight gain":
+        case "extreme-gain":
             // Add 100 if we are below 1600
             if (baseCalories < 1600){
                 adjustedCalories += 100;
@@ -142,5 +141,29 @@ export function exerciseAdjustedCalorieCalculator(constraints: UserConstraints, 
     }
 
     return adjustedCalories;
+}
+
+
+
+/**
+ * Calculates the date for a given day offset from the start date
+ * @param startDate - The starting date object with day, month, year strings
+ * @param dayOffset - Number of days to add to the start date (0-indexed)
+ * @returns A calendarDate object for the calculated date
+ */
+export function calculateDateForDay(startDate: calendarDate, dayOffset: number): calendarDate {
+    const date = new Date(
+        parseInt(startDate.year),
+        parseInt(startDate.month) - 1,
+        parseInt(startDate.day)
+    );
+
+    date.setDate(date.getDate() + dayOffset);
+
+    return{
+        day: date.getDate().toString(),
+        month: (date.getMonth() + 1).toString(),
+        year: date.getFullYear().toString()
+    }
 }
 
