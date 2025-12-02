@@ -143,36 +143,39 @@ export default function Calendar() {
   return (
     <>
       <Header />
-      <div className="calendar-page">
-        <h1 className="calendar-title">Your Meal Calender</h1>
-        
-        <div className="calendar-container">
-          <div className="calendar-header">
-            <button className="nav-arrow" onClick={goToPreviousMonth}>←</button>
-            <h2 className="month-year">{monthNames[month]}, {year}</h2>
-            <button className="nav-arrow" onClick={goToNextMonth}>→</button>
-          </div>
+      <div className={`calendar-page ${displayMealPopUp ? 'with-sidebar' : ''}`}>
+        <div className="calendar-content">
+          <h1 className="calendar-title">Your Meal Calender</h1>
           
-          <div className="calendar-grid">
-            <div className="weekday-header">Sun</div>
-            <div className="weekday-header">Mon</div>
-            <div className="weekday-header">Tue</div>
-            <div className="weekday-header">Wed</div>
-            <div className="weekday-header">Thu</div>
-            <div className="weekday-header">Fri</div>
-            <div className="weekday-header">Sat</div>
+          <div className="calendar-container">
+            <div className="calendar-header">
+              <button className="nav-arrow" onClick={goToPreviousMonth}>←</button>
+              <h2 className="month-year">{monthNames[month]}, {year}</h2>
+              <button className="nav-arrow" onClick={goToNextMonth}>→</button>
+            </div>
             
-            {renderCalendarDays()}
+            <div className="calendar-grid">
+              <div className="weekday-header">Sun</div>
+              <div className="weekday-header">Mon</div>
+              <div className="weekday-header">Tue</div>
+              <div className="weekday-header">Wed</div>
+              <div className="weekday-header">Thu</div>
+              <div className="weekday-header">Fri</div>
+              <div className="weekday-header">Sat</div>
+              
+              {renderCalendarDays()}
+            </div>
           </div>
         </div>
+        
+        {displayMealPopUp && selectedMeal && (
+          <MealCard 
+            onClose={onClose}
+            meal={selectedMeal}
+          />
+        )}
       </div>
       <Footer />
-      {displayMealPopUp && selectedMeal && (
-        <MealCard 
-          onClose={onClose}
-          meal={selectedMeal}
-        />
-      )}
     </>
   );
 }
