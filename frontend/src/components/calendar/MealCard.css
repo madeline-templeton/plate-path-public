@@ -1,0 +1,181 @@
+.meal-card-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.meal-card {
+  background-color: #ffffff;
+  border: 4px solid #2d5016;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 30px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.close-popup {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: #d9884e;
+  border: 2px solid #2d5016;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2d5016;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.close-popup:hover {
+  background-color: #2d5016;
+  color: #d9884e;
+  transform: rotate(90deg);
+}
+
+.meal-header {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid #a8d5a8;
+}
+
+.meal-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2d5016;
+  margin: 0 0 10px 0;
+}
+
+.meal-content {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+  font-weight: 600;
+}
+
+.meal-recipe {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.recipe-detail {
+  background-color: #f9f9f9;
+  border: 2px solid #a8d5a8;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.recipe-header {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #2d5016;
+  margin: 0 0 15px 0;
+}
+
+.ingredient-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ingredient {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1rem;
+  color: #333;
+  padding: 8px 0;
+  padding-left: 20px;
+  position: relative;
+}
+
+.ingredient::before {
+  content: "•";
+  color: #d9884e;
+  font-weight: bold;
+  font-size: 1.5rem;
+  position: absolute;
+  left: 0;
+}
+
+.instructions {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+  margin: 0;
+}
+
+.video-link {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1rem;
+  color: #d9884e;
+  margin: 0;
+  word-break: break-all;
+  font-weight: 600;
+}
+
+.video-link:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Scrollbar styling */
+.meal-card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.meal-card::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.meal-card::-webkit-scrollbar-thumb {
+  background: #a8d5a8;
+  border-radius: 10px;
+}
+
+.meal-card::-webkit-scrollbar-thumb:hover {
+  background: #8bc58b;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .meal-card {
+    padding: 20px;
+    max-width: 95%;
+  }
+
+  .meal-title {
+    font-size: 1.5rem;
+  }
+
+  .recipe-header {
+    font-size: 1.1rem;
+  }
+
+  .close-popup {
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+  }
+}

@@ -3,8 +3,9 @@ import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import './Calendar.css';
 import { useLocation } from 'react-router-dom';
+import MealCard from '../../components/calendar/MealCard';
 
-interface Meal {
+export interface Meal {
   name: string;
   id: number;
   category: string;
@@ -12,7 +13,7 @@ interface Meal {
   recipe: {
     instructions: string;
     video: string;
-    ingredients: string;
+    ingredients: string[];
   };
 }
 
@@ -45,6 +46,8 @@ export default function Calendar() {
   const planner = location.state?.planner as Planner | undefined;
 
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [displayMealPopUp, setDisplayMealPopUp] = useState<boolean>(false);
+  const [selectedMeal, setSelectedMeal] = useState<Meal>();
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -107,11 +110,13 @@ export default function Calendar() {
           <div className="day-number">{day}</div>
           {dayMeals && (
             <div className="meals-list">
-              <div className="meal-item">Breakfast: {dayMeals.breakfast.name}</div>
-              <div className="meal-item">
+              <div className="meal-item" onClick={() => onMealClick(dayMeals.breakfast)}>
+                Breakfast: {dayMeals.breakfast.name}
+              </div>
+              <div className="meal-item" onClick={() => onMealClick(('main' in dayMeals.lunch ? dayMeals.lunch.main : dayMeals.lunch))}>
                 Lunch: {'main' in dayMeals.lunch ? dayMeals.lunch.main.name : dayMeals.lunch.name}
               </div>
-              <div className="meal-item">
+              <div className="meal-item" onClick={() => onMealClick(('main' in dayMeals.dinner ? dayMeals.dinner.main : dayMeals.dinner))}>
                 Dinner: {'main' in dayMeals.dinner ? dayMeals.dinner.main.name : dayMeals.dinner.name}
               </div>
             </div>
@@ -129,6 +134,15 @@ export default function Calendar() {
     
     return days;
   };
+
+  const onClose = () => {
+    setDisplayMealPopUp(false);
+  }
+
+  const onMealClick = (meal: Meal) => {
+    setSelectedMeal(meal);
+    setDisplayMealPopUp(true);
+  }
 
   return (
     <>
@@ -157,6 +171,12 @@ export default function Calendar() {
         </div>
       </div>
       <Footer />
+      {displayMealPopUp && selectedMeal && (
+        <MealCard 
+          onClose={onClose}
+          meal={selectedMeal}
+        />
+      )}
     </>
   );
 }

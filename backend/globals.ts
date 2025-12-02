@@ -30,7 +30,7 @@ export const userConstraintsSchema = z.object({
 export const recipeSchema = z.object({
     instructions: z.string(),
     video: z.string(),
-    ingredients: z.string()
+    ingredients: z.array(z.string())
 
 });
 
