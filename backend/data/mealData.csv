@@ -1,0 +1,18 @@
+ID,meal name,meal time,ingredients,website,calories
+1,Scrambled Eggs,breakfast,"eggs, butter, milk, salt, pepper",https://example.com/scrambled-eggs,300
+2,Oatmeal,breakfast,"oats, milk, honey, banana",https://example.com/oatmeal,250
+3,Greek Yogurt Parfait,breakfast,"greek yogurt, granola, berries, honey",https://example.com/yogurt-parfait,350
+4,Avocado Toast,breakfast,"bread, avocado, eggs, tomato",https://example.com/avocado-toast,400
+5,Grilled Chicken Salad,lunch,"chicken breast, lettuce, tomatoes, olive oil, lemon",https://example.com/chicken-salad,400
+6,Vegetable Stir Fry,lunch,"broccoli, carrots, soy sauce, garlic, ginger",https://example.com/veggie-stir-fry,350
+7,Turkey Wrap,lunch,"turkey, tortilla, lettuce, cheese, mustard",https://example.com/turkey-wrap,450
+8,Quinoa Bowl,lunch,"quinoa, chickpeas, cucumber, feta, olive oil",https://example.com/quinoa-bowl,500
+9,Salmon with Rice,dinner,"salmon fillet, rice, lemon, dill, olive oil",https://example.com/salmon-rice,550
+10,Pasta Primavera,dinner,"pasta, zucchini, bell peppers, garlic, parmesan",https://example.com/pasta-primavera,500
+11,Grilled Steak,dinner,"steak, potatoes, asparagus, butter",https://example.com/steak,600
+12,Chicken Curry,dinner,"chicken, curry sauce, rice, vegetables",https://example.com/chicken-curry,550
+13,Veggie Pizza,dinner,"pizza dough, tomato sauce, mozzarella, vegetables",https://example.com/veggie-pizza,600
+14,Tacos,dinner,"tortillas, ground beef, lettuce, cheese, salsa",https://example.com/tacos,500
+15,Grilled Fish,dinner,"white fish, vegetables, olive oil, herbs",https://example.com/grilled-fish,400
+16,Shrimp Bowl,dinner,"shrimp, rice, vegetables, soy sauce",https://example.com/shrimp-bowl,450
+17,Lentil Soup,dinner,"lentils, carrots, onions, vegetable broth",https://example.com/lentil-soup,350
