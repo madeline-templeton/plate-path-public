@@ -82,11 +82,8 @@ export default function Calendar() {
       meal.date.month === (month + 1).toString() &&
       meal.date.year === year.toString()
     );
-    console.log(day.toString())
-    console.log((month + 1).toString())
-    console.log(year.toString())
-    
 
+  
     return dayData;
   }
 
@@ -103,7 +100,6 @@ export default function Calendar() {
     // Actual days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const dayMeals = getMealsForDate(day);
-      console.log(dayMeals);
 
       days.push(
         <div key={day} className="calendar-day">
