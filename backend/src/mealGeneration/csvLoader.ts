@@ -30,11 +30,12 @@ export function loadMealsFromCSV(): Meal[] {
   const header = lines[0].split(",").map((h) => h.trim());
   const expectedHeaders = [
     "ID",
-    "meal name",
-    "meal time",
-    "ingredients",
-    "website",
-    "calories",
+    "Meal Name",
+    "Meal Time",
+    "Diet",
+    "Ingredients",
+    "Website",
+    "Calories",
   ];
 
   // Validate header structure
@@ -63,9 +64,10 @@ export function loadMealsFromCSV(): Meal[] {
         id: values[0],
         name: values[1],
         mealTime: values[2].toLowerCase(),
-        ingredients: values[3],
-        website: values[4],
-        calories: values[5],
+        diet: values[3],
+        ingredients: values[4],
+        website: values[5],
+        calories: values[6],
         occurrences: 0,
       });
       meals.push(meal);

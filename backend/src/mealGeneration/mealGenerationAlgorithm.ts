@@ -4,7 +4,7 @@ import { applyAllFilters, getPreferredMeals } from "./mealFilters";
 
 export async function mealAlgorithm(
   planLength: number,
-  mealCalories: number,
+  totalCalories: number,
   dietaryRestrictions: string[],
   allergyIngredients: string[],
   downvotedMealIds: number[],
@@ -13,7 +13,7 @@ export async function mealAlgorithm(
 ): Promise<Day[]> {
   // Load all meals from CSV (cached after first load)
   const allMeals = loadMealsFromCSV();
-
+    console.log(`Loaded ${allMeals.length} meals from CSV`);
   // Apply global filters (calories will be applied per meal time in pickMeal)
   const baseFilteredMeals = applyAllFilters(allMeals, {
     dietaryRestrictions,
@@ -27,27 +27,32 @@ export async function mealAlgorithm(
   const plan: Day[] = [];
   const currentDate = { ...startDate };
 
+  const breakfastCalories = 1/3 * totalCalories;
   // Generate meal plan for each day
   for (let i = 0; i < planLength; i++) {
     const breakfast = await pickMeal(
       baseFilteredMeals,
       preferredMeals,
       "breakfast",
-      mealCalories
+      breakfastCalories
     );
+
+    const lunchCalories = (totalCalories - breakfast.calories)/2;
 
     const lunch = await pickMeal(
       baseFilteredMeals,
       preferredMeals,
       "lunch",
-      mealCalories
+      lunchCalories
     );
+
+    const dinnerCalories = totalCalories - breakfast.calories - lunch.calories;
 
     const dinner = await pickMeal(
       baseFilteredMeals,
       preferredMeals,
       "dinner",
-      mealCalories
+      dinnerCalories
     );
 
     const dayPlan: Day = {

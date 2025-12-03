@@ -31,6 +31,7 @@ export const mealSchema = z.object({
     id: z.coerce.number(),
     name: z.string(),
     mealTime: z.enum(["breakfast", "lunch", "dinner", "dessert"]),
+    diet: z.string(),
     ingredients: z.string(),
     website: z.string(),
     calories: z.coerce.number(),

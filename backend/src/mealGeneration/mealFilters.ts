@@ -8,8 +8,8 @@ export function filterMealsByCalories(
   targetCalories: number,
   rangeSize: number = 100
 ): Meal[] {
-  const lowerBound = Math.floor(targetCalories / rangeSize) * rangeSize;
-  const upperBound = lowerBound + rangeSize - 1;
+  const lowerBound = targetCalories - 50;
+  const upperBound = targetCalories + 50; // +- 50 calories
 
   return meals.filter(
     (meal) => meal.calories >= lowerBound && meal.calories <= upperBound
@@ -17,20 +17,19 @@ export function filterMealsByCalories(
 }
 
 /**
- * Filter meals by dietary restrictions
- * Removes meals whose ingredients contain any restricted terms
+ * Filter meals by dietary restrictions (vegan, vegetarian, none, etc.)
+ * Removes meals whose diet fields do not match all restrictions
  */
 export function filterByDietaryRestrictions(
   meals: Meal[],
   restrictions: string[]
 ): Meal[] {
-  if (restrictions.length === 0) return meals;
-
+    if (restrictions.includes("none")) return meals;
   const restrictionsLower = restrictions.map((r) => r.toLowerCase());
 
   return meals.filter((meal) => {
-    const ingredientsLower = meal.ingredients.toLowerCase();
-    return !restrictionsLower.some((restriction) =>
+    const ingredientsLower = meal.diet.toLowerCase();
+    return restrictionsLower.every((restriction) =>
       ingredientsLower.includes(restriction)
     );
   });
@@ -98,7 +97,7 @@ export function getPreferredMeals(
 export function applyAllFilters(
   meals: Meal[],
   options: {
-    targetCalories?: number;
+    targetCalories?: number; // make optional so that we can filter a base list without calorie targets 
     calorieRange?: number;
     dietaryRestrictions?: string[];
     allergyIngredients?: string[];
