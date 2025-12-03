@@ -4,9 +4,12 @@ import Footer from '../../components/footer/Footer';
 import axios from "axios";
 import './GeneratePlan.css';
 import { useNavigate } from 'react-router-dom';
+import { auth } from "../../services/firebase";
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function GeneratePlan() {
   const navigate = useNavigate();
+  const currenUser = useAuth();
 
   // Get current date for defaults
   const today = new Date();
@@ -223,6 +226,7 @@ export default function GeneratePlan() {
 
 
       const constraints = {
+        userId: currenUser.user?.id,
         age: selectedAge,
         sex: selectedSex,
         height : {
@@ -251,7 +255,35 @@ export default function GeneratePlan() {
 
       console.log(response.data)
       if (response.data.success && response.data.planner){
+        if (localStorage.getItem("dataStorageConsent") === "true"){
+          console.log("updating planner")
+          await updatePlanner(response.data.planner);
+        }
         navigate("/calendar", {state: {planner: response.data.planner}});
+      }
+    } catch (error){
+      console.error(error);
+    }
+  }
+
+  const updatePlanner = async (planner: any) => {
+    try{
+      const token = await auth.currentUser?.getIdToken();
+
+      const response = await axios.put("http://localhost:8080/updatePlanner", {
+        planner: planner
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.data.success){
+        console.log("planner saved successfully")
+      }
+      else{
+        console.log(response.status);
+        console.error(response.data.message);
       }
     } catch (error){
       console.error(error);

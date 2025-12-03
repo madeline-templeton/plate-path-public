@@ -1,6 +1,7 @@
 import z from "zod";
 
 export const userConstraintsSchema = z.object({
+    userId: z.coerce.string(),
     age: z.coerce.number().positive(),
     sex: z.enum(["M", "F"]),
     height: z.object({

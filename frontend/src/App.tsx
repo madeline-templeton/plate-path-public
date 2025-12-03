@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Login from "./pages/login/Login";
 import Calendar from './pages/Calendar/Calendar';
 import GeneratePlan from './pages/GeneratePlan/GeneratePlan';
+import Account from './pages/Account/Account';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/generate-plan" element={<GeneratePlan />} />
+            <Route path="/account" element={<Account />} />
           </Routes>
         </PlannerProvider>
       </AuthProvider>

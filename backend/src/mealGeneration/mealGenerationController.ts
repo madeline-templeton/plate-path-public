@@ -20,7 +20,7 @@ export async function mealController(constraints: UserConstraints):
 
         // Initialise our planner to return
         const planner: Planner = {
-            userId: "000",  
+            userId: constraints.userId,  
             weeks: weeks, 
             meals: [],
             startDate: {

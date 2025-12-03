@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import './Calendar.css';
 import { useLocation } from 'react-router-dom';
 import MealCard from '../../components/calendar/MealCard';
+import axios from 'axios';
+import { useAuth } from '../../contexts/AuthContext';
 
 export interface Meal {
   name: string;
@@ -24,7 +26,7 @@ interface Day {
   dinner: Meal | { main: Meal; dessert: Meal };
 }
 
-interface Planner {
+export interface Planner {
   userId: string;
   startDate: {
     day: string;
@@ -43,11 +45,16 @@ interface calendarDate {
 
 export default function Calendar() {
   const location = useLocation();
-  const planner = location.state?.planner as Planner | undefined;
+  const { user: currentUser } = useAuth();
+  const receivedPlanner = location.state?.planner as Planner | undefined;
+  console.log(receivedPlanner, "received");
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [displayMealPopUp, setDisplayMealPopUp] = useState<boolean>(false);
   const [selectedMeal, setSelectedMeal] = useState<Meal>();
+  const [planner, setPlanner] = useState<Planner | undefined>(receivedPlanner);
+  const [loading, setLoading] = useState<boolean>(!receivedPlanner);
+
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -75,7 +82,7 @@ export default function Calendar() {
   };
 
   const getMealsForDate = (day: number) => {
-    if (!planner) return null;
+    if (!planner || !planner.meals) return null;
 
     const dayData = planner.meals.find(meal => 
       meal.date.day === day.toString() &&
@@ -85,6 +92,24 @@ export default function Calendar() {
 
   
     return dayData;
+  }
+
+  const fetchPlanner = async () => {
+    console.log("called")
+    setLoading(true);
+    try{
+      const response = await axios.get(`http://localhost:8080/getPlannerForUser/${currentUser?.id}`);
+
+      if (response.data.success){
+        setPlanner(response.data.planner)
+      } else{
+        console.error("Error while fetching Planner", response.status)
+      }
+    } catch(error){
+      console.error(error, "Error while fetching Planner")
+    } finally{
+      setLoading(false);
+    }
   }
 
   // Generate calendar days
@@ -138,6 +163,46 @@ export default function Calendar() {
   const onMealClick = (meal: Meal) => {
     setSelectedMeal(meal);
     setDisplayMealPopUp(true);
+  }
+
+  useEffect(() => {
+    if (currentUser && !planner){
+      fetchPlanner();
+    }
+  }, [currentUser]);
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="calendar-page">
+          <h1 className="calendar-title">Your Meal Calender</h1>
+          <div className="calendar-container">
+            <p style={{ textAlign: 'center', padding: '40px', fontFamily: 'Quicksand, sans-serif', fontSize: '1.2rem' }}>
+              Loading your meal plan...
+            </p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!planner || !planner.meals) {
+    return (
+      <>
+        <Header />
+        <div className="calendar-page">
+          <h1 className="calendar-title">Your Meal Calender</h1>
+          <div className="calendar-container">
+            <p style={{ textAlign: 'center', padding: '40px', fontFamily: 'Quicksand, sans-serif', fontSize: '1.2rem' }}>
+              No meal plan found. Please generate a plan first.
+            </p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
   }
 
   return (
