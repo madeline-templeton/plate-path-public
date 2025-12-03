@@ -3,44 +3,97 @@ import { loadMealsFromCSV } from "./csvLoader";
 import { applyAllFilters, getPreferredMeals } from "./mealFilters";
 
 export async function mealAlgorithm(
-    dailyCalories: number, 
-    dietaryRestrictions: string[], mealFrequency: Map<Meal, number>[], date: calendarDate): Promise<Day>{
+  planLength: number,
+  totalCalories: number,
+  dietaryRestrictions: string[],
+  allergyIngredients: string[],
+  downvotedMealIds: number[],
+  preferredMealIds: number[],
+  startDate: calendarDate
+): Promise<Day[]> {
+  // Load all meals from CSV (cached after first load)
+  const allMeals = loadMealsFromCSV();
+    console.log(`Loaded ${allMeals.length} meals from CSV`);
+  // Apply global filters (calories will be applied per meal time in pickMeal)
+  const baseFilteredMeals = applyAllFilters(allMeals, {
+    dietaryRestrictions,
+    allergyIngredients,
+    downvotedIds: downvotedMealIds,
+  });
 
-    return {
-        date: date,
-        breakfast: {
-            name: "Rømmegrøt – Norwegian Sour Cream Porridge",
-            id: 53118,
-            category: "Breakfast",
-            calories: 550,
-            recipe: {
-                instructions: "▢\nCook the sour cream in a covered saucepan on medium heat for about 5 minutes.\n▢\nTurn down the heat and add half of the flour and stir well with a whisk. Once the flour is fully incorporated, let the mixture continue to cook, stirring occasionally, until fat starts to release. Use a spoon to gather as much of the fat as you can in a small bowl, saving for later. (Don't worry if you can't get any fat – in that case you can add butter later.)\n▢\nWhisk in the rest of the flour and then slowly add the milk, whisking constantly to avoid lumps. Let the porridge continue to cook on low heat for 5 minutes and then add salt.\n▢\nServe with sugar, cinnamon, and the fat from the porridge. If you're using lower fat sour cream you can top the rømmegrøt with some butter instead.",
-                ingredients: ["Full fat sour cream: 2 cups", "Flour: 3/4 cup", "Milk: 2 cups", "Salt: 1 tsp", "Sugar: Sprinkling", "Cinnamon: Sprinkling", "Butter: To taste"],
-                video: "https://www.youtube.com/watch?v=v4rIJOWXM3w"
-            }
-        },
-        lunch: {
-            name: "Brown Stew Chicken",
-            id: 52940,
-            category: "Chicken",
-            calories: 650,
-            recipe: {
-                instructions: "Combine tomato, scallion, onion, garlic, pepper, thyme, pimento and soy sauce in a large bowl with the chicken pieces. Cover and marinate at least one hour.\nHeat oil in a dutch pot or large saucepan. Shake off the seasonings as you remove each piece of chicken from the marinade. Reserve the marinade for sauce.\nLightly brown the chicken a few pieces at a time in very hot oil. Place browned chicken pieces on a plate to rest while you brown the remaining pieces.\nDrain off excess oil and return the chicken to the pan. Pour the marinade over the chicken and add the carrots. Stir and cook over medium heat for 10 minutes.\nMix flour and coconut milk and add to stew, stirring constantly. Turn heat down to minimum and cook another 20 minutes or until tender.",
-                ingredients: ["Chicken: 1 whole", "Tomato: 1 chopped", "Onions: 2 chopped", "Garlic Clove: 2 chopped", "Red Pepper: 1 chopped", "Carrots: 1 chopped", "Lime: 1", "Thyme: 2 tsp", "Allspice: 1 tsp", "Soy Sauce: 2 tbs", "Cornstarch: 2 tsp", "Coconut Milk: 2 cups", "Vegetable Oil: 1 tbs"],
-                video: "https://www.youtube.com/watch?v=_gFB1fkNhXs"
-            }
-        },
-        dinner: {
-            name: "Egg Drop Soup",
-            id: 52955,
-            category: "Vegetarian",
-            calories: 650,
-            recipe: {
-                instructions: "In a wok add chicken broth and wait for it to boil.\nNext add salt, sugar, white pepper, sesame seed oil.\nWhen the chicken broth is boiling add the vegetables to the wok.\nTo thicken the sauce, whisk together 1 Tablespoon of cornstarch and 2 Tablespoon of water in a bowl and slowly add to your soup until it's the right thickness.\nNext add 1 egg slightly beaten with a knife or fork and add it to the soup slowly and stir for 8 seconds\nServe the soup in a bowl and add the green onions on top.",
-                ingredients: ["Chicken Stock: 3 cups", "Salt: 1/4 tsp", "Sugar: 1/4 tsp", "Pepper: pinch", "Sesame Seed Oil: 1 tsp", "Peas: 1/3 cup", "Mushrooms: 1/3 cup", "Cornstarch: 1 tbs", "Water: 2 tbs", "Spring Onions: 1/4 cup"],
-                video: "https://www.youtube.com/watch?v=9XpzHm9QpZg"
-            }
-        }
+  // Get preferred meals from filtered set
+  const preferredMeals = getPreferredMeals(baseFilteredMeals, preferredMealIds);
+
+  const plan: Day[] = [];
+  const currentDate = { ...startDate };
+
+  const breakfastCalories = 1/3 * totalCalories;
+  // Generate meal plan for each day
+  for (let i = 0; i < planLength; i++) {
+    const breakfast = await pickMeal(
+      baseFilteredMeals,
+      preferredMeals,
+      "breakfast",
+      breakfastCalories
+    );
+
+    const lunchCalories = (totalCalories - breakfast.calories)/2;
+
+    const lunch = await pickMeal(
+      baseFilteredMeals,
+      preferredMeals,
+      "lunch",
+      lunchCalories
+    );
+
+    const dinnerCalories = totalCalories - breakfast.calories - lunch.calories;
+
+    const dinner = await pickMeal(
+      baseFilteredMeals,
+      preferredMeals,
+      "dinner",
+      dinnerCalories
+    );
+
+    const dayPlan: Day = {
+      date: { ...currentDate },
+      breakfast,
+      lunch,
+      dinner,
+    };
+
+    plan.push(dayPlan);
+
+    // Increment date for next day
+    incrementDate(currentDate);
+  }
+
+  return plan;
+}
+
+/**
+ * Helper function to increment a calendar date by one day
+ */
+function incrementDate(date: calendarDate): void {
+  const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  const monthNum = parseInt(date.month);
+  const dayNum = parseInt(date.day);
+  const yearNum = parseInt(date.year);
+
+  // Check for leap year
+  if (monthNum === 2 && isLeapYear(yearNum)) {
+    daysInMonth[1] = 29;
+  }
+
+  if (dayNum < daysInMonth[monthNum - 1]) {
+    date.day = String(dayNum + 1);
+  } else {
+    date.day = "1";
+    if (monthNum < 12) {
+      date.month = String(monthNum + 1);
+    } else {
+      date.month = "1";
+      date.year = String(yearNum + 1);
     }
   }
 }
@@ -62,46 +115,31 @@ export async function pickMeal(
     calorieRange: 100,
   });
 
-export async function mockMealAlgorithm(
-    dailyCalories: number, 
-    dietaryRestrictions: string[], 
-    mealFrequency: Map<Meal, number>[],
-    date: calendarDate): Promise<Day>{
-    return {
-        date: date,
-        breakfast: {
-            name: "Rømmegrøt – Norwegian Sour Cream Porridge",
-            id: 53118,
-            category: "Breakfast",
-            calories: 550,
-            recipe: {
-                instructions: "▢\nCook the sour cream in a covered saucepan on medium heat for about 5 minutes.\n▢\nTurn down the heat and add half of the flour and stir well with a whisk. Once the flour is fully incorporated, let the mixture continue to cook, stirring occasionally, until fat starts to release. Use a spoon to gather as much of the fat as you can in a small bowl, saving for later. (Don't worry if you can't get any fat – in that case you can add butter later.)\n▢\nWhisk in the rest of the flour and then slowly add the milk, whisking constantly to avoid lumps. Let the porridge continue to cook on low heat for 5 minutes and then add salt.\n▢\nServe with sugar, cinnamon, and the fat from the porridge. If you're using lower fat sour cream you can top the rømmegrøt with some butter instead.",
-                ingredients: ["Full fat sour cream: 2 cups", "Flour: 3/4 cup", "Milk: 2 cups", "Salt: 1 tsp", "Sugar: Sprinkling", "Cinnamon: Sprinkling", "Butter: To taste"],
-                video: "https://www.youtube.com/watch?v=v4rIJOWXM3w"
-            }
-        },
-        lunch: {
-            name: "Brown Stew Chicken",
-            id: 52940,
-            category: "Chicken",
-            calories: 650,
-            recipe: {
-                instructions: "Combine tomato, scallion, onion, garlic, pepper, thyme, pimento and soy sauce in a large bowl with the chicken pieces. Cover and marinate at least one hour.\nHeat oil in a dutch pot or large saucepan. Shake off the seasonings as you remove each piece of chicken from the marinade. Reserve the marinade for sauce.\nLightly brown the chicken a few pieces at a time in very hot oil. Place browned chicken pieces on a plate to rest while you brown the remaining pieces.\nDrain off excess oil and return the chicken to the pan. Pour the marinade over the chicken and add the carrots. Stir and cook over medium heat for 10 minutes.\nMix flour and coconut milk and add to stew, stirring constantly. Turn heat down to minimum and cook another 20 minutes or until tender.",
-                ingredients: ["Chicken: 1 whole", "Tomato: 1 chopped", "Onions: 2 chopped", "Garlic Clove: 2 chopped", "Red Pepper: 1 chopped", "Carrots: 1 chopped", "Lime: 1", "Thyme: 2 tsp", "Allspice: 1 tsp", "Soy Sauce: 2 tbs", "Cornstarch: 2 tsp", "Coconut Milk: 2 cups", "Vegetable Oil: 1 tbs"],
-                video: "https://www.youtube.com/watch?v=_gFB1fkNhXs"
-            }
-        },
-        dinner: {
-            name: "Egg Drop Soup",
-            id: 52955,
-            category: "Vegetarian",
-            calories: 650,
-            recipe: {
-                instructions: "In a wok add chicken broth and wait for it to boil.\nNext add salt, sugar, white pepper, sesame seed oil.\nWhen the chicken broth is boiling add the vegetables to the wok.\nTo thicken the sauce, whisk together 1 Tablespoon of cornstarch and 2 Tablespoon of water in a bowl and slowly add to your soup until it's the right thickness.\nNext add 1 egg slightly beaten with a knife or fork and add it to the soup slowly and stir for 8 seconds\nServe the soup in a bowl and add the green onions on top.",
-                ingredients: ["Chicken Stock: 3 cups", "Salt: 1/4 tsp", "Sugar: 1/4 tsp", "Pepper: pinch", "Sesame Seed Oil: 1 tsp", "Peas: 1/3 cup", "Mushrooms: 1/3 cup", "Cornstarch: 1 tbs", "Water: 2 tbs", "Spring Onions: 1/4 cup"],
-                video: "https://www.youtube.com/watch?v=9XpzHm9QpZg"
-            }
-        }
+  const preferred = applyAllFilters(allPreferred, {
+    mealTime,
+    targetCalories,
+    calorieRange: 100,
+  });
+
+  if (candidates.length === 0) {
+    throw new Error(
+      `No meals available for ${mealTime} with target calories ${targetCalories}`
+    );
+  }
+
+  let selectedMeal: Meal = candidates[0]; // fallback
+
+  // Try up to 10 times to find a meal with < 4 occurrences
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const randomValue = Math.random();
+
+    // 60% from candidates, 40% from preferred
+    if (randomValue < 0.6 || preferred.length === 0) {
+      const randomIndex = Math.floor(Math.random() * candidates.length);
+      selectedMeal = candidates[randomIndex];
+    } else {
+      const randomIndex = Math.floor(Math.random() * preferred.length);
+      selectedMeal = preferred[randomIndex];
     }
 
     // Accept if occurrences < 4, or if this is our last attempt
