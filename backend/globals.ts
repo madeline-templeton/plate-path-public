@@ -36,11 +36,14 @@ export const recipeSchema = z.object({
 });
 
 export const mealSchema = z.object({
-    name: z.string(),
     id: z.coerce.number(),
-    category: z.string(),
-    calories: z.number(),
-    recipe: recipeSchema
+    name: z.string(),
+    mealTime: z.enum(["breakfast", "lunch", "dinner", "dessert"]),
+    diet: z.string(),
+    ingredients: z.string(),
+    website: z.string(),
+    calories: z.coerce.number(),
+    occurrences: z.number().default(0)
 });
 
 
@@ -53,8 +56,8 @@ export const daySchema = z.object({
         year: z.string()
     }),
     breakfast: mealSchema,
-    lunch: z.union([mealSchema, z.object({main: mealSchema, dessert: mealSchema})]),
-    dinner: z.union([mealSchema, z.object({main: mealSchema, dessert: mealSchema})])
+    lunch: mealSchema,
+    dinner: mealSchema
 });
 
 export const plannerSchema = z.object({

@@ -1,4 +1,6 @@
 import { calendarDate, Day, Meal } from "../../globals";
+import { loadMealsFromCSV } from "./csvLoader";
+import { applyAllFilters, getPreferredMeals } from "./mealFilters";
 
 export async function mealAlgorithm(
   planLength: number,
@@ -93,8 +95,25 @@ function incrementDate(date: calendarDate): void {
       date.month = "1";
       date.year = String(yearNum + 1);
     }
+  }
 }
 
+function isLeapYear(year: number): boolean {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+export async function pickMeal(
+  allCandidates: Meal[],
+  allPreferred: Meal[],
+  mealTime: "breakfast" | "lunch" | "dinner" | "dessert",
+  targetCalories: number
+): Promise<Meal> {
+  // Filter candidates and preferred by meal time and calories
+  const candidates = applyAllFilters(allCandidates, {
+    mealTime,
+    targetCalories,
+    calorieRange: 100,
+  });
 
   const preferred = applyAllFilters(allPreferred, {
     mealTime,
@@ -123,6 +142,52 @@ function incrementDate(date: calendarDate): void {
       selectedMeal = preferred[randomIndex];
     }
 
+    // Accept if occurrences < 4, or if this is our last attempt
+    if (selectedMeal.occurrences < 4 || attempt >= 9) {
+      selectedMeal.occurrences += 1;
+      break;
+    }
+  }
 
+  return selectedMeal;
+}
+
+export async function mockMealAlgorithm(): Promise<Day[]> {
+  // Return a fixed mock meal plan for testing
+  return [
+    {
+      date: { day: "1", month: "1", year: "2024" },
+      breakfast: {
+        id: 1,
+        name: "Mock Breakfast",
+        mealTime: "breakfast",
+        diet: "vegetarian",
+        ingredients: "eggs, toast",
+        website: "http://example.com/breakfast",
+        calories: 300,
+        occurrences: 0,
+      },
+      lunch: {
+        id: 2,
+        name: "Mock Lunch",
+        mealTime: "lunch",
+        diet: "vegan",
+        ingredients: "salad, tofu",
+        website: "http://example.com/lunch",
+        calories: 500,
+        occurrences: 0,
+      },
+      dinner: {
+        id: 3,
+        name: "Mock Dinner",
+        mealTime: "dinner",
+        diet: " none",
+        ingredients: "chicken, rice",
+        website: "http://example.com/dinner",
+        calories: 700,
+        occurrences: 0,
+      },
+    },
+  ];
 }
 

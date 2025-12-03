@@ -33,14 +33,22 @@ export async function mealController(constraints: UserConstraints):
         const weeklyFrequency = new Array(weeks).fill(mealFrequency);
         
         const days = weeks * 7
-        for (let i = 0; i < days; i++){
-            const currentDate = calculateDateForDay(constraints.date, i)
+        // for (let i = 0; i < days; i++){
+        //     const currentDate = calculateDateForDay(constraints.date, i)
+            
+        //     let plan : Planner = {
+        //         userId: "12345",
+        //         weeks: 1,
+        //         startDate: {
+        //             day: "",
+        //             month: "",
+        //             year: ""
+        //         },
+        //         meals: await mockMealAlgorithm()
+        //     }; 
 
-            const day = await mockMealAlgorithm(adjustedCalories, 
-                constraints.dietaryRestrictions, weeklyFrequency, currentDate);
-
-            planner.meals.push(day);
-        }
+        //     planner.meals.push(plan);
+        // }
 
         return {success: true, planner: planner}
 
