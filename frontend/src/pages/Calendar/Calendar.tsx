@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import './Calendar.css';
 import { useLocation } from 'react-router-dom';
+import MealCard from '../../components/calendar/MealCard';
+import axios from 'axios';
+import { useAuth } from '../../contexts/AuthContext';
 
-interface Meal {
+export interface Meal {
   name: string;
   id: number;
   category: string;
@@ -12,7 +15,7 @@ interface Meal {
   recipe: {
     instructions: string;
     video: string;
-    ingredients: string;
+    ingredients: string[];
   };
 }
 
@@ -23,7 +26,7 @@ interface Day {
   dinner: Meal | { main: Meal; dessert: Meal };
 }
 
-interface Planner {
+export interface Planner {
   userId: string;
   startDate: {
     day: string;
@@ -42,9 +45,16 @@ interface calendarDate {
 
 export default function Calendar() {
   const location = useLocation();
-  const planner = location.state?.planner as Planner | undefined;
+  const { user: currentUser } = useAuth();
+  const receivedPlanner = location.state?.planner as Planner | undefined;
+  console.log(receivedPlanner, "received");
 
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [displayMealPopUp, setDisplayMealPopUp] = useState<boolean>(false);
+  const [selectedMeal, setSelectedMeal] = useState<Meal>();
+  const [planner, setPlanner] = useState<Planner | undefined>(receivedPlanner);
+  const [loading, setLoading] = useState<boolean>(!receivedPlanner);
+
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -72,19 +82,34 @@ export default function Calendar() {
   };
 
   const getMealsForDate = (day: number) => {
-    if (!planner) return null;
+    if (!planner || !planner.meals) return null;
 
     const dayData = planner.meals.find(meal => 
       meal.date.day === day.toString() &&
       meal.date.month === (month + 1).toString() &&
       meal.date.year === year.toString()
     );
-    console.log(day.toString())
-    console.log((month + 1).toString())
-    console.log(year.toString())
-    
 
+  
     return dayData;
+  }
+
+  const fetchPlanner = async () => {
+    console.log("called")
+    setLoading(true);
+    try{
+      const response = await axios.get(`http://localhost:8080/getPlannerForUser/${currentUser?.id}`);
+
+      if (response.data.success){
+        setPlanner(response.data.planner)
+      } else{
+        console.error("Error while fetching Planner", response.status)
+      }
+    } catch(error){
+      console.error(error, "Error while fetching Planner")
+    } finally{
+      setLoading(false);
+    }
   }
 
   // Generate calendar days
@@ -100,18 +125,19 @@ export default function Calendar() {
     // Actual days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const dayMeals = getMealsForDate(day);
-      console.log(dayMeals);
 
       days.push(
         <div key={day} className="calendar-day">
           <div className="day-number">{day}</div>
           {dayMeals && (
             <div className="meals-list">
-              <div className="meal-item">Breakfast: {dayMeals.breakfast.name}</div>
-              <div className="meal-item">
+              <div className="meal-item" onClick={() => onMealClick(dayMeals.breakfast)}>
+                Breakfast: {dayMeals.breakfast.name}
+              </div>
+              <div className="meal-item" onClick={() => onMealClick(('main' in dayMeals.lunch ? dayMeals.lunch.main : dayMeals.lunch))}>
                 Lunch: {'main' in dayMeals.lunch ? dayMeals.lunch.main.name : dayMeals.lunch.name}
               </div>
-              <div className="meal-item">
+              <div className="meal-item" onClick={() => onMealClick(('main' in dayMeals.dinner ? dayMeals.dinner.main : dayMeals.dinner))}>
                 Dinner: {'main' in dayMeals.dinner ? dayMeals.dinner.main.name : dayMeals.dinner.name}
               </div>
             </div>
@@ -130,31 +156,89 @@ export default function Calendar() {
     return days;
   };
 
+  const onClose = () => {
+    setDisplayMealPopUp(false);
+  }
+
+  const onMealClick = (meal: Meal) => {
+    setSelectedMeal(meal);
+    setDisplayMealPopUp(true);
+  }
+
+  useEffect(() => {
+    if (currentUser && !planner){
+      fetchPlanner();
+    }
+  }, [currentUser]);
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="calendar-page">
+          <h1 className="calendar-title">Your Meal Calender</h1>
+          <div className="calendar-container">
+            <p style={{ textAlign: 'center', padding: '40px', fontFamily: 'Quicksand, sans-serif', fontSize: '1.2rem' }}>
+              Loading your meal plan...
+            </p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!planner || !planner.meals) {
+    return (
+      <>
+        <Header />
+        <div className="calendar-page">
+          <h1 className="calendar-title">Your Meal Calender</h1>
+          <div className="calendar-container">
+            <p style={{ textAlign: 'center', padding: '40px', fontFamily: 'Quicksand, sans-serif', fontSize: '1.2rem' }}>
+              No meal plan found. Please generate a plan first.
+            </p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
   return (
     <>
       <Header />
-      <div className="calendar-page">
-        <h1 className="calendar-title">Your Meal Calender</h1>
-        
-        <div className="calendar-container">
-          <div className="calendar-header">
-            <button className="nav-arrow" onClick={goToPreviousMonth}>←</button>
-            <h2 className="month-year">{monthNames[month]}, {year}</h2>
-            <button className="nav-arrow" onClick={goToNextMonth}>→</button>
-          </div>
+      <div className={`calendar-page ${displayMealPopUp ? 'with-sidebar' : ''}`}>
+        <div className="calendar-content">
+          <h1 className="calendar-title">Your Meal Calender</h1>
           
-          <div className="calendar-grid">
-            <div className="weekday-header">Sun</div>
-            <div className="weekday-header">Mon</div>
-            <div className="weekday-header">Tue</div>
-            <div className="weekday-header">Wed</div>
-            <div className="weekday-header">Thu</div>
-            <div className="weekday-header">Fri</div>
-            <div className="weekday-header">Sat</div>
+          <div className="calendar-container">
+            <div className="calendar-header">
+              <button className="nav-arrow" onClick={goToPreviousMonth}>←</button>
+              <h2 className="month-year">{monthNames[month]}, {year}</h2>
+              <button className="nav-arrow" onClick={goToNextMonth}>→</button>
+            </div>
             
-            {renderCalendarDays()}
+            <div className="calendar-grid">
+              <div className="weekday-header">Sun</div>
+              <div className="weekday-header">Mon</div>
+              <div className="weekday-header">Tue</div>
+              <div className="weekday-header">Wed</div>
+              <div className="weekday-header">Thu</div>
+              <div className="weekday-header">Fri</div>
+              <div className="weekday-header">Sat</div>
+              
+              {renderCalendarDays()}
+            </div>
           </div>
         </div>
+        
+        {displayMealPopUp && selectedMeal && (
+          <MealCard 
+            onClose={onClose}
+            meal={selectedMeal}
+          />
+        )}
       </div>
       <Footer />
     </>

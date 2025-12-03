@@ -45,7 +45,7 @@ export default function OurStory() {
           <p>
             The creators of PlatePath are Maddie Templeton, Erik Estienne, and Elizabeth Sessa. 
             They are all sophomore student-athletes at Brown University in Providence, Rhode Island. 
-            Maddie is a part of the Women's Soccer team, Erik is apart of the of the Men's Rugby 
+            Maddie is a part of the Women's Soccer team, Erik is on the Men's Rugby 
             team, and Elizabeth plays for the Women's Volleyball team. When tasked with creating a 
             website for their Software Engineering course, the three were motivated by their 
             experiences as student-athletes to create a meal plan generating website. They know 

@@ -1,6 +1,7 @@
 import express, { Express } from "express";
 import cors from "cors";
 import { registerMealGenerationHandler } from "./mealGeneration/mealGenerationHandler";
+import { registerPlannerHandler } from "./planners/plannerHandler";
 
 
 /**
@@ -38,6 +39,7 @@ export class ServerApp {
    */
   private registerHandlers() {
     registerMealGenerationHandler(this.app);
+    registerPlannerHandler(this.app);
   }
 
   /**

@@ -239,3 +239,31 @@ input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+.unit-selector {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.unit-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.95rem;
+  color: #000000;
+  cursor: pointer;
+}
+
+.unit-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #a8d5a8;
+}
+
+.unit-option span {
+  user-select: none;
+}

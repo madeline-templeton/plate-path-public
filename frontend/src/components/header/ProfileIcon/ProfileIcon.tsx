@@ -1,9 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import './ProfileIcon.css';
 
 export default function ProfileIcon() {
+  const navigate = useNavigate();
   const handleClick = () => {
-    // Will eventually navigate to profile settings
-    console.log('Profile icon clicked');
+    navigate("/account");
   };
 
   return (

@@ -4,9 +4,12 @@ import Footer from '../../components/footer/Footer';
 import axios from "axios";
 import './GeneratePlan.css';
 import { useNavigate } from 'react-router-dom';
+import { auth } from "../../services/firebase";
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function GeneratePlan() {
   const navigate = useNavigate();
+  const currenUser = useAuth();
 
   // Get current date for defaults
   const today = new Date();
@@ -23,6 +26,9 @@ export default function GeneratePlan() {
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
   const [selectedActivityLevel, setSelectedActivityLevel] = useState('');
   const [selectedPlanDuration, setSelectedPlanDuration] = useState("");
+  const [heightUnit, setHeightUnit] = useState<"cm" | "ft-in" | "inch" | "m">("cm");
+  const [heightValue, setHeightValue] = useState("");
+  const [weightUnit, setWeightUnit] = useState<"kg" | "lb">("kg");
   
   // Start date dropdowns with current date as default
   const [selectedDay, setSelectedDay] = useState(currentDay.toString());
@@ -42,6 +48,7 @@ export default function GeneratePlan() {
   const [activityLevelError, setActivityLevelError] = useState(false);
   const [planDurationError, setPlanDurationError] = useState(false);
   const [startDateError, setStartDateError] = useState(false);
+  const [heightError, setHeightError] = useState<'too-low' | 'too-high' | null>(null);
 
   const handleWeightChange = (value: string) => {
     setWeight(value);
@@ -49,12 +56,59 @@ export default function GeneratePlan() {
     
     if (value === '' || isNaN(numValue)) {
       setWeightError(null);
-    } else if (numValue < 75) {
-      setWeightError('too-low');
-    } else if (numValue > 550) {
-      setWeightError('too-high');
     } else {
-      setWeightError(null);
+      if (weightUnit === "lb"){
+        if (numValue < 75) {
+          setWeightError('too-low');
+        } else if (numValue > 550) {
+          setWeightError('too-high');
+        } else {
+          setWeightError(null);
+        }
+      } else {
+        if (numValue < 35) {
+          setWeightError('too-low');
+        } else if (numValue > 250) {
+          setWeightError('too-high');
+        } else {
+          setWeightError(null);
+        }
+      }
+    }
+  };
+
+  const handleHeightChange = (value: string) => {
+    setHeightValue(value);
+    const numValue = parseFloat(value);
+    
+    if (value === '' || isNaN(numValue)) {
+      setHeightError(null);
+    } else {
+      if (heightUnit === "cm"){
+        if (numValue < 120) {
+          setHeightError('too-low');
+        } else if (numValue > 270) {
+          setHeightError('too-high');
+        } else {
+          setHeightError(null);
+        }
+      } else if (heightUnit === "inch") {
+        if (numValue < 48) {
+          setHeightError('too-low');
+        } else if (numValue > 108) {
+          setHeightError('too-high');
+        } else {
+          setHeightError(null);
+        }
+      } else if (heightUnit === "m") {
+        if (numValue < 1.2) {
+          setHeightError('too-low');
+        } else if (numValue > 2.7) {
+          setHeightError('too-high');
+        } else {
+          setHeightError(null);
+        }
+      }
     }
   };
 
@@ -107,15 +161,21 @@ export default function GeneratePlan() {
       hasErrors = true;
     }
 
-    if (!heightFeet || heightFeet === '-') {
-      setHeightFeetError(true);
-      hasErrors = true;
-    }
-
-    if (!heightInches || heightInches === '-') {
-      setHeightInchesError(true);
-      hasErrors = true;
-    }
+    if (heightUnit === 'ft-in') {
+      if (!heightFeet || heightFeet === '-') {
+        setHeightFeetError(true);
+        hasErrors = true;
+      }
+      if (!heightInches || heightInches === '-') {
+        setHeightInchesError(true);
+        hasErrors = true;
+      }
+    } else {
+      if (!heightValue) {
+        setHeightFeetError(true); // Reuse this error state
+        hasErrors = true;
+      }
+    } 
 
     if (!weight) {
       setWeightInputError(true);
@@ -157,16 +217,25 @@ export default function GeneratePlan() {
 
   const getPlan = async () => {
     try{
+      let heightValueToSend;
+      if (heightUnit === "ft-in"){
+        heightValueToSend = [heightFeet, heightInches];
+      } else {
+        heightValueToSend = [heightValue];
+      }
+
+
       const constraints = {
+        userId: currenUser.user?.id,
         age: selectedAge,
         sex: selectedSex,
         height : {
-          value: [heightFeet, heightInches],
-          unit: "ft-in"
+          value: heightValueToSend,
+          unit: heightUnit
         },
         weight: {
           value: weight,
-          unit: "lb"
+          unit: weightUnit
         },
         activityLevel: selectedActivityLevel,
         weightGoal: selectedWeightGoal,
@@ -186,7 +255,35 @@ export default function GeneratePlan() {
 
       console.log(response.data)
       if (response.data.success && response.data.planner){
+        if (localStorage.getItem("dataStorageConsent") === "true"){
+          console.log("updating planner")
+          await updatePlanner(response.data.planner);
+        }
         navigate("/calendar", {state: {planner: response.data.planner}});
+      }
+    } catch (error){
+      console.error(error);
+    }
+  }
+
+  const updatePlanner = async (planner: any) => {
+    try{
+      const token = await auth.currentUser?.getIdToken();
+
+      const response = await axios.put("http://localhost:8080/updatePlanner", {
+        planner: planner
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.data.success){
+        console.log("planner saved successfully")
+      }
+      else{
+        console.log(response.status);
+        console.error(response.data.message);
       }
     } catch (error){
       console.error(error);
@@ -202,7 +299,8 @@ export default function GeneratePlan() {
         
         <form className="plan-form">
           {/* Age Section */}
-          {/* Current Weight Section */}
+
+          {/* Current Age Section */}
           <div className="form-section">
             <h2 className="section-label">Age</h2>
             <div className="weight-input">
@@ -263,44 +361,107 @@ export default function GeneratePlan() {
           {/* Height Section */}
           <div className="form-section">
             <h2 className="section-label">Height</h2>
-            <div className="height-inputs">
-              <div className="height-field">
-                <select
-                  value={heightFeet}
-                  onChange={(e) => setHeightFeet(e.target.value)}
-                  className="height-select"
-                >
-                  <option value="">-</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                  <option value="7">7</option>
-                </select>
-                <span className="unit-label">ft</span>
-              </div>
-              <div className="height-field">
-                <select
-                  value={heightInches}
-                  onChange={(e) => setHeightInches(e.target.value)}
-                  className="height-select"
-                >
-                  <option value="">-</option>
-                  <option value="0">0</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                  <option value="7">7</option>
-                  <option value="8">8</option>
-                  <option value="9">9</option>
-                  <option value="10">10</option>
-                  <option value="11">11</option>
-                </select>
-                <span className="unit-label">inches</span>
-              </div>
+
+            <div className="unit-selector">
+              <label className="unit-option">
+                <input
+                  type="radio"
+                  name="heightUnit"
+                  value="ft-in"
+                  checked={heightUnit === 'ft-in'}
+                  onChange={(e) => setHeightUnit(e.target.value as "ft-in")}
+                />
+                <span>Feet & Inches</span>
+              </label>
+              <label className="unit-option">
+                <input
+                  type="radio"
+                  name="heightUnit"
+                  value="cm"
+                  checked={heightUnit === 'cm'}
+                  onChange={(e) => setHeightUnit(e.target.value as "cm")}
+                />
+                <span>Centimeters</span>
+              </label>
+              <label className="unit-option">
+                <input
+                  type="radio"
+                  name="heightUnit"
+                  value="m"
+                  checked={heightUnit === 'm'}
+                  onChange={(e) => setHeightUnit(e.target.value as "m")}
+                />
+                <span>Meters</span>
+              </label>
+              <label className="unit-option">
+                <input
+                  type="radio"
+                  name="heightUnit"
+                  value="inch"
+                  checked={heightUnit === 'inch'}
+                  onChange={(e) => setHeightUnit(e.target.value as "inch")}
+                />
+                <span>Inches</span>
+              </label>
             </div>
+
+
+
+            {/* Conditional height input based on unit */}
+            {heightUnit === 'ft-in' ? (
+              <div className="height-inputs">
+                <div className="height-field">
+                  <select
+                    value={heightFeet}
+                    onChange={(e) => setHeightFeet(e.target.value)}
+                    className="height-select"
+                  >
+                    <option value="">-</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                  </select>
+                  <span className="unit-label">ft</span>
+                </div>
+                <div className="height-field">
+                  <select
+                    value={heightInches}
+                    onChange={(e) => setHeightInches(e.target.value)}
+                    className="height-select"
+                  >
+                    <option value="">-</option>
+                    {Array.from({ length: 12 }, (_, i) => i).map(inch => (
+                      <option key={inch} value={inch}>{inch}</option>
+                    ))}
+                  </select>
+                  <span className="unit-label">inches</span>
+                </div>
+              </div>
+            ) : (
+              <div className="weight-input">
+                <input
+                  type="number"
+                  value={heightValue}
+                  onChange={(e) => handleHeightChange(e.target.value)}
+                  placeholder=""
+                  min="0"
+                />
+                <span className="unit-label">{heightUnit}</span>
+              </div>
+            )}
+
+            {heightError && (
+              <div className="weight-error">
+                <p className="error-message">
+                  {heightError === 'too-low' ? 'Entered height too low' : 'Entered height too high'}
+                </p>
+                <p className="error-disclaimer">
+                  PlatePath cannot responsibly advise on dietary needs at this height
+                </p>
+              </div>
+            )}
+          
             {(heightFeetError || heightInchesError) && (
               <p className="field-error">must input height</p>
             )}
@@ -309,16 +470,47 @@ export default function GeneratePlan() {
           {/* Current Weight Section */}
           <div className="form-section">
             <h2 className="section-label">Current Weight</h2>
+
+            {/* Unit selector */}
+            <div className="unit-selector">
+              <label className="unit-option">
+                <input
+                  type="radio"
+                  name="weightUnit"
+                  value="lb"
+                  checked={weightUnit === 'lb'}
+                  onChange={(e) => {
+                    setWeightUnit(e.target.value as "lb");
+                    handleWeightChange(weight); // Re-validate with new unit
+                  }}
+                />
+                <span>Pounds (lb)</span>
+              </label>
+              <label className="unit-option">
+                <input
+                  type="radio"
+                  name="weightUnit"
+                  value="kg"
+                  checked={weightUnit === 'kg'}
+                  onChange={(e) => {
+                    setWeightUnit(e.target.value as "kg");
+                    handleWeightChange(weight); // Re-validate with new unit
+                  }}
+                />
+                <span>Kilograms (kg)</span>
+              </label>
+            </div>
+
             <div className="weight-input">
               <input
                 type="number"
                 value={weight}
                 onChange={(e) => handleWeightChange(e.target.value)}
                 placeholder=""
-                min="75"
-                max="550"
+                min={weightUnit === 'lb' ? "75" : "34"}
+                max={weightUnit === 'lb' ? "550" : "250"}
               />
-              <span className="unit-label">lbs</span>
+              <span className="unit-label">{weightUnit}</span>
             </div>
             {weightError && (
               <div className="weight-error">

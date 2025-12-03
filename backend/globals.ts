@@ -1,6 +1,7 @@
 import z from "zod";
 
 export const userConstraintsSchema = z.object({
+    userId: z.coerce.string(),
     age: z.coerce.number().positive(),
     sex: z.enum(["M", "F"]),
     height: z.object({
@@ -26,6 +27,13 @@ export const userConstraintsSchema = z.object({
 });
 
 
+
+export const recipeSchema = z.object({
+    instructions: z.string(),
+    video: z.string(),
+    ingredients: z.array(z.string())
+
+});
 
 export const mealSchema = z.object({
     id: z.coerce.number(),
