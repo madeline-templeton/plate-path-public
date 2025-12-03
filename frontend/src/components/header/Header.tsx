@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import './Header.css';
 import LoginButton from './LoginButton/LoginButton';
 import ProfileIcon from './ProfileIcon/ProfileIcon';
+import DarkModeToggle from './DarkModeToggle/DarkModeToggle';
 
  
 
@@ -21,6 +22,7 @@ export default function Header() {
       </nav>
       
       <div className="header-actions">
+        <DarkModeToggle />
         <LoginButton />
         <ProfileIcon />
       </div>

@@ -1,28 +1,24 @@
 .meal-card-background {
-  position: fixed;
+  position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
+  right: 0;
+  width: 30%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background-color: transparent;
   z-index: 1000;
-  padding: 20px;
+  overflow: hidden;
 }
 
 .meal-card {
   background-color: #ffffff;
-  border: 4px solid #2d5016;
-  border-radius: 15px;
+  border-left: 4px solid #2d5016;
   width: 100%;
-  max-width: 700px;
-  max-height: 85vh;
+  height: 100%;
   overflow-y: auto;
-  padding: 30px;
+  padding: 20px 30px 40px 30px;
   position: relative;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
 }
 
 .close-popup {
