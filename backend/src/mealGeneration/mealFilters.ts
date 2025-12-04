@@ -10,8 +10,11 @@ export function filterMealsByCalories(
   targetCalories: number,
   rangeSize: number = 100
 ): Meal[] {
-  const lowerBound = targetCalories - 50;
-  const upperBound = targetCalories + 50; // +- 50 calories
+  // TEMPORARY FIX: Use the rangeSize parameter to allow wider calorie ranges
+  // TODO: Once CSV has more meals, the default rangeSize of 100 should work fine
+  const halfRange = rangeSize / 2;
+  const lowerBound = targetCalories - halfRange;
+  const upperBound = targetCalories + halfRange;
 
   return meals.filter(
     (meal) => meal.calories >= lowerBound && meal.calories <= upperBound

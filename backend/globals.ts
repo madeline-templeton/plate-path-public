@@ -28,13 +28,6 @@ export const userConstraintsSchema = z.object({
 
 
 
-export const recipeSchema = z.object({
-    instructions: z.string(),
-    video: z.string(),
-    ingredients: z.array(z.string())
-
-});
-
 export const mealSchema = z.object({
     id: z.coerce.number(),
     name: z.string(),
@@ -86,7 +79,6 @@ export const dateSchema = z.object({
 
 
 export type UserConstraints = z.infer<typeof userConstraintsSchema>;
-export type Recipe = z.infer<typeof recipeSchema>;
 export type Meal = z.infer<typeof mealSchema>;
 export type Day = z.infer<typeof daySchema>;
 export type Planner = z.infer<typeof plannerSchema>;

@@ -248,21 +248,27 @@ export default function GeneratePlan() {
         }
       }
 
-      console.log(constraints)
       const response = await axios.post("http://localhost:8080/api/planner/generate", {
         constraints: constraints
       });
-
-      console.log(response.data)
+      
       if (response.data.success && response.data.planner){
         if (localStorage.getItem("dataStorageConsent") === "true"){
-          console.log("updating planner")
           await updatePlanner(response.data.planner);
         }
         navigate("/calendar", {state: {planner: response.data.planner}});
+      } else {
+        alert(`Failed to generate meal plan: ${response.data.message || response.data.error || 'Unknown error'}`);
       }
-    } catch (error){
+    } catch (error: any){
       console.error(error);
+      if (error.response) {
+        alert(`Error generating meal plan: ${error.response.data.message || error.response.data.error || 'Server error'}`);
+      } else if (error.request) {
+        alert("Could not connect to server. Please make sure the backend is running.");
+      } else {
+        alert(`Error: ${error.message}`);
+      }
     }
   }
 
@@ -282,8 +288,6 @@ export default function GeneratePlan() {
         console.log("planner saved successfully")
       }
       else{
-        console.log(response.status);
-        console.error(response.data.message);
       }
     } catch (error){
       console.error(error);
@@ -302,7 +306,7 @@ export default function GeneratePlan() {
 
           {/* Current Age Section */}
           <div className="form-section">
-            <h2 className="section-label">Age</h2>
+            <h2 className="section-label">Age <span style={{ color: 'red' }}>*</span></h2>
             <div className="weight-input">
               <input
                 type="number"
@@ -330,7 +334,7 @@ export default function GeneratePlan() {
 
           {/* Sex Section */}
           <div className="form-section">
-            <h2 className="section-label">Sex</h2>
+            <h2 className="section-label">Sex <span style={{ color: 'red' }}>*</span></h2>
             <div className="radio-group">
               <label className="radio-option">
                 <input

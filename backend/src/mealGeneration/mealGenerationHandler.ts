@@ -27,7 +27,7 @@ export async function registerMealGenerationHandler(app: Express) {
             } else {
                 return res.status(500).json({
                     success: false,
-                    message: ("Error while generating a meal plan"),
+                    message: controllerResponse.error?.message || "Error while generating a meal plan",
                     error: controllerResponse.error
                 })
             }

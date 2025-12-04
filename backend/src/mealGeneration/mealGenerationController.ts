@@ -3,7 +3,6 @@ import { UserConstraints } from "../../globals";
 import { Planner, Meal } from "../../globals";
 import { exerciseAdjustedCalorieCalculator, calculateDateForDay, baseCalorieCalculator } from "./mealGenerationHelpers";
 import { mealAlgorithm, mockMealAlgorithm } from "./mealGenerationAlgorithm";
-import { console } from "inspector";
 
 
 const mealFrequency: Map<Meal, number> = new Map(); 
@@ -12,17 +11,30 @@ export async function mealController(constraints: UserConstraints):
     Promise<{success: boolean, planner?: Planner, error?: any}> {
     try{
         const weeks = constraints.weeks;
+        const days = weeks * 7;
+        
         // Compute the base calories
         const baseCalories = baseCalorieCalculator(constraints);
 
         // Compute the adjusted calories
         const adjustedCalories = exerciseAdjustedCalorieCalculator(constraints, baseCalories);
 
+        // Call the meal algorithm to generate the meal plan
+        const generatedMeals = await mealAlgorithm(
+            days,                                // planLength: number of days
+            adjustedCalories,                    // totalCalories per day
+            constraints.dietaryRestrictions,     // dietaryRestrictions array
+            [],                                  // allergyIngredients (empty for now, can be added later)
+            [],                                  // downvotedMealIds (empty for now)
+            [],                                  // preferredMealIds (empty for now)
+            constraints.date                     // startDate
+        );
+
         // Initialise our planner to return
         const planner: Planner = {
             userId: constraints.userId,  
             weeks: weeks, 
-            meals: [],
+            meals: generatedMeals,
             startDate: {
                 day: constraints.date.day,
                 month: constraints.date.month,
@@ -30,32 +42,13 @@ export async function mealController(constraints: UserConstraints):
             }
         }
 
-        const weeklyFrequency = new Array(weeks).fill(mealFrequency);
-        
-        const days = weeks * 7
-        // for (let i = 0; i < days; i++){
-        //     const currentDate = calculateDateForDay(constraints.date, i)
-            
-        //     let plan : Planner = {
-        //         userId: "12345",
-        //         weeks: 1,
-        //         startDate: {
-        //             day: "",
-        //             month: "",
-        //             year: ""
-        //         },
-        //         meals: await mockMealAlgorithm()
-        //     }; 
-
-        //     planner.meals.push(plan);
-        // }
-
         return {success: true, planner: planner}
 
 
-    } catch(error){
+    } catch(error: any){
         console.error("Error during planner generation", error);
-        return {success: false, error: error}
+        const errorMessage = error.message || "Unknown error occurred";
+        return {success: false, error: { message: errorMessage, details: error }}
     }
 }
 
