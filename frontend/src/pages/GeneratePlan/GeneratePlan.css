@@ -25,15 +25,30 @@
 }
 
 .form-section {
-  margin-bottom: 35px;
+  margin-bottom: 50px;
+}
+
+/* Remove fieldset default styling */
+fieldset.form-section {
+  border: none;
+  padding: 0;
+  margin: 0 0 50px 0;
 }
 
 .section-label {
   font-family: 'Quicksand', sans-serif;
   font-size: 1.3rem;
   color: #000000;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   font-weight: 600;
+}
+
+.field-hint {
+  font-size: 0.875rem;
+  color: #666666;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-style: italic;
 }
 
 .select-all {
@@ -68,6 +83,51 @@
   height: 20px;
   cursor: pointer;
   accent-color: #a8d5a8;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 1px solid #d9884e;
+  background-color: white;
+  position: relative;
+}
+
+.radio-option input[type="radio"] {
+  border-radius: 50%;
+}
+
+.checkbox-option input[type="checkbox"] {
+  border-radius: 3px;
+}
+
+.radio-option input[type="radio"]:checked {
+  background-color: #a8d5a8;
+}
+
+.radio-option input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: white;
+}
+
+.checkbox-option input[type="checkbox"]:checked {
+  background-color: #a8d5a8;
+}
+
+.checkbox-option input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .radio-option span,
