@@ -56,6 +56,21 @@ export default function MealCard({ onClose, meal} : MealCardProps) {
 
         </div>
 
+        <div className="meal-voting">
+          <div className="vote-container">
+            <button className="vote-button downvote-button" aria-label="Downvote meal">
+              <span className="vote-arrow">↓</span>
+            </button>
+            <span className="vote-text">I DON'T love this meal</span>
+          </div>
+          <div className="vote-container">
+            <button className="vote-button upvote-button" aria-label="Upvote meal">
+              <span className="vote-arrow">↑</span>
+            </button>
+            <span className="vote-text">I DO love this meal</span>
+          </div>
+        </div>
+
       </div>
     </div>
   )
