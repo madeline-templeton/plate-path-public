@@ -8,15 +8,14 @@ import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
 
 export interface Meal {
-  name: string;
   id: number;
-  category: string;
+  name: string;
+  mealTime: "breakfast" | "lunch" | "dinner" | "dessert";
+  diet: string;
+  ingredients: string;
+  website: string;
   calories: number;
-  recipe: {
-    instructions: string;
-    video: string;
-    ingredients: string[];
-  };
+  occurrences: number;
 }
 
 interface Day {

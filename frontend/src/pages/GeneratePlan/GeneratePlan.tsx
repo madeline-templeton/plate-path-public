@@ -26,9 +26,9 @@ export default function GeneratePlan() {
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
   const [selectedActivityLevel, setSelectedActivityLevel] = useState('');
   const [selectedPlanDuration, setSelectedPlanDuration] = useState("");
-  const [heightUnit, setHeightUnit] = useState<"cm" | "ft-in" | "inch" | "m">("cm");
+  const [heightUnit, setHeightUnit] = useState<"cm" | "ft-in">("ft-in");
   const [heightValue, setHeightValue] = useState("");
-  const [weightUnit, setWeightUnit] = useState<"kg" | "lb">("kg");
+  const [weightUnit, setWeightUnit] = useState<"kg" | "lb">("lb");
   
   // Start date dropdowns with current date as default
   const [selectedDay, setSelectedDay] = useState(currentDay.toString());
@@ -101,22 +101,6 @@ export default function GeneratePlan() {
         if (numValue < 120) {
           setHeightError('too-low');
         } else if (numValue > 270) {
-          setHeightError('too-high');
-        } else {
-          setHeightError(null);
-        }
-      } else if (heightUnit === "inch") {
-        if (numValue < 48) {
-          setHeightError('too-low');
-        } else if (numValue > 108) {
-          setHeightError('too-high');
-        } else {
-          setHeightError(null);
-        }
-      } else if (heightUnit === "m") {
-        if (numValue < 1.2) {
-          setHeightError('too-low');
-        } else if (numValue > 2.7) {
           setHeightError('too-high');
         } else {
           setHeightError(null);
@@ -264,12 +248,10 @@ export default function GeneratePlan() {
         }
       }
 
-      console.log(constraints)
       const response = await axios.post("http://localhost:8080/api/planner/generate", {
         constraints: constraints
       });
-
-      console.log(response.data)
+      
       if (response.data.success && response.data.planner){
         if (consentGranted){
           console.log("updating planner")
@@ -277,9 +259,18 @@ export default function GeneratePlan() {
           await updateUserInfo(constraints);
         }
         navigate("/calendar", {state: {planner: response.data.planner}});
+      } else {
+        alert(`Failed to generate meal plan: ${response.data.message || response.data.error || 'Unknown error'}`);
       }
-    } catch (error){
+    } catch (error: any){
       console.error(error);
+      if (error.response) {
+        alert(`Error generating meal plan: ${error.response.data.message || error.response.data.error || 'Server error'}`);
+      } else if (error.request) {
+        alert("Could not connect to server. Please make sure the backend is running.");
+      } else {
+        alert(`Error: ${error.message}`);
+      }
     }
   }
 
@@ -298,10 +289,7 @@ export default function GeneratePlan() {
       if (response.data.success){
         console.log("planner saved successfully")
       }
-      else{
-        console.log(response.status);
-        console.error(response.data.message);
-      }
+
     } catch (error){
       console.error(error);
     }
@@ -353,16 +341,10 @@ export default function GeneratePlan() {
           setHeightUnit("ft-in");
           setHeightFeet(response.data.userInfo.height.value[0]);
           setHeightInches(response.data.userInfo.height.value[1]);
-        } else if (response.data.userInfo.height.unit === "m"){
-          setHeightUnit("m");
-          setHeightValue(response.data.userInfo.height.value[0]);
-        } else if (response.data.userInfo.height.unit === "cm"){
+        }  else if (response.data.userInfo.height.unit === "cm"){
           setHeightUnit("cm");
           setHeightValue(response.data.userInfo.height.value[0]);
-        } else if (response.data.userInfo.height.unit === "inch"){
-          setHeightUnit("inch");
-          setHeightValue(response.data.userInfo.height.value[0]);
-        }
+        } 
         console.log(response.data.userInfo.weight.value[0]);
         if (response.data.userInfo.weight.unit === "kg"){
           setWeightUnit("kg");
@@ -424,7 +406,8 @@ export default function GeneratePlan() {
 
           {/* Current Age Section */}
           <div className="form-section">
-            <h2 className="section-label">Age</h2>
+            <h2 className="section-label">Age <span style={{ color: 'red' }} aria-hidden="true">*</span></h2>
+            <p className="field-hint" id="age-hint">Used to calculate your metabolic rate</p>
             <div className="weight-input">
               <input
                 type="number"
@@ -433,6 +416,9 @@ export default function GeneratePlan() {
                 placeholder=""
                 min="18"
                 max="120"
+                aria-required="true"
+                aria-describedby="age-hint"
+                id="age-input"
               />
             </div>
             {ageError && (
@@ -451,8 +437,9 @@ export default function GeneratePlan() {
           </div>
 
           {/* Sex Section */}
-          <div className="form-section">
-            <h2 className="section-label">Sex</h2>
+          <fieldset className="form-section" aria-required="true">
+            <legend className="section-label">Sex <span style={{ color: 'red' }} aria-hidden="true">*</span></legend>
+            <p className="field-hint" id="sex-hint">Affects calorie needs</p>
             <div className="radio-group">
               <label className="radio-option">
                 <input
@@ -461,6 +448,7 @@ export default function GeneratePlan() {
                   value="M"
                   checked={selectedSex === 'M'}
                   onChange={(e) => setSelectedSex(e.target.value)}
+                  aria-describedby="sex-hint"
                 />
                 <span>Male</span>
               </label>
@@ -471,18 +459,20 @@ export default function GeneratePlan() {
                   value="F"
                   checked={selectedSex === 'F'}
                   onChange={(e) => setSelectedSex(e.target.value)}
+                  aria-describedby="sex-hint"
                 />
                 <span>Female</span>
               </label>
             </div>
             {sexError && (
-              <p className="field-error">must input age</p>
+              <p className="field-error">must input sex</p>
             )}
-          </div>
+          </fieldset>
 
           {/* Height Section */}
-          <div className="form-section">
-            <h2 className="section-label">Height</h2>
+          <fieldset className="form-section">
+            <legend className="section-label">Height <span style={{ color: 'red' }} aria-hidden="true">*</span></legend>
+            <p className="field-hint" id="height-hint">For energy requirement calculation</p>
 
             <div className="unit-selector">
               <label className="unit-option">
@@ -505,26 +495,6 @@ export default function GeneratePlan() {
                 />
                 <span>Centimeters</span>
               </label>
-              <label className="unit-option">
-                <input
-                  type="radio"
-                  name="heightUnit"
-                  value="m"
-                  checked={heightUnit === 'm'}
-                  onChange={(e) => setHeightUnit(e.target.value as "m")}
-                />
-                <span>Meters</span>
-              </label>
-              <label className="unit-option">
-                <input
-                  type="radio"
-                  name="heightUnit"
-                  value="inch"
-                  checked={heightUnit === 'inch'}
-                  onChange={(e) => setHeightUnit(e.target.value as "inch")}
-                />
-                <span>Inches</span>
-              </label>
             </div>
 
 
@@ -537,6 +507,9 @@ export default function GeneratePlan() {
                     value={heightFeet}
                     onChange={(e) => setHeightFeet(e.target.value)}
                     className="height-select"
+                    aria-required="true"
+                    aria-describedby="height-hint"
+                    aria-label="Height feet"
                   >
                     <option value="">-</option>
                     <option value="4">4</option>
@@ -551,6 +524,9 @@ export default function GeneratePlan() {
                     value={heightInches}
                     onChange={(e) => setHeightInches(e.target.value)}
                     className="height-select"
+                    aria-required="true"
+                    aria-describedby="height-hint"
+                    aria-label="Height inches"
                   >
                     <option value="">-</option>
                     {Array.from({ length: 12 }, (_, i) => i).map(inch => (
@@ -568,6 +544,8 @@ export default function GeneratePlan() {
                   onChange={(e) => handleHeightChange(e.target.value)}
                   placeholder=""
                   min="0"
+                  aria-required="true"
+                  aria-describedby="height-hint"
                 />
                 <span className="unit-label">{heightUnit}</span>
               </div>
@@ -587,11 +565,12 @@ export default function GeneratePlan() {
             {(heightFeetError || heightInchesError) && (
               <p className="field-error">must input height</p>
             )}
-          </div>
+          </fieldset>
 
           {/* Current Weight Section */}
           <div className="form-section">
-            <h2 className="section-label">Current Weight</h2>
+            <h2 className="section-label">Current Weight <span style={{ color: 'red' }} aria-hidden="true">*</span></h2>
+            <p className="field-hint" id="weight-hint">For calorie target calculation</p>
 
             {/* Unit selector */}
             <div className="unit-selector">
@@ -631,6 +610,8 @@ export default function GeneratePlan() {
                 placeholder=""
                 min={weightUnit === 'lb' ? "75" : "34"}
                 max={weightUnit === 'lb' ? "550" : "250"}
+                aria-required="true"
+                aria-describedby="weight-hint"
               />
               <span className="unit-label">{weightUnit}</span>
             </div>
@@ -650,8 +631,9 @@ export default function GeneratePlan() {
           </div>
 
           {/* Weight Goals Section */}
-          <div className="form-section">
-            <h2 className="section-label">Weight Goals</h2>
+          <fieldset className="form-section" aria-required="true">
+            <legend className="section-label">Weight Goals <span style={{ color: 'red' }} aria-hidden="true">*</span></legend>
+            <p className="field-hint" id="weight-goal-hint">Determines your calorie adjustment</p>
             <div className="radio-group">
               <label className="radio-option">
                 <input
@@ -660,6 +642,7 @@ export default function GeneratePlan() {
                   value="extreme-loss"
                   checked={selectedWeightGoal === 'extreme-loss'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
+                  aria-describedby="weight-goal-hint"
                 />
                 <span>Extreme Weight Loss (1-2 lbs per week)</span>
               </label>
@@ -670,6 +653,7 @@ export default function GeneratePlan() {
                   value="weight-loss"
                   checked={selectedWeightGoal === 'weight-loss'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
+                  aria-describedby="weight-goal-hint"
                 />
                 <span>Weight Loss (0.5-1 lbs per week)</span>
               </label>
@@ -680,6 +664,7 @@ export default function GeneratePlan() {
                   value="maintain"
                   checked={selectedWeightGoal === 'maintain'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
+                  aria-describedby="weight-goal-hint"
                 />
                 <span>Maintain Weight</span>
               </label>
@@ -690,6 +675,7 @@ export default function GeneratePlan() {
                   value="weight-gain"
                   checked={selectedWeightGoal === 'weight-gain'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
+                  aria-describedby="weight-goal-hint"
                 />
                 <span>Weight Gain (0.5-1 lbs per week)</span>
               </label>
@@ -700,6 +686,7 @@ export default function GeneratePlan() {
                   value="extreme-gain"
                   checked={selectedWeightGoal === 'extreme-gain'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
+                  aria-describedby="weight-goal-hint"
                 />
                 <span>Extreme Weight Gain (1-2 lbs per week)</span>
               </label>
@@ -707,11 +694,12 @@ export default function GeneratePlan() {
             {weightGoalError && (
               <p className="field-error">must input weight goal</p>
             )}
-          </div>
+          </fieldset>
 
           {/* Activity Level Section */}
-          <div className="form-section">
-            <h2 className="section-label">Activity Level</h2>
+          <fieldset className="form-section" aria-required="true">
+            <legend className="section-label">Activity Level <span style={{ color: 'red' }} aria-hidden="true">*</span></legend>
+            <p className="field-hint" id="activity-level-hint">Affects your daily calorie target</p>
             <div className="radio-group">
               <label className="radio-option">
                 <input
@@ -720,6 +708,7 @@ export default function GeneratePlan() {
                   value="not-active"
                   checked={selectedActivityLevel === 'not-active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
+                  aria-describedby="activity-level-hint"
                 />
                 <span>Not Active</span>
               </label>
@@ -730,6 +719,7 @@ export default function GeneratePlan() {
                   value="lightly-active"
                   checked={selectedActivityLevel === 'lightly-active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
+                  aria-describedby="activity-level-hint"
                 />
                 <span>Lightly Active (exercise 1-3 days per week)</span>
               </label>
@@ -740,6 +730,7 @@ export default function GeneratePlan() {
                   value="moderately-active"
                   checked={selectedActivityLevel === 'moderately-active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
+                  aria-describedby="activity-level-hint"
                 />
                 <span>Moderately Active (exercise 3-4 times per week)</span>
               </label>
@@ -750,6 +741,7 @@ export default function GeneratePlan() {
                   value="active"
                   checked={selectedActivityLevel === 'active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
+                  aria-describedby="activity-level-hint"
                 />
                 <span>Active (exercise 5-7 times per week)</span>
               </label>
@@ -760,6 +752,7 @@ export default function GeneratePlan() {
                   value="very-active"
                   checked={selectedActivityLevel === 'very-active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
+                  aria-describedby="activity-level-hint"
                 />
                 <span>Very Active (intense exercise 5-7 times per week)</span>
               </label>
@@ -767,17 +760,19 @@ export default function GeneratePlan() {
             {activityLevelError && (
               <p className="field-error">must input activity level</p>
             )}
-          </div>
+          </fieldset>
 
           {/* Dietary Restrictions Section */}
-          <div className="form-section">
-            <h2 className="section-label">Dietary Restrictions <span className="select-all">(select all that apply)</span></h2>
+          <fieldset className="form-section">
+            <legend className="section-label">Dietary Restrictions <span className="select-all">(select all that apply)</span></legend>
+            <p className="field-hint" id="dietary-restrictions-hint">Filter meals to match your needs</p>
             <div className="checkbox-group">
               <label className="checkbox-option">
                 <input
                   type="checkbox"
                   checked={dietaryRestrictions.includes('vegetarian')}
                   onChange={() => handleDietaryChange('vegetarian')}
+                  aria-describedby="dietary-restrictions-hint"
                 />
                 <span>Vegetarian</span>
               </label>
@@ -786,6 +781,7 @@ export default function GeneratePlan() {
                   type="checkbox"
                   checked={dietaryRestrictions.includes('vegan')}
                   onChange={() => handleDietaryChange('vegan')}
+                  aria-describedby="dietary-restrictions-hint"
                 />
                 <span>Vegan</span>
               </label>
@@ -794,6 +790,7 @@ export default function GeneratePlan() {
                   type="checkbox"
                   checked={dietaryRestrictions.includes('dairy-free')}
                   onChange={() => handleDietaryChange('dairy-free')}
+                  aria-describedby="dietary-restrictions-hint"
                 />
                 <span>Dairy Free</span>
               </label>
@@ -802,6 +799,7 @@ export default function GeneratePlan() {
                   type="checkbox"
                   checked={dietaryRestrictions.includes('nut-free')}
                   onChange={() => handleDietaryChange('nut-free')}
+                  aria-describedby="dietary-restrictions-hint"
                 />
                 <span>Nut Free</span>
               </label>
@@ -810,15 +808,17 @@ export default function GeneratePlan() {
                   type="checkbox"
                   checked={dietaryRestrictions.includes('gluten-free')}
                   onChange={() => handleDietaryChange('gluten-free')}
+                  aria-describedby="dietary-restrictions-hint"
                 />
                 <span>Gluten Free</span>
               </label>
             </div>
-          </div>
+          </fieldset>
 
           {/* Plan Duration Section */}
-          <div className="form-section">
-            <h2 className="section-label">Plan Duration</h2>
+          <fieldset className="form-section" aria-required="true">
+            <legend className="section-label">Plan Duration <span style={{ color: 'red' }} aria-hidden="true">*</span></legend>
+            <p className="field-hint" id="plan-duration-hint">How many weeks of meals to generate</p>
             <div className="radio-group">
               <label className="radio-option">
                 <input
@@ -827,6 +827,7 @@ export default function GeneratePlan() {
                   value="1"
                   checked={selectedPlanDuration === '1'}
                   onChange={(e) => setSelectedPlanDuration(e.target.value)}
+                  aria-describedby="plan-duration-hint"
                 />
                 <span>One Week</span>
               </label>
@@ -837,6 +838,7 @@ export default function GeneratePlan() {
                   value="2"
                   checked={selectedPlanDuration === '2'}
                   onChange={(e) => setSelectedPlanDuration(e.target.value)}
+                  aria-describedby="plan-duration-hint"
                 />
                 <span>Two Weeks</span>
               </label>
@@ -847,6 +849,7 @@ export default function GeneratePlan() {
                   value="4"
                   checked={selectedPlanDuration === '4'}
                   onChange={(e) => setSelectedPlanDuration(e.target.value)}
+                  aria-describedby="plan-duration-hint"
                 />
                 <span>Four Weeks</span>
               </label>
@@ -854,17 +857,21 @@ export default function GeneratePlan() {
             {planDurationError && (
               <p className="field-error">must input plan duration</p>
             )}
-          </div>
+          </fieldset>
 
           {/* Start Date Section */}
           <div className="form-section">
-            <h2 className="section-label">Start Date</h2>
+            <h2 className="section-label">Start Date <span style={{ color: 'red' }} aria-hidden="true">*</span></h2>
+            <p className="field-hint" id="start-date-hint">When your meal plan begins</p>
             <div className="height-inputs">
               <div className="height-field">
                 <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
                   className="height-select month-select"
+                  aria-required="true"
+                  aria-describedby="start-date-hint"
+                  aria-label="Start month"
                 >
                   <option value="1">January</option>
                   <option value="2">February</option>
@@ -885,6 +892,9 @@ export default function GeneratePlan() {
                   value={selectedDay}
                   onChange={(e) => setSelectedDay(e.target.value)}
                   className="height-select"
+                  aria-required="true"
+                  aria-describedby="start-date-hint"
+                  aria-label="Start day"
                 >
                   {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
                     <option key={day} value={day}>{day}</option>
@@ -896,6 +906,9 @@ export default function GeneratePlan() {
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(e.target.value)}
                   className="height-select"
+                  aria-required="true"
+                  aria-describedby="start-date-hint"
+                  aria-label="Start year"
                 >
                   {Array.from({ length: 5 }, (_, i) => currentYear + i).map(year => (
                     <option key={year} value={year}>{year}</option>

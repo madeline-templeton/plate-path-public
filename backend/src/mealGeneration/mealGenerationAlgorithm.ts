@@ -108,17 +108,19 @@ export async function pickMeal(
   mealTime: "breakfast" | "lunch" | "dinner" | "dessert",
   targetCalories: number
 ): Promise<Meal> {
+  // TEMPORARY FIX: Use wider calorie range due to limited meals in CSV
+  // TODO: Restore to 100 once CSV has more meal variety with diverse calorie ranges
   // Filter candidates and preferred by meal time and calories
   const candidates = applyAllFilters(allCandidates, {
     mealTime,
     targetCalories,
-    calorieRange: 100,
+    calorieRange: 2000, // Temporarily increased to essentially disable calorie filtering
   });
 
   const preferred = applyAllFilters(allPreferred, {
     mealTime,
     targetCalories,
-    calorieRange: 100,
+    calorieRange: 2000, // Temporarily increased to essentially disable calorie filtering
   });
 
   if (candidates.length === 0) {
@@ -129,7 +131,9 @@ export async function pickMeal(
 
   let selectedMeal: Meal = candidates[0]; // fallback
 
-  // Try up to 10 times to find a meal with < 4 occurrences
+  // TEMPORARY FIX: Allow unlimited repetition due to limited meals in CSV
+  // TODO: Remove this and restore occurrence limit once CSV has sufficient meal variety
+  // (Need at least 10+ lunch and 10+ dinner options)
   for (let attempt = 0; attempt < 10; attempt++) {
     const randomValue = Math.random();
 
@@ -142,11 +146,11 @@ export async function pickMeal(
       selectedMeal = preferred[randomIndex];
     }
 
-    // Accept if occurrences < 4, or if this is our last attempt
-    if (selectedMeal.occurrences < 4 || attempt >= 9) {
-      selectedMeal.occurrences += 1;
-      break;
-    }
+    // TEMPORARY: Allow unlimited repetition - comment out occurrence check
+    // Original code checked: if (selectedMeal.occurrences < 4 || attempt >= 9)
+    // Accept any meal regardless of occurrences
+    selectedMeal.occurrences += 1;
+    break;
   }
 
   return selectedMeal;

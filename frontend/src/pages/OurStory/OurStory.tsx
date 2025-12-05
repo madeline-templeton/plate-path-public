@@ -1,8 +1,38 @@
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { PrivacyConsentModal } from '../../components/PrivacyConsentModal/PrivacyConsentModal';
 import './OurStory.css';
 
 export default function OurStory() {
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    // Check if this is a new signup (flag set during account creation)
+    const isNewSignup = localStorage.getItem('showPrivacyConsent');
+    const hasSeenConsent = localStorage.getItem('privacyConsentSeen');
+    
+    // Show modal only if this is a new signup AND they haven't seen it before
+    if (isNewSignup === 'true' && !hasSeenConsent) {
+      setShowModal(true);
+      // Clear the signup flag so modal doesn't show on subsequent visits
+      localStorage.removeItem('showPrivacyConsent');
+    }
+  }, []);
+
+  const handleAccept = () => {
+    // Save that user has seen the modal and accepted
+    localStorage.setItem('privacyConsentSeen', 'true');
+    localStorage.setItem('saveHealthInfo', 'true');
+    setShowModal(false);
+  };
+
+  const handleReject = () => {
+    // Save that user has seen the modal and rejected
+    localStorage.setItem('privacyConsentSeen', 'true');
+    localStorage.setItem('saveHealthInfo', 'false');
+    setShowModal(false);
+  };
 
   return (
     <div className="our-story-container">
@@ -64,6 +94,13 @@ export default function OurStory() {
           </p>
         </div>
       </div>
+
+      {/* Privacy Consent Modal */}
+      <PrivacyConsentModal 
+        isOpen={showModal}
+        onAccept={handleAccept}
+        onReject={handleReject}
+      />
     </div>
   );
 }
