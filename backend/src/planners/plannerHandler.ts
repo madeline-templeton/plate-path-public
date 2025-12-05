@@ -1,9 +1,7 @@
 import { Express, Response, Request } from "express";
-import { Planner, plannerSchema } from "../../globals";
+import { plannerSchema } from "../../globals";
 import { admin, firestore } from "../firebase/firebasesetup";
 import { AuthRequest, verifyToken } from "../firebase/handleAuthentication";
-import { success } from "zod";
-import { use } from "react";
 
 
 

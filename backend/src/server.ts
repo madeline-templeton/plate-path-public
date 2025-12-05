@@ -2,6 +2,8 @@ import express, { Express } from "express";
 import cors from "cors";
 import { registerMealGenerationHandler } from "./mealGeneration/mealGenerationHandler";
 import { registerPlannerHandler } from "./planners/plannerHandler";
+import { registerUserInformationHandler } from "./userInformation/userInformationHandler";
+import { registerConsentHandler } from "./consent/consentHandler";
 
 
 /**
@@ -40,6 +42,8 @@ export class ServerApp {
   private registerHandlers() {
     registerMealGenerationHandler(this.app);
     registerPlannerHandler(this.app);
+    registerUserInformationHandler(this.app);
+    registerConsentHandler(this.app);
   }
 
   /**

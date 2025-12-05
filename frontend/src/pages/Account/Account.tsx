@@ -9,6 +9,7 @@ import "./Account.css";
 
 export default function Account(){
     const [plannerExists, setPlannerExists] = useState<boolean>(false);
+    const [userInfoInStorage, setUserInfoInStorage] = useState<boolean>(false);
     const [dataConsent, setDataConsent] = useState<boolean>(false);
     const { user: currentUser } = useAuth();
 
@@ -39,7 +40,7 @@ export default function Account(){
             });
 
             if (response.data.success){
-                alert("Planner delete successfully!");
+                alert("Planner deleted successfully!");
                 setPlannerExists(false);
             }
         } catch(error){
@@ -49,21 +50,91 @@ export default function Account(){
         }
     }
 
-    const handleConsentToggle = () => {
-        setDataConsent(!dataConsent);
-        localStorage.setItem("dataStorageConsent", `${!dataConsent}`)
-        console.log(`Data consent ${!dataConsent ? 'granted' : 'revoked'}`);
+    const checkUserInfo = async () => {
+        try{
+            const response = await axios.get(`http://localhost:8080/checkIfInfoInStorage/${currentUser?.id}`);
+
+            if (response.data.success && response.data.exists){
+                console.log("Planner in Storage")
+                setUserInfoInStorage(true);
+            }
+        } catch (error) {
+            console.error(error, "Failed to check userInfo")
+        }
+    }
+
+    const deleteUserInfo = async () => {
+        if (!window.confirm("Are you sure you want to delete your saved information? This action cannot be undone.")) {
+            return;
+        }
+
+        try {
+            const token = await auth.currentUser?.getIdToken();
+
+            const response  = await axios.delete("http://localhost:8080/deleteUserInfo", {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.data.success){
+                alert("Stored data deleted successfully!");
+                setUserInfoInStorage(false);
+            }
+        } catch (error) {
+            alert("Failed to delete stored information");
+            console.error(error, "Failed to delete userInfo. Please try again.");
+        }
+    }
+
+    const updateConsent = async (consentGranted: boolean) => {
+        try{
+            const token = await auth.currentUser?.getIdToken();
+
+            const response = await axios.put("http://localhost:8080/updateUserConsent", {
+                consent: consentGranted ? "granted" : "revoked",
+                providedUserId: currentUser?.id
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.data.success){
+                setDataConsent(consentGranted);
+                console.log(`Data consent ${consentGranted ? 'granted' : 'revoked'}`);
+            } else {
+                alert("Error while updating consent. Please try again.");
+            }
+        } catch(error){
+            console.error(error, "Error while updating consent");
+            alert("Error while updating consent. Please try again.");
+        }
+    }
+
+    const getConsent = async () => {
+        try{
+            const response = await axios.get(`http://localhost:8080/getUserConsent/${currentUser?.id}`);
+
+            if (response.data.exists && response.data.success){
+                if (response.data.consent.consent === "granted"){
+                    setDataConsent(true);
+                } else{
+                    setDataConsent(false);
+                }
+                console.log("Consent updated successfully");
+            } 
+        } catch(error){
+            console.error(error, "Error while fetching consent")
+        }
     }
 
     useEffect(() => {
         if (currentUser) {
-            if (localStorage.getItem("dataStorageConsent") === "true"){
-                setDataConsent(true);
-            }
+            getConsent();
             checkPlanner();
-        } else{
-            localStorage.setItem("dataStorageConsent", `false`);
-        }
+            checkUserInfo();
+        } 
     }, [currentUser])
 
     return (
@@ -106,6 +177,29 @@ export default function Account(){
                         </div>
                     </div>
 
+
+                    {/* Stored Data Section */}
+                    <div className="account-section">
+                        <h2 className="section-title">Saved Information Status</h2>
+                        <div className="status-card">
+                            <div className="status-indicator">
+                                <span className={`status-dot ${userInfoInStorage ? 'active' : 'inactive'}`}></span>
+                                <span className="status-text">
+                                    {userInfoInStorage ? 'Personal data in storage' : 'No personal data in storage'}
+                                </span>
+                            </div>
+                            
+                            {userInfoInStorage && (
+                                <button 
+                                    className="delete-button"
+                                    onClick={deleteUserInfo}
+                                >
+                                    Delete Personal Data
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
                     {/* Data Consent Section */}
                     <div className="account-section">
                         <h2 className="section-title">Privacy Settings</h2>
@@ -121,7 +215,7 @@ export default function Account(){
                                     <input
                                         type="checkbox"
                                         checked={dataConsent}
-                                        onChange={handleConsentToggle}
+                                        onChange={(e) => updateConsent(e.target.checked)}
                                     />
                                     <span className="toggle-slider"></span>
                                 </label>

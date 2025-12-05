@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import axios from "axios";
@@ -9,7 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 export default function GeneratePlan() {
   const navigate = useNavigate();
-  const currenUser = useAuth();
+  const { user: currentUser } = useAuth();
 
   // Get current date for defaults
   const today = new Date();
@@ -50,9 +50,18 @@ export default function GeneratePlan() {
   const [startDateError, setStartDateError] = useState(false);
   const [heightError, setHeightError] = useState<'too-low' | 'too-high' | null>(null);
 
+  const [hasLoadedUserInfo, setHasLoadedUserInfo] = useState(false);
+  const [consentGranted, setConsentGranted] = useState(false);
+  const [hasLoadedConsent, setHasLoadedConsent] = useState(false);
+
+
+
   const handleWeightChange = (value: string) => {
+    console.log("Prev weight", weight);
+    console.log("New weight", value);
     setWeight(value);
     const numValue = parseFloat(value);
+    console.log("Parsed", numValue);
     
     if (value === '' || isNaN(numValue)) {
       setWeightError(null);
@@ -78,8 +87,12 @@ export default function GeneratePlan() {
   };
 
   const handleHeightChange = (value: string) => {
+    console.log("Prev height", heightValue);
+    console.log("New height", value);
     setHeightValue(value);
     const numValue = parseFloat(value);
+    console.log("Parsed", numValue);
+
     
     if (value === '' || isNaN(numValue)) {
       setHeightError(null);
@@ -113,8 +126,11 @@ export default function GeneratePlan() {
   };
 
   const handleAgeChange = (value: string) => {
+    console.log("Prev age", selectedAge);
+    console.log("New age", value);
     setSelectedAge(value);
     const numValue = parseFloat(value);
+    console.log("Parsed", numValue);
     
     if (value === '' || isNaN(numValue)) {
       setAgeError(null);
@@ -226,7 +242,7 @@ export default function GeneratePlan() {
 
 
       const constraints = {
-        userId: currenUser.user?.id,
+        userId: currentUser?.id,
         age: selectedAge,
         sex: selectedSex,
         height : {
@@ -255,9 +271,10 @@ export default function GeneratePlan() {
 
       console.log(response.data)
       if (response.data.success && response.data.planner){
-        if (localStorage.getItem("dataStorageConsent") === "true"){
+        if (consentGranted){
           console.log("updating planner")
           await updatePlanner(response.data.planner);
+          await updateUserInfo(constraints);
         }
         navigate("/calendar", {state: {planner: response.data.planner}});
       }
@@ -289,6 +306,111 @@ export default function GeneratePlan() {
       console.error(error);
     }
   }
+
+
+  const updateUserInfo = async (userInfo: any) => {
+    try {
+      const token = await auth.currentUser?.getIdToken();
+
+      const response = await axios.put("http://localhost:8080/updateUserInformation", {
+        userInfo: userInfo
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.data.success){
+        console.log("User info saved successfully")
+      }
+      else{
+        console.log(response.status);
+        console.error(response.data.message);
+      } 
+
+    } catch (error){
+      console.error(error, "Failed to update userInformation");
+    }
+  }
+  
+
+  const getUserInfo = async () => {
+    try{
+      const response = await axios.get(`http://localhost:8080/getUserInformation/${currentUser?.id}`);
+
+      if (response.data.success){
+        setSelectedAge(response.data.userInfo.age);
+        setSelectedSex(response.data.userInfo.sex);
+        setSelectedWeightGoal(response.data.userInfo.weightGoal);
+        setSelectedActivityLevel(response.data.userInfo.activityLevel);
+        setDietaryRestrictions(response.data.userInfo.dietaryRestrictions);
+        setSelectedPlanDuration(response.data.userInfo.weeks.toString());
+        setSelectedDay(response.data.userInfo.startDate.day);
+        setSelectedMonth(response.data.userInfo.startDate.month);
+        setSelectedYear(response.data.userInfo.startDate.year);
+
+        if (response.data.userInfo.height.unit === "ft-in"){
+          setHeightUnit("ft-in");
+          setHeightFeet(response.data.userInfo.height.value[0]);
+          setHeightInches(response.data.userInfo.height.value[1]);
+        } else if (response.data.userInfo.height.unit === "m"){
+          setHeightUnit("m");
+          setHeightValue(response.data.userInfo.height.value[0]);
+        } else if (response.data.userInfo.height.unit === "cm"){
+          setHeightUnit("cm");
+          setHeightValue(response.data.userInfo.height.value[0]);
+        } else if (response.data.userInfo.height.unit === "inch"){
+          setHeightUnit("inch");
+          setHeightValue(response.data.userInfo.height.value[0]);
+        }
+        console.log(response.data.userInfo.weight.value[0]);
+        if (response.data.userInfo.weight.unit === "kg"){
+          setWeightUnit("kg");
+          setWeight(response.data.userInfo.weight.value);
+        } else {
+          setWeightUnit("lb");
+          setWeight(response.data.userInfo.weight.value);
+        } 
+
+        setHasLoadedUserInfo(true);
+      } else {
+        console.log(`No data in memory for user ${currentUser?.id}`);
+      }
+    } catch (error: any){
+      console.error(error, "Failed to get userInformation");
+      setHasLoadedUserInfo(true);
+
+    }
+  }
+
+  useEffect(() => {
+    if (currentUser && !hasLoadedUserInfo && !hasLoadedConsent){
+      getConsent();
+      getUserInfo();
+    }
+  }, [currentUser]);
+
+  const getConsent = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/getUserConsent/${currentUser?.id}`);
+      console.log(response.data)
+
+      if (response.data.success && response.data.exists){
+        if (response.data.consent.consent === "granted"){
+          console.log("here");
+          setConsentGranted(true);
+        }
+      } else {
+        console.log("there");
+        setConsentGranted(false);
+      }
+      setHasLoadedConsent(true);
+    } catch (error){
+      console.error(error, "Error while fetching consent");
+      setHasLoadedConsent(true);
+    }
+  }
+
 
 
   return (
