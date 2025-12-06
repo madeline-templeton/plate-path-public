@@ -20,13 +20,13 @@ export async function mealController(constraints: UserConstraints):
         const adjustedCalories = exerciseAdjustedCalorieCalculator(constraints, baseCalories);
 
         // Call the meal algorithm to generate the meal plan
-        const generatedMeals = await mealAlgorithm(
+        const generatedMeals = await mealAlgorithm (
             days,                                // planLength: number of days
             adjustedCalories,                    // totalCalories per day
             constraints.dietaryRestrictions,     // dietaryRestrictions array
             [],                                  // allergyIngredients (empty for now, can be added later)
-            [],                                  // downvotedMealIds (empty for now)
-            [],                                  // preferredMealIds (empty for now)
+            constraints.downvotedMealIds,        // downvotedMealIds (empty for now)
+            constraints.preferredMealIds,        // preferredMealIds (empty for now)
             constraints.date                     // startDate
         );
 

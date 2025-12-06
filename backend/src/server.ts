@@ -4,6 +4,7 @@ import { registerMealGenerationHandler } from "./mealGeneration/mealGenerationHa
 import { registerPlannerHandler } from "./planners/plannerHandler";
 import { registerUserInformationHandler } from "./userInformation/userInformationHandler";
 import { registerConsentHandler } from "./consent/consentHandler";
+import registerVotingHandler from "./mealVoting/mealVotingHandler";
 
 
 /**
@@ -44,6 +45,7 @@ export class ServerApp {
     registerPlannerHandler(this.app);
     registerUserInformationHandler(this.app);
     registerConsentHandler(this.app);
+    registerVotingHandler(this.app);
   }
 
   /**

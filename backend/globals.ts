@@ -15,7 +15,9 @@ export const userConstraintsSchema = z.object({
     activityLevel: z.enum(["not-active", "lightly-active", "moderately-active", "active", "very-active"]),
     weightGoal: z.enum(["extreme-loss", "weight-loss", "maintain", "weight-gain", "extreme-gain"]),
     dietaryRestrictions: z.array(z.string()),
-    // excludeIngredients: z.array(z.string()),
+    // excludeIngredients: z.array(z.string()),,
+    downvotedMealIds: z.array(z.coerce.number()),
+    preferredMealIds: z.array(z.coerce.number()),
     weeks: z.coerce.number().refine((val) => [1, 2, 4].includes(val), {
         message: "weeks must be 1, 2, or 4"
     }),

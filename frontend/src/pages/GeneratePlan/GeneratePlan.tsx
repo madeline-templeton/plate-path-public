@@ -53,6 +53,10 @@ export default function GeneratePlan() {
   const [hasLoadedUserInfo, setHasLoadedUserInfo] = useState(false);
   const [consentGranted, setConsentGranted] = useState(false);
   const [hasLoadedConsent, setHasLoadedConsent] = useState(false);
+  const [hasLoadedMealPreferences, setHasLoadedMealPreferences] = useState(false);
+
+  const [likedMeals, setLikedMeals] = useState([]);
+  const [disLikedMeals, setDisLikedMeals] = useState([]);
 
 
 
@@ -240,6 +244,8 @@ export default function GeneratePlan() {
         activityLevel: selectedActivityLevel,
         weightGoal: selectedWeightGoal,
         dietaryRestrictions: dietaryRestrictions,
+        downvotedMealIds: disLikedMeals,
+        preferredMealIds: likedMeals,
         weeks: selectedPlanDuration,
         date: {
           day: selectedDay,
@@ -365,10 +371,39 @@ export default function GeneratePlan() {
     }
   }
 
+  
+  const getUserMealVotes = async () => {
+    try{
+      const response = await axios.get(`http://localhost:8080/getUserMealVotes/${currentUser?.id}`);
+
+      if (response.data.success){
+        if (response.data.liked){
+          setLikedMeals(response.data.liked);
+        } 
+
+        if (response.data.disliked){
+          setDisLikedMeals(response.data.disliked);
+        } 
+
+        console.log(response.data);
+
+
+        setHasLoadedMealPreferences(true);
+      } else {
+        console.log(`No user votes in memory for user ${currentUser?.id}`);
+      }
+    } catch (error: any){
+      console.error(error, "Failed to get userInformation");
+      setHasLoadedMealPreferences(true);
+
+    }
+  }
+
   useEffect(() => {
-    if (currentUser && !hasLoadedUserInfo && !hasLoadedConsent){
+    if (currentUser && !hasLoadedUserInfo && !hasLoadedConsent && !hasLoadedMealPreferences){
       getConsent();
       getUserInfo();
+      getUserMealVotes();
     }
   }, [currentUser]);
 

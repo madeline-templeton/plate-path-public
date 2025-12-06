@@ -78,7 +78,7 @@ export async function registerUserInformationHandler(app: Express) {
 
 
         } catch (error){
-            console.error("Error while updating user information", error)
+            console.error("Error while updating user information", error);
             res.status(500).json({
                 success: false,
                 error: "Error while updating user information"

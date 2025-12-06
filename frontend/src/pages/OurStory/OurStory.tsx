@@ -2,10 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { PrivacyConsentModal } from '../../components/PrivacyConsentModal/PrivacyConsentModal';
 import './OurStory.css';
+import { auth } from '../../services/firebase';
+import { useAuth } from '../../contexts/AuthContext';
+import axios from 'axios';
 
 export default function OurStory() {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
     // Check if this is a new signup (flag set during account creation)
@@ -20,19 +24,43 @@ export default function OurStory() {
     }
   }, []);
 
-  const handleAccept = () => {
+  const handleAccept = async () => {
     // Save that user has seen the modal and accepted
     localStorage.setItem('privacyConsentSeen', 'true');
-    localStorage.setItem('saveHealthInfo', 'true');
+    await updateConsent(true);
     setShowModal(false);
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     // Save that user has seen the modal and rejected
     localStorage.setItem('privacyConsentSeen', 'true');
-    localStorage.setItem('saveHealthInfo', 'false');
+    await updateConsent(false);
     setShowModal(false);
   };
+
+  const updateConsent = async (consentGranted: boolean) => {
+    try{
+        const token = await auth.currentUser?.getIdToken();
+
+        const response = await axios.put("http://localhost:8080/updateUserConsent", {
+            consent: consentGranted ? "granted" : "revoked",
+            providedUserId: currentUser?.id
+        }, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.data.success){
+            console.log(`Data consent ${consentGranted ? 'granted' : 'revoked'}`);
+        } else {
+            alert("Error while updating consent. Please try again.");
+        }
+    } catch(error){
+        console.error(error, "Error while updating consent");
+        alert("Error while updating consent. Please try again.");
+    }
+  }
 
   return (
     <div className="our-story-container">

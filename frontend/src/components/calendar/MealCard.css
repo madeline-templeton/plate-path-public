@@ -255,3 +255,21 @@
     font-size: 1.2rem;
   }
 }
+
+.downvote-button.active {
+  background-color: #d9884e;
+  border-color: #c7753d;
+}
+
+.downvote-button.active .vote-arrow {
+  color: #ffffff;
+}
+
+.upvote-button.active {
+  background-color: #4a9b4a;
+  border-color: #3a7a3a;
+}
+
+.upvote-button.active .vote-arrow {
+  color: #ffffff;
+}

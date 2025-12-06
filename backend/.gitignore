@@ -10,4 +10,4 @@ git push
 node_modules
 .env
 
-meals.csv
+mealData.csv
