@@ -15,6 +15,7 @@ export interface Meal {
   ingredients: string;
   website: string;
   calories: number;
+  serving: number;
   occurrences: number;
 }
 
