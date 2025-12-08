@@ -108,12 +108,12 @@ export function adjustServings(
     let bestDifference = Math.abs(targetCalories - meal.calories);
     let foundMatch = false;
 
-    // Try different serving sizes (reasonable range 1-10)
-    for (let serving = 1; serving <= 10; serving++) {
+    // Try different serving sizes in 0.5 increments (0.5 to 10)
+    for (let serving = 0.5; serving <= 10; serving += 0.5) {
       const totalCalories = meal.calories * serving;
       const difference = Math.abs(targetCalories - totalCalories);
 
-      // Check if within 10% tolerance
+      // Check if within 20% tolerance
       if (difference <= tolerance) {
         foundMatch = true;
         // Keep the serving that's closest to target
