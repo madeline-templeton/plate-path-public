@@ -12,7 +12,10 @@ export async function verifyToken(req: AuthRequest, res: Response, next: NextFun
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")){
-        return res.status(401).json({ error: "Unauthorised: No token provided"});
+        return res.status(401).json({ 
+            success: false,
+            message: "Unauthorised: No token provided"
+        });
     }
 
     const token = authHeader.split("Bearer ")[1];
@@ -28,4 +31,20 @@ export async function verifyToken(req: AuthRequest, res: Response, next: NextFun
         console.error('Error verifying token:', error);
         return res.status(401).json({ error: 'Unauthorised: Invalid token' });
     }
+}
+
+
+export async function verifyTokenOrBypass(req: AuthRequest, res: Response, next: NextFunction) {
+    // Bypass authentication in test mode
+    if (process.env.NODE_ENV === 'test' && req.headers['x-test-user-id']) {
+
+        req.user = {
+            uid: req.headers['x-test-user-id'] as string,
+            email: 'test@example.com'
+        };
+        return next();
+    }
+
+    // Otherwise use normal verification
+    return verifyToken(req, res, next);
 }

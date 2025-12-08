@@ -8,7 +8,9 @@
     "dev": "tsx watch src/server.ts",
     "debug": "tsx --inspect src/server.ts",
     "test": "vitest run",
-    "test:watch": "vitest watch"
+    "test:watch": "vitest watch",
+    "test:server": "NODE_ENV=test tsx watch src/server.ts",
+    "playwrightTest": "NODE_ENV=test npx playwright test"
   },
   "keywords": [],
   "author": "",

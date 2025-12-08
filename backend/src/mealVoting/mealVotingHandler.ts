@@ -1,15 +1,16 @@
 import { Express, Request, Response } from "express";
-import { AuthRequest, verifyToken } from "../firebase/handleAuthentication";
+import { AuthRequest, verifyToken, verifyTokenOrBypass } from "../firebase/handleAuthentication";
 import { success } from "zod";
 import { admin, firestore } from "../firebase/firebasesetup";
 import { use } from "react";
 import { create } from "domain";
 
 export default function registerVotingHandler(app: Express){
-    app.put("/updateUserMealVote", verifyToken, async (req: AuthRequest, res: Response) => {
+    app.put("/updateUserMealVote", verifyTokenOrBypass, async (req: AuthRequest, res: Response) => {
         try{
             const { mealId, mealName, liked } = req.body;
             const userId = req.user?.uid;
+            
 
             if (!mealId || !mealName || typeof liked !== "boolean"){
                 return res.status(400).json({
@@ -52,32 +53,38 @@ export default function registerVotingHandler(app: Express){
 
             const likedMeals = voteData?.liked || {};
             const dislikedMeals = voteData?.disliked || {};
+            let alreadyExisted = false;
 
             if (liked){
-                likedMeals[mealId] = mealName;
-                delete dislikedMeals[mealId];
-
-                await firestore.collection("mealVotes").doc(userId).update({
-                    liked: likedMeals,
-                    disliked: dislikedMeals,
-                    updatedAt: admin.firestore.FieldValue.serverTimestamp()
-                });
+                if (likedMeals[mealId]){
+                    delete likedMeals[mealId];
+                    alreadyExisted = true;
+                } else {
+                    likedMeals[mealId] = mealName;
+                    delete dislikedMeals[mealId];
+                }
 
             } else {
-                dislikedMeals[mealId] = mealName;
-                delete likedMeals[mealId];
-
-                await firestore.collection("mealVotes").doc(userId).update({
-                    liked: likedMeals,
-                    disliked: dislikedMeals,
-                    updatedAt: admin.firestore.FieldValue.serverTimestamp()
-                });
+                if (dislikedMeals[mealId]){
+                    delete dislikedMeals[mealId];
+                    alreadyExisted = true;
+                } else {
+                    dislikedMeals[mealId] = mealName;
+                    delete likedMeals[mealId];
+                }
 
             } 
 
+            await firestore.collection("mealVotes").doc(userId).update({
+                liked: likedMeals,
+                disliked: dislikedMeals,
+                updatedAt: admin.firestore.FieldValue.serverTimestamp()
+            });
+
             return res.status(200).json({
                 success: true,
-                message: `${liked ? "Liked" : "Disliked"} meal updated successfully`
+                message: `${liked ? "Liked" : "Disliked"} meal updated successfully`,
+                alreadyExisted: alreadyExisted
             });
 
 
@@ -88,6 +95,13 @@ export default function registerVotingHandler(app: Express){
                 error: "Error while updating user meal votes"
             });
         }
+    });
+
+    app.get("/getUserMealVotes/", async (req: Request, res: Response) => {
+        return res.status(400).json({
+            success: false,
+            message: "Missing fields"
+        });
     });
 
     app.get("/getUserMealVotes/:userId", async (req: Request, res: Response) => {
@@ -132,6 +146,13 @@ export default function registerVotingHandler(app: Express){
         }
     });
 
+    app.get("/checkUserMealVotes/", async (req: Request, res: Response) => {
+        return res.status(400).json({
+            success: false,
+            message: "Missing fields"
+        });
+    });
+
     app.get("/checkUserMealVotes/:userId", async (req: Request, res: Response) => {
         try{
         const userId = typeof req.params.userId === "string" ? req.params.userId.trim() : "";
@@ -169,7 +190,7 @@ export default function registerVotingHandler(app: Express){
     });
 
 
-    app.delete("/deleteUserMealVotes", verifyToken, async (req: AuthRequest, res: Response) => {
+    app.delete("/deleteUserMealVotes", verifyTokenOrBypass, async (req: AuthRequest, res: Response) => {
         try{
             const userId = req.user?.uid;
 
@@ -182,7 +203,7 @@ export default function registerVotingHandler(app: Express){
 
             const mealVotesDoc = await firestore.collection("mealVotes").doc(userId).get();
 
-            if (!mealVotesDoc){
+            if (!mealVotesDoc.exists){
                 return res.status(404).json({
                     success: false,
                     message: `No votes to delete for user ${userId}`
@@ -193,7 +214,7 @@ export default function registerVotingHandler(app: Express){
 
             return res.status(200).json({
                 success: true,
-                message: `Successfully deleted meal voted for user ${userId}`
+                message: `Successfully deleted voted meals for user ${userId}`
             });
 
 
@@ -204,6 +225,13 @@ export default function registerVotingHandler(app: Express){
                 error: "Error while updating user information"
             });
         }
+    });
+
+    app.get("/checkIfMealVoted/", async (req: Request, res: Response) => {
+        return res.status(400).json({
+            success: false,
+            message: "Missing fields"
+        });
     });
 
     app.get("/checkIfMealVoted/:userId", async (req: Request, res: Response) => {

@@ -1,12 +1,12 @@
 import { Express, Response, Request } from "express";
 import { plannerSchema } from "../../globals";
 import { admin, firestore } from "../firebase/firebasesetup";
-import { AuthRequest, verifyToken } from "../firebase/handleAuthentication";
+import { AuthRequest, verifyToken, verifyTokenOrBypass } from "../firebase/handleAuthentication";
 
 
 
 export async function registerPlannerHandler(app:Express) {
-    app.put("/updatePlanner", verifyToken, async (req: AuthRequest, res: Response) => {
+    app.put("/updatePlanner", verifyTokenOrBypass, async (req: AuthRequest, res: Response) => {
         try{
             const planner = req.body.planner;
             const userId = req.user?.uid;
@@ -81,6 +81,12 @@ export async function registerPlannerHandler(app:Express) {
         }
     });
 
+    app.get("/getPlannerForUser/", async (req: Request, res: Response) => {
+        return res.status(400).json({
+            success: false,
+            message: "Missing userId"
+        });
+    });
 
     app.get("/getPlannerForUser/:userId", async (req: Request, res: Response) => {
         try{
@@ -97,7 +103,7 @@ export async function registerPlannerHandler(app:Express) {
 
 
             if (!plannerDoc.exists){
-                return res.status(400).json({
+                return res.status(404).json({
                     success: false,
                     error: `No planner for user ${userId}`
                 });
@@ -118,7 +124,7 @@ export async function registerPlannerHandler(app:Express) {
         }
     });
 
-    app.delete("/deletePlannerForUser", verifyToken, async (req: AuthRequest, res: Response) => {
+    app.delete("/deletePlannerForUser", verifyTokenOrBypass, async (req: AuthRequest, res: Response) => {
         try{
             const userId = req.user?.uid;
 
@@ -166,6 +172,12 @@ export async function registerPlannerHandler(app:Express) {
 
     });
 
+    app.get("/checkUserPlannerExists/", async (req: Request, res: Response) => {
+        return res.status(400).json({
+            success: false,
+            message: "Missing userId"
+        });
+    });
 
     app.get("/checkUserPlannerExists/:userId", async (req: Request, res: Response) => {
         try{
@@ -174,7 +186,7 @@ export async function registerPlannerHandler(app:Express) {
             if (userId === ""){
                 return res.status(400).json({
                     success: false,
-                    message: "Missing userId",
+                    message: "Missing fields",
                 })
             }
 
