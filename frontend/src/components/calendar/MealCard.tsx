@@ -58,9 +58,13 @@ export default function MealCard({ onClose, meal} : MealCardProps) {
         });
         console.log(response.data)
 
-
         if (response.data.success) {
-          setIsLiked(liked);
+          if (response.data.alreadyExisted){
+            setIsLiked(null);
+          } else {
+            setIsLiked(liked);
+          }
+          
         } 
 
       } catch (error){

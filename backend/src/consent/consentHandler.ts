@@ -2,9 +2,11 @@ import { Express, Request, Response } from "express";
 import { AuthRequest, verifyToken } from "../firebase/handleAuthentication";
 import { success } from "zod";
 import { admin, firestore } from "../firebase/firebasesetup";
+import { verifyTokenOrBypass } from "../firebase/handleAuthentication";
 
 export async function registerConsentHandler(app: Express){
-    app.put("/updateUserConsent", verifyToken, async (req: AuthRequest, res: Response) => {
+    // Use verifyTokenOrBypass instead of verifyToken for tests
+    app.put("/updateUserConsent", verifyTokenOrBypass, async (req: AuthRequest, res: Response) => {
         try{    
             console.log(req.body)
             const userId = req.user?.uid;
@@ -20,7 +22,7 @@ export async function registerConsentHandler(app: Express){
             if (!userId){
                 return res.status(401).json({
                     success: false,
-                    message: "You must sign-in to edit consent settings"
+                    message: "Unauthorised: No token provided"
                 });
             }
 
@@ -42,7 +44,7 @@ export async function registerConsentHandler(app: Express){
 
                 return res.status(200).json({
                     success: true,
-                    message: "Consent created successfully"
+                    message: `Consent ${consent} successfully`
                 });
             }
 
@@ -65,9 +67,19 @@ export async function registerConsentHandler(app: Express){
         }
     });
 
+    app.get("/getUserConsent/", async (req: Request, res: Response) => {
+        return res.status(400).json({
+            success: false,
+            message: "No userId provided",
+            exists: false
+        });
+    });
+
+
     app.get("/getUserConsent/:userId", async (req: Request, res: Response) => {
         try{
             const userId = typeof req.params.userId === "string" ? req.params.userId.trim() : "" ;
+            console.log(userId)
 
             if (userId === ""){
                 return res.status(400).json({
@@ -96,7 +108,11 @@ export async function registerConsentHandler(app: Express){
             })
 
         } catch (error) {
-
+            console.error(error);
+            return res.status(500).json({
+                success: false,
+                message: "Error while getting consent"
+            });
         }
     });
 

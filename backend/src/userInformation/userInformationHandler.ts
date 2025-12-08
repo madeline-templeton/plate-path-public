@@ -1,12 +1,12 @@
 import { Express, Response, Request } from "express";
-import { AuthRequest, verifyToken } from "../firebase/handleAuthentication";
+import { AuthRequest, verifyToken, verifyTokenOrBypass } from "../firebase/handleAuthentication";
 import { userConstraintsSchema } from "../../globals";
 import { success } from "zod";
 import { admin, firestore } from "../firebase/firebasesetup";
 import { userInfo } from "os";
 
 export async function registerUserInformationHandler(app: Express) {
-    app.put("/updateUserInformation", verifyToken, async (req: AuthRequest, res: Response) => {
+    app.put("/updateUserInformation", verifyTokenOrBypass, async (req: AuthRequest, res: Response) => {
         try{
             const userInfo = req.body.userInfo;
             const userId = req.user?.uid;
@@ -31,7 +31,7 @@ export async function registerUserInformationHandler(app: Express) {
             if (userId !== parsedUserInfo.data.userId){
                 return res.status(403).json({
                     success: false,
-                    message: "Forbidden: You may not edit a planner that isn't yours",
+                    message: "Forbidden: You may not edit a user information that isn't yours",
                 });
             }
 
@@ -86,6 +86,13 @@ export async function registerUserInformationHandler(app: Express) {
         }
     });
 
+    app.get("/getUserInformation/", async (req: Request, res: Response) => {
+        return res.status(400).json({
+            success: false,
+            message: "Missing fields"
+        });
+    });
+
 
     app.get("/getUserInformation/:userId", async (req: Request, res: Response) => {
         try{
@@ -94,14 +101,14 @@ export async function registerUserInformationHandler(app: Express) {
             if (userId === ""){
                 return res.status(400).json({
                     success: false,
-                    message: "No userId provided"
+                    message: "Missing fields"
                 });
             }
 
             const userInfoDoc = await firestore.collection("userInfo").doc(userId).get();
 
             if (!userInfoDoc.exists){
-                return res.status(200).json({
+                return res.status(404).json({
                     success: false,
                     message: `No information found for user ${userId}`
                 });
@@ -121,7 +128,14 @@ export async function registerUserInformationHandler(app: Express) {
         }
     });
 
+    app.get("/checkIfInfoInStorage/", async (req: Request, res: Response) => {
+        return res.status(400).json({
+            success: false,
+            message: "No userId provided"
+        });
+    });
 
+    
     app.get("/checkIfInfoInStorage/:userId", async (req: Request, res: Response) => {
         try{
             const userId = typeof req.params.userId === "string" ? req.params.userId.trim() : "";
@@ -157,7 +171,7 @@ export async function registerUserInformationHandler(app: Express) {
         }
     });
 
-    app.delete("/deleteUserInfo", verifyToken, async (req: AuthRequest, res: Response) => {
+    app.delete("/deleteUserInfo", verifyTokenOrBypass, async (req: AuthRequest, res: Response) => {
         try{
             const userId = req.user?.uid;
 
@@ -192,7 +206,7 @@ export async function registerUserInformationHandler(app: Express) {
 
             return res.status(200).json({
                 success: true,
-                message: "User Information deleted successfully"
+                message: "User information deleted successfully"
             });
 
         } catch (error){
