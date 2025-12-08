@@ -38,6 +38,7 @@ export const mealSchema = z.object({
     ingredients: z.string(),
     website: z.string(),
     calories: z.coerce.number(),
+    serving: z.number().default(1),
     occurrences: z.number().default(0)
 });
 

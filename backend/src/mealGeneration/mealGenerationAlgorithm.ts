@@ -108,19 +108,17 @@ export async function pickMeal(
   mealTime: "breakfast" | "lunch" | "dinner" | "dessert",
   targetCalories: number
 ): Promise<Meal> {
-  // TEMPORARY FIX: Use wider calorie range due to limited meals in CSV
-  // TODO: Restore to 100 once CSV has more meal variety with diverse calorie ranges
   // Filter candidates and preferred by meal time and calories
   const candidates = applyAllFilters(allCandidates, {
     mealTime,
     targetCalories,
-    calorieRange: 2000, // Temporarily increased to essentially disable calorie filtering
+    calorieRange: 100,
   });
 
   const preferred = applyAllFilters(allPreferred, {
     mealTime,
     targetCalories,
-    calorieRange: 2000, // Temporarily increased to essentially disable calorie filtering
+    calorieRange: 100,
   });
 
   if (candidates.length === 0) {
@@ -131,9 +129,7 @@ export async function pickMeal(
 
   let selectedMeal: Meal = candidates[0]; // fallback
 
-  // TEMPORARY FIX: Allow unlimited repetition due to limited meals in CSV
-  // TODO: Remove this and restore occurrence limit once CSV has sufficient meal variety
-  // (Need at least 10+ lunch and 10+ dinner options)
+  // Try up to 10 times to find a meal with < 4 occurrences
   for (let attempt = 0; attempt < 10; attempt++) {
     const randomValue = Math.random();
 
@@ -146,11 +142,11 @@ export async function pickMeal(
       selectedMeal = preferred[randomIndex];
     }
 
-    // TEMPORARY: Allow unlimited repetition - comment out occurrence check
-    // Original code checked: if (selectedMeal.occurrences < 4 || attempt >= 9)
-    // Accept any meal regardless of occurrences
-    selectedMeal.occurrences += 1;
-    break;
+    // Accept if occurrences < 4, or if this is our last attempt
+    if (selectedMeal.occurrences < 4 || attempt >= 9) {
+      selectedMeal.occurrences += 1;
+      break;
+    }
   }
 
   return selectedMeal;
@@ -169,6 +165,7 @@ export async function mockMealAlgorithm(): Promise<Day[]> {
         ingredients: "eggs, toast",
         website: "http://example.com/breakfast",
         calories: 300,
+        serving: 1,
         occurrences: 0,
       },
       lunch: {
@@ -179,6 +176,7 @@ export async function mockMealAlgorithm(): Promise<Day[]> {
         ingredients: "salad, tofu",
         website: "http://example.com/lunch",
         calories: 500,
+        serving: 1,
         occurrences: 0,
       },
       dinner: {
@@ -189,9 +187,51 @@ export async function mockMealAlgorithm(): Promise<Day[]> {
         ingredients: "chicken, rice",
         website: "http://example.com/dinner",
         calories: 700,
+        serving: 1,
         occurrences: 0,
       },
     },
   ];
 }
 
+
+// export async function mockMealAlgorithm(
+//   dailyCalories: number,
+//   dietaryRestrictions: string[],
+//   mealFrequency: Map<Meal, number>[],
+//   date: calendarDate
+// ): Promise<Day> {
+//   return {
+//     date: date,
+//     breakfast: {
+//       id: 53118,
+//       name: "Rømmegrøt – Norwegian Sour Cream Porridge",
+//       mealTime: "breakfast",
+//       ingredients:
+//         "Full fat sour cream: 2 cups ; Flour: 3/4 cup; Milk: 2 cups ; Salt: 1 tsp; Sugar: Sprinkling; Cinnamon: Sprinkling; Butter: To taste",
+//       website: "https://www.youtube.com/watch?v=v4rIJOWXM3w",
+//       calories: 550,
+//       occurrences: 0,
+//     },
+//     lunch: {
+//       id: 52940,
+//       name: "Brown Stew Chicken",
+//       mealTime: "lunch",
+//       ingredients:
+//         "Chicken: 1 whole; Tomato: 1 chopped; Onions: 2 chopped; Garlic Clove: 2 chopped; Red Pepper: 1 chopped; Carrots: 1 chopped; Lime: 1; Thyme: 2 tsp; Allspice: 1 tsp ; Soy Sauce: 2 tbs; Cornstarch: 2 tsp; Coconut Milk: 2 cups ; Vegetable Oil: 1 tbs",
+//       website: "https://www.youtube.com/watch?v=_gFB1fkNhXs",
+//       calories: 650,
+//       occurrences: 0,
+//     },
+//     dinner: {
+//       id: 52955,
+//       name: "Egg Drop Soup",
+//       mealTime: "dinner",
+//       ingredients:
+//         "Chicken Stock: 3 cups ; Salt: 1/4 tsp; Sugar: 1/4 tsp; Pepper: pinch; Sesame Seed Oil: 1 tsp ; Peas: 1/3 cup; Mushrooms: 1/3 cup; Cornstarch: 1 tbs; Water: 2 tbs; Spring Onions: 1/4 cup",
+//       website: "https://www.youtube.com/watch?v=9XpzHm9QpZg",
+//       calories: 650,
+//       occurrences: 0,
+//     },
+//   };
+// }

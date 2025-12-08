@@ -65,11 +65,12 @@ export function loadMealsFromCSV(): Meal[] {
       const meal = mealSchema.parse({
         id: values[0],
         name: values[1],
-        mealTime: values[2].trim().toLowerCase(),
+        mealTime: values[2].toLowerCase(),
         diet: values[3],
         ingredients: values[4],
         website: values[5],
         calories: values[6],
+        serving: 1,
         occurrences: 0,
       });
       meals.push(meal);

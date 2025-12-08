@@ -1,25 +1,25 @@
 import { Meal } from "../../globals";
 
 
-// for commiting 
-/**
- * Filter meals by calorie range
- */
-export function filterMealsByCalories(
-  meals: Meal[],
-  targetCalories: number,
-  rangeSize: number = 100
-): Meal[] {
-  // TEMPORARY FIX: Use the rangeSize parameter to allow wider calorie ranges
-  // TODO: Once CSV has more meals, the default rangeSize of 100 should work fine
-  const halfRange = rangeSize / 2;
-  const lowerBound = targetCalories - halfRange;
-  const upperBound = targetCalories + halfRange;
+// // for commiting 
+// /**
+//  * Filter meals by calorie range
+//  */
+// export function filterMealsByCalories(
+//   meals: Meal[],
+//   targetCalories: number,
+//   rangeSize: number = 100
+// ): Meal[] {
+//   // TEMPORARY FIX: Use the rangeSize parameter to allow wider calorie ranges
+//   // TODO: Once CSV has more meals, the default rangeSize of 100 should work fine
+//   const halfRange = rangeSize / 100;
+//   const lowerBound = targetCalories - halfRange;
+//   const upperBound = targetCalories + halfRange;
 
-  return meals.filter(
-    (meal) => meal.calories >= lowerBound && meal.calories <= upperBound
-  );
-}
+//   return meals.filter(
+//     (meal) => meal.calories >= lowerBound && meal.calories <= upperBound
+//   );
+// }
 
 /**
  * Filter meals by dietary restrictions (vegan, vegetarian, none, etc.)
@@ -96,6 +96,44 @@ export function getPreferredMeals(
   return meals.filter((meal) => preferredSet.has(meal.id));
 }
 
+export function adjustServings(
+  meals: Meal[], 
+  targetCalories: number
+): Meal[] { 
+  const tolerance = targetCalories * .2; // 20% tolerance
+  const filteredMeals: Meal[] = [];
+
+  for (const meal of meals) {
+    let bestServing = 1;
+    let bestDifference = Math.abs(targetCalories - meal.calories);
+    let foundMatch = false;
+
+    // Try different serving sizes (reasonable range 1-10)
+    for (let serving = 1; serving <= 10; serving++) {
+      const totalCalories = meal.calories * serving;
+      const difference = Math.abs(targetCalories - totalCalories);
+
+      // Check if within 10% tolerance
+      if (difference <= tolerance) {
+        foundMatch = true;
+        // Keep the serving that's closest to target
+        if (difference < bestDifference) {
+          bestDifference = difference;
+          bestServing = serving;
+        }
+      }
+    }
+
+    // Only include meal if we found a match within tolerance
+    if (foundMatch) {
+      meal.serving = bestServing;
+      filteredMeals.push(meal);
+    }
+  }
+
+  return filteredMeals;
+}
+
 /**
  * Apply all filters in sequence
  */
@@ -111,14 +149,6 @@ export function applyAllFilters(
   }
 ): Meal[] {
   let filtered = meals;
-
-  if (options.targetCalories !== undefined) {
-    filtered = filterMealsByCalories(
-      filtered,
-      options.targetCalories,
-      options.calorieRange
-    );
-  }
 
   if (options.dietaryRestrictions) {
     filtered = filterByDietaryRestrictions(
@@ -137,6 +167,13 @@ export function applyAllFilters(
 
   if (options.mealTime) {
     filtered = filterByMealTime(filtered, options.mealTime);
+  }
+
+  if (options.targetCalories !== undefined) {
+    filtered = adjustServings(
+      filtered,
+      options.targetCalories
+    );
   }
 
   return filtered;
