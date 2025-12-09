@@ -46,7 +46,8 @@ test.describe("put endpoint error messages",  () => {
     test("test input with no provided user id", async ({ request }) => {
         const response = await request.put(`${BASE_URL}/updateUserConsent`,  {
             data: {
-                consent: "granted",
+                sensitiveConsent: "granted",
+                generalConsent: "granted"
             }, 
             headers: {
                 'x-test-user-id': "'test-user-123'" // Mock user ID
@@ -60,10 +61,30 @@ test.describe("put endpoint error messages",  () => {
         expect(body.message).toBe("Incorrect input provided");
     });
 
-    test("test input with no provided consent", async ({ request }) => {
+    test("test input with no sensitive consent", async ({ request }) => {
         const response = await request.put(`${BASE_URL}/updateUserConsent`,  {
             data: {
                 providedUserId: "test-user-123",
+                generalConsent: "granted"
+            }, 
+            headers: {
+                'x-test-user-id': 'test-user-123' // Mock user ID
+            }
+        });
+
+        expect(response.status()).toBe(400);
+
+        const body = await response.json();
+        expect(body.success).toBe(false);
+        expect(body.message).toBe("Incorrect input provided");
+    });
+
+
+    test("test input with no provided general consent", async ({ request }) => {
+        const response = await request.put(`${BASE_URL}/updateUserConsent`,  {
+            data: {
+                providedUserId: "test-user-123",
+                sensitiveConsent: "granted"
             }, 
             headers: {
                 'x-test-user-id': 'test-user-123' // Mock user ID
@@ -81,7 +102,8 @@ test.describe("put endpoint error messages",  () => {
         const response = await request.put(`${BASE_URL}/updateUserConsent`,  {
             data: {
                 providedUserId: "test-user-123",
-                consent: "granted"
+                sensitiveConsent: "granted",
+                generalConsent: "granted"
             }, 
             headers: {
                 'x-test-user-id': "" 
@@ -100,7 +122,8 @@ test.describe("put endpoint error messages",  () => {
         const response = await request.put(`${BASE_URL}/updateUserConsent`,  {
             data: {
                 providedUserId: "incorrectId",
-                consent: "granted"
+                sensitiveConsent: "granted",
+                generalConsent: "granted"
             }, 
             headers: {
                 'x-test-user-id': "test-user-123"

@@ -8,7 +8,8 @@ test.describe("check actual firebase consent calls", () => {
         const response = await request.put(`${BASE_URL}/updateUserConsent`,  {
             data: {
                 providedUserId: "test-user-123",
-                consent: "granted"
+                sensitiveConsent: "granted",
+                generalConsent: "granted"
             }, 
             headers: {
                 'x-test-user-id': "test-user-123"
@@ -19,14 +20,15 @@ test.describe("check actual firebase consent calls", () => {
 
         const body = await response.json();
         expect(body.success).toBe(true);
-        expect(body.message).toBe("Consent granted successfully");
+        expect(body.message).toBe("Sensitive consent granted successfully; General Consent granted successfully");
     });
 
-    test("test creating and then updating user consent", async ({ request }) => {
+    test("test creating and then updating user consent while getting them", async ({ request }) => {
         const creatingResponse = await request.put(`${BASE_URL}/updateUserConsent`,  {
             data: {
                 providedUserId: "test-user-456",
-                consent: "granted"
+                sensitiveConsent: "granted",
+                generalConsent: "granted"
             }, 
             headers: {
                 'x-test-user-id': "test-user-456"
@@ -37,13 +39,27 @@ test.describe("check actual firebase consent calls", () => {
 
         const creatingBody = await creatingResponse.json();
         expect(creatingBody.success).toBe(true);
-        expect(creatingBody.message).toBe("Consent granted successfully");
+        expect(creatingBody.message).toBe("Sensitive consent granted successfully; General Consent granted successfully");
+
+
+        const getCreatingResponse = await request.get(`${BASE_URL}/getUserConsent/test-user-456`);
+
+        expect(getCreatingResponse.status()).toBe(200);
+
+        const getCreatingBody = await getCreatingResponse.json();
+
+        expect(getCreatingBody.success).toBe(true);
+        expect(getCreatingBody.exists).toBe(true);
+        expect(getCreatingBody.sensitiveConsent).toBe("granted");
+        expect(getCreatingBody.generalConsent).toBe("granted");
+
 
 
         const updatingResponse = await request.put(`${BASE_URL}/updateUserConsent`,  {
             data: {
                 providedUserId: "test-user-456",
-                consent: "revoked"
+                sensitiveConsent: "granted",
+                generalConsent: "revoked"
             }, 
             headers: {
                 'x-test-user-id': "test-user-456"
@@ -55,5 +71,16 @@ test.describe("check actual firebase consent calls", () => {
         const updatingBody = await updatingResponse.json();
         expect(updatingBody.success).toBe(true);
         expect(updatingBody.message).toBe("Consent updated successfully");
+
+        const getUpdatingResponse = await request.get(`${BASE_URL}/getUserConsent/test-user-456`);
+
+        expect(getUpdatingResponse.status()).toBe(200);
+
+        const getUpdatingBody = await getUpdatingResponse.json();
+
+        expect(getUpdatingBody.success).toBe(true);
+        expect(getUpdatingBody.exists).toBe(true);
+        expect(getUpdatingBody.sensitiveConsent).toBe("granted");
+        expect(getUpdatingBody.generalConsent).toBe("revoked");
     });
 });

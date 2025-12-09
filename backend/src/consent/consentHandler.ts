@@ -10,9 +10,9 @@ export async function registerConsentHandler(app: Express){
         try{    
             console.log(req.body)
             const userId = req.user?.uid;
-            const { consent, providedUserId } = req.body;
+            const { sensitiveConsent, generalConsent, providedUserId} = req.body;
 
-            if (!consent || !providedUserId){
+            if (!sensitiveConsent || !generalConsent || !providedUserId){
                 return res.status(400).json({
                     success: false,
                     message: "Incorrect input provided"
@@ -38,18 +38,20 @@ export async function registerConsentHandler(app: Express){
 
             if (!consentDoc.exists){
                 await firestore.collection("userConsent").doc(userId).set({
-                    consent: consent,
+                    sensitiveConsent: sensitiveConsent,
+                    generalConsent: generalConsent,
                     createdAt: admin.firestore.FieldValue.serverTimestamp()
                 });
 
                 return res.status(200).json({
                     success: true,
-                    message: `Consent ${consent} successfully`
+                    message: `Sensitive consent ${sensitiveConsent} successfully; General Consent ${generalConsent} successfully`
                 });
             }
 
             await firestore.collection("userConsent").doc(userId).update({
-                consent: consent,
+                sensitiveConsent: sensitiveConsent,
+                generalConsent: generalConsent,
                 updatedAt: admin.firestore.FieldValue.serverTimestamp()
             });
 
@@ -91,20 +93,22 @@ export async function registerConsentHandler(app: Express){
 
             const consentDoc = await firestore.collection("userConsent").doc(userId).get();
 
-            if (!consentDoc.exists){
+            const consentData = consentDoc.data();
+
+            if (!consentDoc.exists || !consentData){
                 return res.status(200).json({
                     success: true,
-                    message: "No consent exists for this user",
+                    message: "No consent data exists for this user",
                     exists: false
                 })
             }
 
-            const consentData = consentDoc.data();
 
             return res.status(200).json({
                 success: true,
                 exists: true,
-                consent: consentData
+                sensitiveConsent: consentData.sensitiveConsent,
+                generalConsent: consentData.generalConsent
             })
 
         } catch (error) {

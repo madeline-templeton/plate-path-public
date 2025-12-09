@@ -27,23 +27,24 @@ export default function OurStory() {
   const handleAccept = async () => {
     // Save that user has seen the modal and accepted
     localStorage.setItem('privacyConsentSeen', 'true');
-    await updateConsent(true);
+    await updateConsent(true, true);
     setShowModal(false);
   };
 
   const handleReject = async () => {
     // Save that user has seen the modal and rejected
     localStorage.setItem('privacyConsentSeen', 'true');
-    await updateConsent(false);
+    await updateConsent(false, true);
     setShowModal(false);
   };
 
-  const updateConsent = async (consentGranted: boolean) => {
+  const updateConsent = async (sensitiveConsentGranted: boolean, generalConsentGranted: boolean) => {
     try{
         const token = await auth.currentUser?.getIdToken();
 
         const response = await axios.put("http://localhost:8080/updateUserConsent", {
-            consent: consentGranted ? "granted" : "revoked",
+            sensitiveConsent: sensitiveConsentGranted ? "granted" : "revoked",
+            generalConsent: generalConsentGranted ? "granted" : "revoked",
             providedUserId: currentUser?.id
         }, {
             headers: {
@@ -52,7 +53,8 @@ export default function OurStory() {
         });
 
         if (response.data.success){
-            console.log(`Data consent ${consentGranted ? 'granted' : 'revoked'}`);
+            console.log(`General consent ${generalConsentGranted ? 'granted' : 'revoked'}`);
+            console.log(`Sensitive consent ${sensitiveConsentGranted ? 'granted' : 'revoked'}`);
         } else {
             alert("Error while updating consent. Please try again.");
         }

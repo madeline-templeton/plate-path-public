@@ -8,9 +8,10 @@ import { auth } from "../../services/firebase";
 interface MealCardProps {
   onClose: () => void;
   meal: Meal;
+  consentGranted: boolean
 }
 
-export default function MealCard({ onClose, meal }: MealCardProps) {
+export default function MealCard({ onClose, meal, consentGranted }: MealCardProps) {
   const [isLiked, setIsLiked] = useState<boolean | null>(null);
   const { user: currentUser } = useAuth();
   const [hasLoadedPreference, setHasLoadedPreference] = useState(false);
@@ -122,32 +123,34 @@ export default function MealCard({ onClose, meal }: MealCardProps) {
           </div>
         </div>
 
-        <div className="meal-voting">
-          <div className="vote-container">
-            <button
-              className={`vote-button downvote-button ${
-                isLiked === false ? "active" : ""
-              }`}
-              aria-label="Downvote meal"
-              onClick={() => updateMealVote(false)}
-            >
-              <span className="vote-arrow">↓</span>
-            </button>
-            <span className="vote-text">I DON'T love this meal</span>
+        {consentGranted && (
+          <div className="meal-voting">
+            <div className="vote-container">
+              <button
+                className={`vote-button downvote-button ${
+                  isLiked === false ? "active" : ""
+                }`}
+                aria-label="Downvote meal"
+                onClick={() => updateMealVote(false)}
+              >
+                <span className="vote-arrow">↓</span>
+              </button>
+              <span className="vote-text">I DON'T love this meal</span>
+            </div>
+            <div className="vote-container">
+              <button
+                className={`vote-button upvote-button ${
+                  isLiked === true ? "active" : ""
+                }`}
+                aria-label="Upvote meal"
+                onClick={() => updateMealVote(true)}
+              >
+                <span className="vote-arrow">↑</span>
+              </button>
+              <span className="vote-text">I DO love this meal</span>
+            </div>
           </div>
-          <div className="vote-container">
-            <button
-              className={`vote-button upvote-button ${
-                isLiked === true ? "active" : ""
-              }`}
-              aria-label="Upvote meal"
-              onClick={() => updateMealVote(true)}
-            >
-              <span className="vote-arrow">↑</span>
-            </button>
-            <span className="vote-text">I DO love this meal</span>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

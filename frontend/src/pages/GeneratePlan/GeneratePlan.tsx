@@ -51,8 +51,10 @@ export default function GeneratePlan() {
   const [heightError, setHeightError] = useState<'too-low' | 'too-high' | null>(null);
 
   const [hasLoadedUserInfo, setHasLoadedUserInfo] = useState(false);
-  const [consentGranted, setConsentGranted] = useState(false);
-  const [hasLoadedConsent, setHasLoadedConsent] = useState(false);
+  const [sensitiveConsentGranted, setSensitiveConsentGranted] = useState(false);
+  const [generalConsentGranted, setGeneralConsentGranted] = useState(false);
+  const [hasLoadedSensitiveConsent, setHasLoadedSensitiveConsent] = useState(false);
+  const [hasLoadedGeneralConsent, setHasLoadedGeneralConsent] = useState(false);
   const [hasLoadedMealPreferences, setHasLoadedMealPreferences] = useState(false);
 
   const [likedMeals, setLikedMeals] = useState([]);
@@ -259,10 +261,12 @@ export default function GeneratePlan() {
       });
       
       if (response.data.success && response.data.planner){
-        if (consentGranted){
+        if (generalConsentGranted){
           console.log("updating planner")
           await updatePlanner(response.data.planner);
-          await updateUserInfo(constraints);
+          if (sensitiveConsentGranted){
+            await updateUserInfo(constraints);
+          }
         }
         navigate("/calendar", {state: {planner: response.data.planner}});
       } else {
@@ -400,7 +404,7 @@ export default function GeneratePlan() {
   }
 
   useEffect(() => {
-    if (currentUser && !hasLoadedUserInfo && !hasLoadedConsent && !hasLoadedMealPreferences){
+    if (currentUser && !hasLoadedUserInfo && !hasLoadedGeneralConsent && !hasLoadedSensitiveConsent && !hasLoadedMealPreferences){
       getConsent();
       getUserInfo();
       getUserMealVotes();
@@ -413,18 +417,23 @@ export default function GeneratePlan() {
       console.log(response.data)
 
       if (response.data.success && response.data.exists){
-        if (response.data.consent.consent === "granted"){
-          console.log("here");
-          setConsentGranted(true);
+        if (response.data.sensitiveConsent === "granted"){
+          setSensitiveConsentGranted(true);
+        } else {
+          setSensitiveConsentGranted(false);
         }
-      } else {
-        console.log("there");
-        setConsentGranted(false);
-      }
-      setHasLoadedConsent(true);
+        if (response.data.generalConsent === "granted"){
+          setGeneralConsentGranted(true);
+        } else {
+          setGeneralConsentGranted(false);
+        }
+      } 
+      setHasLoadedGeneralConsent(true);
+      setHasLoadedSensitiveConsent(true);
     } catch (error){
       console.error(error, "Error while fetching consent");
-      setHasLoadedConsent(true);
+      setHasLoadedGeneralConsent(true);
+      setHasLoadedSensitiveConsent(true);
     }
   }
 

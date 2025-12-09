@@ -54,6 +54,8 @@ export default function Calendar() {
   const [selectedMeal, setSelectedMeal] = useState<Meal>();
   const [planner, setPlanner] = useState<Planner | undefined>(receivedPlanner);
   const [loading, setLoading] = useState<boolean>(!receivedPlanner);
+  const [consentGranted, setConsentGranted] = useState<boolean>(false);
+  const [hasLoadedConsentGranted, setHasLoadedConsentGranted] = useState<boolean>(false);
 
 
   const year = currentDate.getFullYear();
@@ -112,6 +114,25 @@ export default function Calendar() {
     }
   }
 
+  const getConsent = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/getUserConsent/${currentUser?.id}`);
+      console.log(response.data)
+
+      if (response.data.success && response.data.exists){
+        if (response.data.generalConsent === "granted"){
+          setConsentGranted(true);
+        } else {
+          setConsentGranted(false);
+        }
+      } 
+      setHasLoadedConsentGranted(true);
+    } catch (error){
+      console.error(error, "Error while fetching consent");
+      setHasLoadedConsentGranted(true);
+    }
+  }
+
   // Generate calendar days
   const renderCalendarDays = () => {
     console.log(planner)
@@ -166,8 +187,9 @@ export default function Calendar() {
   }
 
   useEffect(() => {
-    if (currentUser && !planner){
+    if (currentUser && !planner && !hasLoadedConsentGranted){
       fetchPlanner();
+      getConsent();
     }
   }, [currentUser]);
 
@@ -237,6 +259,7 @@ export default function Calendar() {
           <MealCard 
             onClose={onClose}
             meal={selectedMeal}
+            consentGranted={consentGranted}
           />
         )}
       </div>
