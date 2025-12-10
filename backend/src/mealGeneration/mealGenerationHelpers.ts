@@ -112,6 +112,11 @@ export function exerciseAdjustedCalorieCalculator(constraints: UserConstraints, 
             }
             break;
 
+        case "maintain": 
+        {
+            adjustedCalories = baseCalories
+        }
+
         case "weight-gain":
             // Add 50 if we are below 1600
             if (baseCalories < 1600){

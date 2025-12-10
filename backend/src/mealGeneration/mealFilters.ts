@@ -29,9 +29,14 @@ export function filterByDietaryRestrictions(
   meals: Meal[],
   restrictions: string[]
 ): Meal[] {
-    if (restrictions.includes("none")) return meals;
+  // If restrictions is undefined or empty, default to "none"
+  if (!restrictions || restrictions.length === 0) {
+    restrictions = ["none"];
+  }
+  
+  console.log("restrictions: " + restrictions[0])
   const restrictionsLower = restrictions.map((r) => r.toLowerCase());
-
+  
   return meals.filter((meal) => {
     const ingredientsLower = meal.diet.toLowerCase();
     return restrictionsLower.every((restriction) =>

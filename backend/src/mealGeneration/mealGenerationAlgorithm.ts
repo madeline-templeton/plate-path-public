@@ -27,7 +27,7 @@ export async function mealAlgorithm(
   const plan: Day[] = [];
   const currentDate = { ...startDate };
 
-  const breakfastCalories = 1/3 * totalCalories;
+  const breakfastCalories = 1/4 * totalCalories;
   // Generate meal plan for each day
   for (let i = 0; i < planLength; i++) {
     const breakfast = await pickMeal(
@@ -37,7 +37,7 @@ export async function mealAlgorithm(
       breakfastCalories
     );
 
-    const lunchCalories = (totalCalories - breakfast.calories)/2;
+    const lunchCalories = (totalCalories - (breakfast.calories * breakfast.serving))/2;
 
     const lunch = await pickMeal(
       baseFilteredMeals,
@@ -46,7 +46,7 @@ export async function mealAlgorithm(
       lunchCalories
     );
 
-    const dinnerCalories = totalCalories - breakfast.calories - lunch.calories;
+    const dinnerCalories = totalCalories - (breakfast.calories * breakfast.serving) - (lunch.calories * lunch.serving);
 
     const dinner = await pickMeal(
       baseFilteredMeals,
@@ -54,6 +54,9 @@ export async function mealAlgorithm(
       "dinner",
       dinnerCalories
     );
+
+    const dayCalories = (breakfast.calories * breakfast.serving) + (lunch.calories * lunch.serving) + (dinner.calories * dinner.serving)
+    console.log("total calories for day: " + totalCalories + "\ntotal calorie planned : " + dayCalories)
 
     const dayPlan: Day = {
       date: { ...currentDate },
@@ -112,13 +115,13 @@ export async function pickMeal(
   const candidates = applyAllFilters(allCandidates, {
     mealTime,
     targetCalories,
-    calorieRange: 100,
+    calorieRange: 50,
   });
 
   const preferred = applyAllFilters(allPreferred, {
     mealTime,
     targetCalories,
-    calorieRange: 100,
+    calorieRange: 50,
   });
 
   if (candidates.length === 0) {
