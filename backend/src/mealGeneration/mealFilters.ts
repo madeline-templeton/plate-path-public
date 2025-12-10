@@ -75,12 +75,16 @@ export function removeDownvotedMeals(
 
 /**
  * Filter meals by meal time (breakfast, lunch, dinner, dessert)
+ * Now supports comma-separated meal times like "lunch, dinner" or "breakfast, lunch, dinner"
  */
 export function filterByMealTime(
   meals: Meal[],
   mealTime: "breakfast" | "lunch" | "dinner" | "dessert"
 ): Meal[] {
-  return meals.filter((meal) => meal.mealTime === mealTime);
+  return meals.filter((meal) => {
+    const mealTimesLower = meal.mealTime.toLowerCase();
+    return mealTimesLower.includes(mealTime.toLowerCase());
+  });
 }
 
 /**
