@@ -29,9 +29,14 @@ export function filterByDietaryRestrictions(
   meals: Meal[],
   restrictions: string[]
 ): Meal[] {
-    if (restrictions.includes("none")) return meals;
+  // If restrictions is undefined or empty, default to "none"
+  if (!restrictions || restrictions.length === 0) {
+    restrictions = ["none"];
+  }
+  
+  console.log("restrictions: " + restrictions[0])
   const restrictionsLower = restrictions.map((r) => r.toLowerCase());
-
+  
   return meals.filter((meal) => {
     const ingredientsLower = meal.diet.toLowerCase();
     return restrictionsLower.every((restriction) =>
@@ -75,12 +80,16 @@ export function removeDownvotedMeals(
 
 /**
  * Filter meals by meal time (breakfast, lunch, dinner, dessert)
+ * Now supports comma-separated meal times like "lunch, dinner" or "breakfast, lunch, dinner"
  */
 export function filterByMealTime(
   meals: Meal[],
   mealTime: "breakfast" | "lunch" | "dinner" | "dessert"
 ): Meal[] {
-  return meals.filter((meal) => meal.mealTime === mealTime);
+  return meals.filter((meal) => {
+    const mealTimesLower = meal.mealTime.toLowerCase();
+    return mealTimesLower.includes(mealTime.toLowerCase());
+  });
 }
 
 /**

@@ -109,7 +109,12 @@ export const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({
           <p className="modal-text">
             We automatically save your active meal plan as well as meal upvotes and downvotes. 
             This makes PlatePath work seamlessly for you. You can disable this anytime in your{' '}
-            <a href="/account" onClick={handleProfileClick} className="modal-link">
+            <a 
+              href="/account" 
+              onClick={handleProfileClick} 
+              className="modal-link"
+              aria-label="Navigate to your Account page to manage data storage preferences"
+            >
               Account
             </a>.
           </p>
@@ -126,7 +131,12 @@ export const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({
           <p className="modal-privacy">
             All data is stored securely in your account. We do NOT share or sell your information. 
             Manage preferences anytime in your{' '}
-            <a href="/account" onClick={handleProfileClick} className="modal-link">
+            <a 
+              href="/account" 
+              onClick={handleProfileClick} 
+              className="modal-link"
+              aria-label="Navigate to your Account page to manage privacy settings"
+            >
               Account
             </a>.
           </p>

@@ -9,6 +9,22 @@
   text-align: center;
 }
 
+/* Main and Section Structure */
+main[role="main"] {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.intro-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
 .welcome-title {
   font-family: 'Montserrat', sans-serif;
   font-size: 5rem;
@@ -43,10 +59,17 @@
   text-decoration: underline;
   cursor: pointer;
   transition: opacity 0.3s;
+  outline: none;
 }
 
 .link-text:hover {
   opacity: 0.7;
+}
+
+.link-text:focus {
+  outline: 3px solid #d9884e;
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* About Us Section */
@@ -77,21 +100,46 @@
   align-items: center;
 }
 
-.member-name {
-  font-family: 'Quicksand', sans-serif;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #000000;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
 .member-photo-placeholder {
   width: 200px;
   height: 250px;
-  background-color: #d3d3d3;
-  border: 2px solid #000000;
+  background-color: #e8f5e9;
+  border: 3px solid #a8d5a8;
   border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.member-photo {
+  width: 200px;
+  height: 250px;
+  object-fit: cover;
+  border: 3px solid #a8d5a8;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.member-photo-zoom-out {
+  object-fit: contain;
+  background-color: #f9f9f9;
+}
+
+.member-name {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2d5016;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.member-role {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  margin: 0;
 }
 
 /* Bio Text */
