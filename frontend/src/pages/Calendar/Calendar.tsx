@@ -140,27 +140,49 @@ export default function Calendar() {
     
     // Empty cells for days before the month starts
     for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(<div key={`empty-start-${i}`} className="calendar-day empty"></div>);
+      days.push(<div key={`empty-start-${i}`} className="calendar-day empty" role="gridcell" aria-hidden="true"></div>);
     }
     
     // Actual days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const dayMeals = getMealsForDate(day);
+      const lunchMeal = dayMeals ? ('main' in dayMeals.lunch ? dayMeals.lunch.main : dayMeals.lunch) : null;
+      const dinnerMeal = dayMeals ? ('main' in dayMeals.dinner ? dayMeals.dinner.main : dayMeals.dinner) : null;
 
       days.push(
-        <div key={day} className="calendar-day">
-          <div className="day-number">{day}</div>
+        <div 
+          key={day} 
+          className="calendar-day"
+          role="gridcell"
+          aria-label={`${monthNames[month]} ${day}, ${year}${dayMeals ? ', 3 meals planned' : ''}`}
+        >
+          <div className="day-number" aria-hidden="true">{day}</div>
           {dayMeals && (
-            <div className="meals-list">
-              <div className="meal-item" onClick={() => onMealClick(dayMeals.breakfast)}>
-                Breakfast: {dayMeals.breakfast.name}
-              </div>
-              <div className="meal-item" onClick={() => onMealClick(('main' in dayMeals.lunch ? dayMeals.lunch.main : dayMeals.lunch))}>
-                Lunch: {'main' in dayMeals.lunch ? dayMeals.lunch.main.name : dayMeals.lunch.name}
-              </div>
-              <div className="meal-item" onClick={() => onMealClick(('main' in dayMeals.dinner ? dayMeals.dinner.main : dayMeals.dinner))}>
-                Dinner: {'main' in dayMeals.dinner ? dayMeals.dinner.main.name : dayMeals.dinner.name}
-              </div>
+            <div className="meals-list" role="list">
+              <button 
+                className="meal-item" 
+                role="listitem"
+                onClick={() => onMealClick(dayMeals.breakfast)}
+                aria-label={`View details for Breakfast: ${dayMeals.breakfast.name}`}
+              >
+                <span aria-hidden="true">B: {dayMeals.breakfast.name}</span>
+              </button>
+              <button 
+                className="meal-item" 
+                role="listitem"
+                onClick={() => onMealClick(lunchMeal!)}
+                aria-label={`View details for Lunch: ${lunchMeal?.name}`}
+              >
+                <span aria-hidden="true">L: {lunchMeal?.name}</span>
+              </button>
+              <button 
+                className="meal-item" 
+                role="listitem"
+                onClick={() => onMealClick(dinnerMeal!)}
+                aria-label={`View details for Dinner: ${dinnerMeal?.name}`}
+              >
+                <span aria-hidden="true">D: {dinnerMeal?.name}</span>
+              </button>
             </div>
           )}
         </div>
@@ -235,23 +257,40 @@ export default function Calendar() {
           <h1 className="calendar-title">Your Meal Calender</h1>
           
           <div className="calendar-container">
-            <div className="calendar-header">
-              <button className="nav-arrow" onClick={goToPreviousMonth}>←</button>
-              <h2 className="month-year">{monthNames[month]}, {year}</h2>
-              <button className="nav-arrow" onClick={goToNextMonth}>→</button>
+            <div className="calendar-header" role="toolbar" aria-label="Calendar navigation">
+              <button 
+                className="nav-arrow" 
+                onClick={goToPreviousMonth}
+                aria-label="Go to previous month"
+              >
+                ←
+              </button>
+              <h2 className="month-year" id="current-month-year" aria-live="polite">
+                {monthNames[month]}, {year}
+              </h2>
+              <button 
+                className="nav-arrow" 
+                onClick={goToNextMonth}
+                aria-label="Go to next month"
+              >
+                →
+              </button>
             </div>
             
-            <div className="calendar-grid">
-              <div className="weekday-header">Sun</div>
-              <div className="weekday-header">Mon</div>
-              <div className="weekday-header">Tue</div>
-              <div className="weekday-header">Wed</div>
-              <div className="weekday-header">Thu</div>
-              <div className="weekday-header">Fri</div>
-              <div className="weekday-header">Sat</div>
+            <div className="calendar-grid" role="grid" aria-labelledby="current-month-year">
+              <div className="weekday-header" role="columnheader">Sun</div>
+              <div className="weekday-header" role="columnheader">Mon</div>
+              <div className="weekday-header" role="columnheader">Tue</div>
+              <div className="weekday-header" role="columnheader">Wed</div>
+              <div className="weekday-header" role="columnheader">Thu</div>
+              <div className="weekday-header" role="columnheader">Fri</div>
+              <div className="weekday-header" role="columnheader">Sat</div>
               
               {renderCalendarDays()}
             </div>
+            <p className="meal-label-disclaimer" aria-hidden="true">
+              *Meal Labels: B = Breakfast, L = Lunch, and D = Dinner
+            </p>
           </div>
         </div>
         

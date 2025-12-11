@@ -168,11 +168,11 @@ export default function GeneratePlan() {
     }
 
     if (heightUnit === 'ft-in') {
-      if (!heightFeet || heightFeet === '-') {
+      if (!heightFeet || heightFeet === '-' || heightFeet === '') {
         setHeightFeetError(true);
         hasErrors = true;
       }
-      if (!heightInches || heightInches === '-') {
+      if (heightInches === '' || heightInches === '-') {
         setHeightInchesError(true);
         hasErrors = true;
       }
@@ -442,10 +442,10 @@ export default function GeneratePlan() {
   return (
     <>
       <Header />
-      <div className="generate-plan-page">
-        <h1 className="plan-title">Generate Your Plan</h1>
+      <main role="main" className="generate-plan-page">
+        <h1 id="generate-plan-title" className="plan-title">Generate Your Plan</h1>
         
-        <form className="plan-form">
+        <form className="plan-form" aria-labelledby="generate-plan-title">
           {/* Age Section */}
 
           {/* Current Age Section */}
@@ -461,12 +461,12 @@ export default function GeneratePlan() {
                 min="18"
                 max="120"
                 aria-required="true"
-                aria-describedby="age-hint"
+                aria-describedby={`age-hint${ageError ? ' age-error' : ''}${ageInputError ? ' age-input-error' : ''}`}
                 id="age-input"
               />
             </div>
             {ageError && (
-              <div className="weight-error">
+              <div id="age-error" className="weight-error" aria-live="polite">
                 <p className="error-message">
                   {ageError === 'too-low' ? 'Entered age too low' : 'Entered age too high'}
                 </p>
@@ -476,7 +476,7 @@ export default function GeneratePlan() {
               </div>
             )}
             {ageInputError && (
-              <p className="field-error">must input age</p>
+              <p id="age-input-error" className="field-error" aria-live="polite">must input age</p>
             )}
           </div>
 
@@ -492,7 +492,7 @@ export default function GeneratePlan() {
                   value="M"
                   checked={selectedSex === 'M'}
                   onChange={(e) => setSelectedSex(e.target.value)}
-                  aria-describedby="sex-hint"
+                  aria-describedby={`sex-hint${sexError ? ' sex-error' : ''}`}
                 />
                 <span>Male</span>
               </label>
@@ -503,13 +503,13 @@ export default function GeneratePlan() {
                   value="F"
                   checked={selectedSex === 'F'}
                   onChange={(e) => setSelectedSex(e.target.value)}
-                  aria-describedby="sex-hint"
+                  aria-describedby={`sex-hint${sexError ? ' sex-error' : ''}`}
                 />
                 <span>Female</span>
               </label>
             </div>
             {sexError && (
-              <p className="field-error">must input sex</p>
+              <p id="sex-error" className="field-error" aria-live="polite">must input sex</p>
             )}
           </fieldset>
 
@@ -518,7 +518,7 @@ export default function GeneratePlan() {
             <legend className="section-label">Height <span style={{ color: 'red' }} aria-hidden="true">*</span></legend>
             <p className="field-hint" id="height-hint">For energy requirement calculation</p>
 
-            <div className="unit-selector">
+            <div className="unit-selector" role="radiogroup" aria-label="Height unit">
               <label className="unit-option">
                 <input
                   type="radio"
@@ -596,7 +596,7 @@ export default function GeneratePlan() {
             )}
 
             {heightError && (
-              <div className="weight-error">
+              <div id="height-error" className="weight-error" aria-live="polite">
                 <p className="error-message">
                   {heightError === 'too-low' ? 'Entered height too low' : 'Entered height too high'}
                 </p>
@@ -607,7 +607,7 @@ export default function GeneratePlan() {
             )}
           
             {(heightFeetError || heightInchesError) && (
-              <p className="field-error">must input height</p>
+              <p id="height-input-error" className="field-error" aria-live="polite">must input height</p>
             )}
           </fieldset>
 
@@ -617,7 +617,7 @@ export default function GeneratePlan() {
             <p className="field-hint" id="weight-hint">For calorie target calculation</p>
 
             {/* Unit selector */}
-            <div className="unit-selector">
+            <div className="unit-selector" role="radiogroup" aria-label="Weight unit">
               <label className="unit-option">
                 <input
                   type="radio"
@@ -655,12 +655,12 @@ export default function GeneratePlan() {
                 min={weightUnit === 'lb' ? "75" : "34"}
                 max={weightUnit === 'lb' ? "550" : "250"}
                 aria-required="true"
-                aria-describedby="weight-hint"
+                aria-describedby={`weight-hint${weightError ? ' weight-error' : ''}${weightInputError ? ' weight-input-error' : ''}`}
               />
               <span className="unit-label">{weightUnit}</span>
             </div>
             {weightError && (
-              <div className="weight-error">
+              <div id="weight-error" className="weight-error" aria-live="polite">
                 <p className="error-message">
                   {weightError === 'too-low' ? 'Entered weight too low' : 'Entered weight too high'}
                 </p>
@@ -670,7 +670,7 @@ export default function GeneratePlan() {
               </div>
             )}
             {weightInputError && (
-              <p className="field-error">must input weight</p>
+              <p id="weight-input-error" className="field-error" aria-live="polite">must input weight</p>
             )}
           </div>
 
@@ -686,7 +686,7 @@ export default function GeneratePlan() {
                   value="extreme-loss"
                   checked={selectedWeightGoal === 'extreme-loss'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
-                  aria-describedby="weight-goal-hint"
+                  aria-describedby={`weight-goal-hint${weightGoalError ? ' weight-goal-error' : ''}`}
                 />
                 <span>Extreme Weight Loss (1-2 lbs per week)</span>
               </label>
@@ -697,7 +697,7 @@ export default function GeneratePlan() {
                   value="weight-loss"
                   checked={selectedWeightGoal === 'weight-loss'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
-                  aria-describedby="weight-goal-hint"
+                  aria-describedby={`weight-goal-hint${weightGoalError ? ' weight-goal-error' : ''}`}
                 />
                 <span>Weight Loss (0.5-1 lbs per week)</span>
               </label>
@@ -708,7 +708,7 @@ export default function GeneratePlan() {
                   value="maintain"
                   checked={selectedWeightGoal === 'maintain'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
-                  aria-describedby="weight-goal-hint"
+                  aria-describedby={`weight-goal-hint${weightGoalError ? ' weight-goal-error' : ''}`}
                 />
                 <span>Maintain Weight</span>
               </label>
@@ -719,7 +719,7 @@ export default function GeneratePlan() {
                   value="weight-gain"
                   checked={selectedWeightGoal === 'weight-gain'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
-                  aria-describedby="weight-goal-hint"
+                  aria-describedby={`weight-goal-hint${weightGoalError ? ' weight-goal-error' : ''}`}
                 />
                 <span>Weight Gain (0.5-1 lbs per week)</span>
               </label>
@@ -730,13 +730,13 @@ export default function GeneratePlan() {
                   value="extreme-gain"
                   checked={selectedWeightGoal === 'extreme-gain'}
                   onChange={(e) => setSelectedWeightGoal(e.target.value)}
-                  aria-describedby="weight-goal-hint"
+                  aria-describedby={`weight-goal-hint${weightGoalError ? ' weight-goal-error' : ''}`}
                 />
                 <span>Extreme Weight Gain (1-2 lbs per week)</span>
               </label>
             </div>
             {weightGoalError && (
-              <p className="field-error">must input weight goal</p>
+              <p id="weight-goal-error" className="field-error" aria-live="polite">must input weight goal</p>
             )}
           </fieldset>
 
@@ -752,7 +752,7 @@ export default function GeneratePlan() {
                   value="not-active"
                   checked={selectedActivityLevel === 'not-active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
-                  aria-describedby="activity-level-hint"
+                  aria-describedby={`activity-level-hint${activityLevelError ? ' activity-level-error' : ''}`}
                 />
                 <span>Not Active</span>
               </label>
@@ -763,7 +763,7 @@ export default function GeneratePlan() {
                   value="lightly-active"
                   checked={selectedActivityLevel === 'lightly-active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
-                  aria-describedby="activity-level-hint"
+                  aria-describedby={`activity-level-hint${activityLevelError ? ' activity-level-error' : ''}`}
                 />
                 <span>Lightly Active (exercise 1-3 days per week)</span>
               </label>
@@ -774,7 +774,7 @@ export default function GeneratePlan() {
                   value="moderately-active"
                   checked={selectedActivityLevel === 'moderately-active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
-                  aria-describedby="activity-level-hint"
+                  aria-describedby={`activity-level-hint${activityLevelError ? ' activity-level-error' : ''}`}
                 />
                 <span>Moderately Active (exercise 3-4 times per week)</span>
               </label>
@@ -785,7 +785,7 @@ export default function GeneratePlan() {
                   value="active"
                   checked={selectedActivityLevel === 'active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
-                  aria-describedby="activity-level-hint"
+                  aria-describedby={`activity-level-hint${activityLevelError ? ' activity-level-error' : ''}`}
                 />
                 <span>Active (exercise 5-7 times per week)</span>
               </label>
@@ -796,13 +796,13 @@ export default function GeneratePlan() {
                   value="very-active"
                   checked={selectedActivityLevel === 'very-active'}
                   onChange={(e) => setSelectedActivityLevel(e.target.value)}
-                  aria-describedby="activity-level-hint"
+                  aria-describedby={`activity-level-hint${activityLevelError ? ' activity-level-error' : ''}`}
                 />
                 <span>Very Active (intense exercise 5-7 times per week)</span>
               </label>
             </div>
             {activityLevelError && (
-              <p className="field-error">must input activity level</p>
+              <p id="activity-level-error" className="field-error" aria-live="polite">must input activity level</p>
             )}
           </fieldset>
 
@@ -871,7 +871,7 @@ export default function GeneratePlan() {
                   value="1"
                   checked={selectedPlanDuration === '1'}
                   onChange={(e) => setSelectedPlanDuration(e.target.value)}
-                  aria-describedby="plan-duration-hint"
+                  aria-describedby={`plan-duration-hint${planDurationError ? ' plan-duration-error' : ''}`}
                 />
                 <span>One Week</span>
               </label>
@@ -882,7 +882,7 @@ export default function GeneratePlan() {
                   value="2"
                   checked={selectedPlanDuration === '2'}
                   onChange={(e) => setSelectedPlanDuration(e.target.value)}
-                  aria-describedby="plan-duration-hint"
+                  aria-describedby={`plan-duration-hint${planDurationError ? ' plan-duration-error' : ''}`}
                 />
                 <span>Two Weeks</span>
               </label>
@@ -893,13 +893,13 @@ export default function GeneratePlan() {
                   value="4"
                   checked={selectedPlanDuration === '4'}
                   onChange={(e) => setSelectedPlanDuration(e.target.value)}
-                  aria-describedby="plan-duration-hint"
+                  aria-describedby={`plan-duration-hint${planDurationError ? ' plan-duration-error' : ''}`}
                 />
                 <span>Four Weeks</span>
               </label>
             </div>
             {planDurationError && (
-              <p className="field-error">must input plan duration</p>
+              <p id="plan-duration-error" className="field-error" aria-live="polite">must input plan duration</p>
             )}
           </fieldset>
 
@@ -914,7 +914,7 @@ export default function GeneratePlan() {
                   onChange={(e) => setSelectedMonth(e.target.value)}
                   className="height-select month-select"
                   aria-required="true"
-                  aria-describedby="start-date-hint"
+                  aria-describedby={`start-date-hint${startDateError ? ' start-date-error' : ''}`}
                   aria-label="Start month"
                 >
                   <option value="1">January</option>
@@ -937,7 +937,7 @@ export default function GeneratePlan() {
                   onChange={(e) => setSelectedDay(e.target.value)}
                   className="height-select"
                   aria-required="true"
-                  aria-describedby="start-date-hint"
+                  aria-describedby={`start-date-hint${startDateError ? ' start-date-error' : ''}`}
                   aria-label="Start day"
                 >
                   {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
@@ -951,7 +951,7 @@ export default function GeneratePlan() {
                   onChange={(e) => setSelectedYear(e.target.value)}
                   className="height-select"
                   aria-required="true"
-                  aria-describedby="start-date-hint"
+                  aria-describedby={`start-date-hint${startDateError ? ' start-date-error' : ''}`}
                   aria-label="Start year"
                 >
                   {Array.from({ length: 5 }, (_, i) => currentYear + i).map(year => (
@@ -961,21 +961,26 @@ export default function GeneratePlan() {
               </div>
             </div>
             {startDateError && (
-              <p className="field-error">must input start date</p>
+              <p id="start-date-error" className="field-error" aria-live="polite">must input start date</p>
             )}
           </div>
 
           {/* Main Validation Error Message */}
           {showValidationErrors && (
-            <p className="main-error-message">Please fill in all required fields</p>
+            <p className="main-error-message" role="alert">Please fill in all required fields</p>
           )}
 
           {/* Submit Button */}
-          <button type="button" className="generate-plan-button" onClick={handleGeneratePlan}>
+          <button 
+            type="button" 
+            className="generate-plan-button" 
+            onClick={handleGeneratePlan}
+            aria-label="Generate meal plan based on your preferences and dietary needs"
+          >
             Generate Plan
           </button>
         </form>
-      </div>
+      </main>
       <Footer />
     </>
   );

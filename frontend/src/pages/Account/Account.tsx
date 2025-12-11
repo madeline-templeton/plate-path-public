@@ -189,27 +189,27 @@ export default function Account(){
     return (
         <>
             <Header/>
-            <div className="account-page">
-                <h2 className="account-title">My Account</h2>
+            <main role="main" className="account-page">
+                <h1 id="account-page-title" className="account-title">My Account</h1>
 
                 <div className="account-container">
                     {/* User Info Section */}
-                    <div className="account-section">
-                        <h2 className="section-title">Account Information</h2>
+                    <section className="account-section" aria-labelledby="account-info-heading">
+                        <h2 id="account-info-heading" className="section-title">Account Information</h2>
                         <div className="info-card">
                             <div className="info-row">
                                 <span className="info-label">Email:</span>
                                 <span className="info-value">{currentUser?.email || 'Not available'}</span>
                             </div>
                         </div>
-                    </div>
+                    </section>
 
                     {/* Planner Status Section */}
-                    <div className="account-section">
-                        <h2 className="section-title">Meal Plan Status</h2>
+                    <section className="account-section" aria-labelledby="meal-plan-heading">
+                        <h2 id="meal-plan-heading" className="section-title">Meal Plan Status</h2>
                         <div className="status-card">
                             <div className="status-indicator">
-                                <span className={`status-dot ${plannerExists ? 'active' : 'inactive'}`}></span>
+                                <span className={`status-dot ${plannerExists ? 'active' : 'inactive'}`} aria-hidden="true"></span>
                                 <span className="status-text">
                                     {plannerExists ? 'Active meal plan in storage' : 'No meal plan found'}
                                 </span>
@@ -219,19 +219,20 @@ export default function Account(){
                                 <button 
                                     className="delete-button"
                                     onClick={deletePlanner}
+                                    aria-label="Delete your meal plan. This action requires confirmation and cannot be undone."
                                 >
                                     Delete Meal Plan
                                 </button>
                             )}
                         </div>
-                    </div>
+                    </section>
 
                     {/* Meal Preferences Status Section */}
-                    <div className="account-section">
-                        <h2 className="section-title">Voted Meals Status</h2>
+                    <section className="account-section" aria-labelledby="voted-meals-heading">
+                        <h2 id="voted-meals-heading" className="section-title">Voted Meals Status</h2>
                         <div className="status-card">
                             <div className="status-indicator">
-                                <span className={`status-dot ${preferencesExist ? 'active' : 'inactive'}`}></span>
+                                <span className={`status-dot ${preferencesExist ? 'active' : 'inactive'}`} aria-hidden="true"></span>
                                 <span className="status-text">
                                     {preferencesExist ? 'Liked and/ or disliked meals in storage' : 'No liked or disliked meals found'}
                                 </span>
@@ -241,20 +242,21 @@ export default function Account(){
                                 <button 
                                     className="delete-button"
                                     onClick={deleteMealPreferences}
+                                    aria-label="Delete your liked and disliked meals. This action requires confirmation and cannot be undone."
                                 >
                                     Delete Liked and/ or Disliked Meals
                                 </button>
                             )}
                         </div>
-                    </div>
+                    </section>
 
 
                     {/* Stored Data Section */}
-                    <div className="account-section">
-                        <h2 className="section-title">Saved Information Status</h2>
+                    <section className="account-section" aria-labelledby="saved-info-heading">
+                        <h2 id="saved-info-heading" className="section-title">Saved Information Status</h2>
                         <div className="status-card">
                             <div className="status-indicator">
-                                <span className={`status-dot ${userInfoInStorage ? 'active' : 'inactive'}`}></span>
+                                <span className={`status-dot ${userInfoInStorage ? 'active' : 'inactive'}`} aria-hidden="true"></span>
                                 <span className="status-text">
                                     {userInfoInStorage ? 'Personal data in storage' : 'No personal data in storage'}
                                 </span>
@@ -264,55 +266,64 @@ export default function Account(){
                                 <button 
                                     className="delete-button"
                                     onClick={deleteUserInfo}
+                                    aria-label="Delete your personal data. This action requires confirmation and cannot be undone."
                                 >
                                     Delete Personal Data
                                 </button>
                             )}
                         </div>
-                    </div>
+                    </section>
 
                     {/* Data Consent Section */}
-                    <div className="account-section">
-                        <h2 className="section-title">Privacy Settings</h2>
+                    <section className="account-section" aria-labelledby="privacy-settings-heading">
+                        <h2 id="privacy-settings-heading" className="section-title">Privacy Settings</h2>
                         <div className="consent-card">
                             <div className="consent-info">
-                                <p className="consent-description">
+                                <p id="consent-description" className="consent-description">
                                     Allow PlatePath to store your meal plans and preferences for a personalised experience. 
                                     Sensitive data relates all of your inputted personal data, while general data encompasses 
                                     everything generated by us, such as your planner and meal preferences. 
                                 </p>
                             </div>
-                            <div className="toggle-container">
-                                <span className="toggle-label">General Storage Consent</span>
-                                <label className="toggle-switch">
+                            <div className="toggle-container" role="group" aria-describedby="consent-description">
+                                <label htmlFor="general-consent-toggle" className="toggle-label">General Storage Consent</label>
+                                <div className="toggle-switch">
                                     <input
+                                        id="general-consent-toggle"
                                         type="checkbox"
+                                        role="switch"
+                                        aria-checked={generalDataConsent}
                                         checked={generalDataConsent}
                                         onChange={(e) => updateConsent(sensitiveDataConsent, e.target.checked)}
+                                        aria-label="Toggle general storage consent for meal plans and preferences"
                                     />
-                                    <span className="toggle-slider"></span>
-                                </label>
-                                <span className="toggle-label">Sensitive Data Storage Consent</span>
-                                <label className="toggle-switch">
+                                    <span className="toggle-slider" aria-hidden="true"></span>
+                                </div>
+                                <label htmlFor="sensitive-consent-toggle" className="toggle-label">Sensitive Data Storage Consent</label>
+                                <div className="toggle-switch">
                                     <input
+                                        id="sensitive-consent-toggle"
                                         type="checkbox"
+                                        role="switch"
+                                        aria-checked={sensitiveDataConsent}
                                         checked={sensitiveDataConsent}
                                         onChange={(e) => updateConsent(e.target.checked, generalDataConsent)}
+                                        aria-label="Toggle sensitive data storage consent for personal information"
                                     />
-                                    <span className="toggle-slider"></span>
-                                </label>
+                                    <span className="toggle-slider" aria-hidden="true"></span>
+                                </div>
                             </div>
-                            <p className="consent-status">
-                                Consent for sensitive data storage: <strong>{generalDataConsent ? 'Granted' : 'Revoked'}</strong>
+                            <p className="consent-status" aria-live="polite">
+                                Consent for general data storage: <strong>{generalDataConsent ? 'Granted' : 'Revoked'}</strong>
                             </p>
-                            <p className="consent-status">
-                                Consent for general data storage: <strong>{sensitiveDataConsent ? 'Granted' : 'Revoked'}</strong>
+                            <p className="consent-status" aria-live="polite">
+                                Consent for sensitive data storage: <strong>{sensitiveDataConsent ? 'Granted' : 'Revoked'}</strong>
                             </p>
                         </div>
-                    </div>
+                    </section>
                 </div>
 
-            </div>
+            </main>
             <Footer/>
         </>
     )

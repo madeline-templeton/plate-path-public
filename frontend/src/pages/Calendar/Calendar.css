@@ -168,3 +168,14 @@
   box-sizing: border-box;
   cursor: pointer;
 }
+
+.meal-label-disclaimer {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.9rem;
+  color: #000000;
+  text-align: center;
+  margin-top: 15px;
+  margin-bottom: 0;
+  font-style: italic;
+  font-weight: 700;
+}

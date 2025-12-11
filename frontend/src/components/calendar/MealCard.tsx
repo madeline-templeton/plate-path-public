@@ -86,21 +86,28 @@ export default function MealCard({ onClose, meal, consentGranted }: MealCardProp
   }, [currentUser, meal.id]);
 
   return (
-    <div className="meal-card-background">
+    <div className="meal-card-background" role="dialog" aria-modal="true" aria-labelledby="meal-card-title">
       <div className="meal-card">
-        <button className="close-popup" aria-label="Close" onClick={onClose}>
+        <button 
+          className="close-popup" 
+          aria-label="Close meal details" 
+          onClick={onClose}
+        >
           x
         </button>
-        <div className="meal-header">
-          <h2 className="meal-title">{meal.name}</h2>
+        <header className="meal-header">
+          <h2 id="meal-card-title" className="meal-title">{meal.name}</h2>
           <p className="meal-content">
-            {meal.mealTime} - {meal.diet} - serving size {meal.serving} -{meal.calories * meal.serving} calories
+            {meal.mealTime}
+            {meal.diet && meal.diet.toLowerCase() !== 'none' 
+              ? ` - ${meal.diet.split(',').map(d => d.trim()).filter(d => d.toLowerCase() !== 'none').join(', ')}` 
+              : ''} - serving size: {meal.serving} - {meal.calories * meal.serving} calories
           </p>
-        </div>
+        </header>
 
         <div className="meal-recipe">
-          <div className="recipe-detail">
-            <h3 className="recipe-header">Ingredients</h3>
+          <section className="recipe-detail" aria-labelledby="ingredients-heading">
+            <h3 id="ingredients-heading" className="recipe-header">Ingredients</h3>
             <ul className="ingredient-list">
               {ingredientsList.map((ingredient, index) => (
                 <li key={index} className="ingredient">
@@ -108,48 +115,51 @@ export default function MealCard({ onClose, meal, consentGranted }: MealCardProp
                 </li>
               ))}
             </ul>
-          </div>
+          </section>
 
-          <div className="recipe-detail">
-            <h3 className="recipe-header">Recipe Link</h3>
+          <section className="recipe-detail" aria-labelledby="recipe-link-heading">
+            <h3 id="recipe-link-heading" className="recipe-header">Recipe Link</h3>
             <a
               href={meal.website}
               target="_blank"
               rel="noopener noreferrer"
               className="video-link"
+              aria-label={`View recipe for ${meal.name} on external website`}
             >
               {meal.website}
             </a>
-          </div>
+          </section>
         </div>
 
         {consentGranted && (
-          <div className="meal-voting">
+          <section className="meal-voting" aria-label="Rate this meal">
             <div className="vote-container">
               <button
                 className={`vote-button downvote-button ${
                   isLiked === false ? "active" : ""
                 }`}
-                aria-label="Downvote meal"
+                aria-label={`Downvote ${meal.name}${isLiked === false ? ', currently downvoted' : ''}`}
+                aria-pressed={isLiked === false}
                 onClick={() => updateMealVote(false)}
               >
-                <span className="vote-arrow">↓</span>
+                <span className="vote-arrow" aria-hidden="true">↓</span>
               </button>
-              <span className="vote-text">I DON'T love this meal</span>
+              <span className="vote-text" aria-hidden="true">I DON'T love this meal</span>
             </div>
             <div className="vote-container">
               <button
                 className={`vote-button upvote-button ${
                   isLiked === true ? "active" : ""
                 }`}
-                aria-label="Upvote meal"
+                aria-label={`Upvote ${meal.name}${isLiked === true ? ', currently upvoted' : ''}`}
+                aria-pressed={isLiked === true}
                 onClick={() => updateMealVote(true)}
               >
-                <span className="vote-arrow">↑</span>
+                <span className="vote-arrow" aria-hidden="true">↑</span>
               </button>
-              <span className="vote-text">I DO love this meal</span>
+              <span className="vote-text" aria-hidden="true">I DO love this meal</span>
             </div>
-          </div>
+          </section>
         )}
       </div>
     </div>

@@ -37,7 +37,11 @@ export default function LoginButton() {
   };
 
   return (
-    <button className="login-button" onClick={handleClick}>
+    <button 
+      className="login-button" 
+      onClick={handleClick}
+      aria-label={user ? "Sign out of your account" : "Sign in to your account"}
+    >
       {user ? "Sign Out" : "Sign In"}
     </button>
   );

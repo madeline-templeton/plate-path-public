@@ -5,7 +5,7 @@ export const userConstraintsSchema = z.object({
     age: z.coerce.number().positive(),
     sex: z.enum(["M", "F"]),
     height: z.object({
-        value: z.array(z.coerce.number().positive()),
+        value: z.array(z.coerce.number().nonnegative()),
         unit: z.enum(["cm", "ft-in", "inch", "m"])
     }),
     weight: z.object({

@@ -8,12 +8,17 @@ export default function ProfileIcon() {
   };
 
   return (
-    <button className="profile-icon-button" onClick={handleClick} aria-label="Profile settings">
+    <button 
+      className="profile-icon-button" 
+      onClick={handleClick} 
+      aria-label="Navigate to Account page"
+    >
       <svg
         className="profile-icon"
         viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
       >
         <circle cx="12" cy="12" r="10" fill="#f0faf0" />
         <circle cx="12" cy="9" r="3" fill="#2d5016" />

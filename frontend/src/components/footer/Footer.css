@@ -1,12 +1,14 @@
 .bottom-bar {
   background-color: white;
-  height: 100px;
+  min-height: 100px;
   width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 40px;
+  padding: 20px 40px;
   border-top: 2px solid #d9884e;
+  gap: 10px;
 }
 
 .bottom-bar p {

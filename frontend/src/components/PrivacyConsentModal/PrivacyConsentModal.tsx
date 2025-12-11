@@ -85,6 +85,7 @@ export const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
+      aria-describedby="modal-description"
     >
       <div 
         className="modal-content" 
@@ -94,7 +95,7 @@ export const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({
         <button 
           className="modal-close" 
           onClick={onReject}
-          aria-label="Close modal"
+          aria-label="Decline data storage and close privacy consent dialog"
         >
           ×
         </button>
@@ -103,9 +104,9 @@ export const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({
         
         <p className="modal-subtitle">Thank you for creating an account!</p>
 
-        <div className="modal-divider"></div>
+        <div className="modal-divider" aria-hidden="true"></div>
 
-        <div className="modal-section">
+        <div id="modal-description" className="modal-section">
           <p className="modal-text">
             We automatically save your active meal plan as well as meal upvotes and downvotes. 
             This makes PlatePath work seamlessly for you. You can disable this anytime in your{' '}
@@ -120,10 +121,10 @@ export const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({
           </p>
         </div>
 
-        <div className="modal-divider"></div>
+        <div className="modal-divider" aria-hidden="true"></div>
 
-        <div className="modal-section">
-          <h2 className="modal-section-title">Personal Information</h2>
+        <section className="modal-section" aria-labelledby="personal-info-heading">
+          <h2 id="personal-info-heading" className="modal-section-title">Personal Information</h2>
           <p className="modal-text">
             Would you like us to remember your personal profile (age, sex, height, current weight, etc.) for faster 
             meal plan creation?
@@ -141,12 +142,13 @@ export const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({
             </a>.
           </p>
           <p className="modal-question">May we save your personal information?</p>
-        </div>
+        </section>
 
-        <div className="modal-actions">
+        <div className="modal-actions" role="group" aria-label="Privacy consent decision">
           <button 
             className="modal-button modal-button-reject" 
             onClick={onReject}
+            aria-label="Reject saving personal information. You can change this later in your Account settings."
           >
             Reject
           </button>
@@ -154,6 +156,7 @@ export const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({
             className="modal-button modal-button-accept" 
             onClick={onAccept}
             ref={acceptButtonRef}
+            aria-label="Accept saving personal information. You can change this later in your Account settings."
           >
             Accept
           </button>
