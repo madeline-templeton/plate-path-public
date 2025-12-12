@@ -53,9 +53,12 @@ export function filterByAllergies(
   meals: Meal[],
   allergyIngredients: string[]
 ): Meal[] {
-  if (allergyIngredients.length === 0) return meals;
+  // Normalize and drop empty/whitespace allergy entries
+  const allergiesLower = allergyIngredients
+    .map((a) => a.toLowerCase().trim())
+    .filter((a) => a.length > 0);
 
-  const allergiesLower = allergyIngredients.map((a) => a.toLowerCase());
+  if (allergiesLower.length === 0) return meals;
 
   return meals.filter((meal) => {
     const ingredientsLower = meal.ingredients.toLowerCase();

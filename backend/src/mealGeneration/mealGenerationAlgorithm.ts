@@ -10,10 +10,11 @@ export async function mealAlgorithm(
   downvotedMealIds: number[],
   preferredMealIds: number[],
   startDate: calendarDate
+  // maintenance?: number
 ): Promise<Day[]> {
   // Load all meals from CSV (cached after first load)
   const allMeals = loadMealsFromCSV();
-    console.log(`Loaded ${allMeals.length} meals from CSV`);
+  console.log(`Loaded ${allMeals.length} meals from CSV`);
   // Apply global filters (calories will be applied per meal time in pickMeal)
   const baseFilteredMeals = applyAllFilters(allMeals, {
     dietaryRestrictions,
@@ -21,13 +22,17 @@ export async function mealAlgorithm(
     downvotedIds: downvotedMealIds,
   });
 
+  if (totalCalories < 1400) {
+    totalCalories = 1400;
+  }
+
   // Get preferred meals from filtered set
   const preferredMeals = getPreferredMeals(baseFilteredMeals, preferredMealIds);
 
   const plan: Day[] = [];
   const currentDate = { ...startDate };
 
-  const breakfastCalories = 1/4 * totalCalories;
+  const breakfastCalories = (1 / 4) * totalCalories;
   // Generate meal plan for each day
   for (let i = 0; i < planLength; i++) {
     const breakfast = await pickMeal(
@@ -37,7 +42,8 @@ export async function mealAlgorithm(
       breakfastCalories
     );
 
-    const lunchCalories = (totalCalories - (breakfast.calories * breakfast.serving))/2;
+    const breakfastTotal = breakfast.calories * breakfast.serving;
+    const lunchCalories = (totalCalories - breakfastTotal) / 2;
 
     const lunch = await pickMeal(
       baseFilteredMeals,
@@ -46,7 +52,8 @@ export async function mealAlgorithm(
       lunchCalories
     );
 
-    const dinnerCalories = totalCalories - (breakfast.calories * breakfast.serving) - (lunch.calories * lunch.serving);
+    const lunchTotal = lunch.calories * lunch.serving;
+    const dinnerCalories = totalCalories - breakfastTotal - lunchTotal;
 
     const dinner = await pickMeal(
       baseFilteredMeals,
@@ -55,8 +62,60 @@ export async function mealAlgorithm(
       dinnerCalories
     );
 
-    const dayCalories = (breakfast.calories * breakfast.serving) + (lunch.calories * lunch.serving) + (dinner.calories * dinner.serving)
-    console.log("total calories for day: " + totalCalories + "\ntotal calorie planned : " + dayCalories)
+    // End-of-day correction: ensure total >= 1200 by adjusting servings
+    let dayCalories =
+      breakfast.calories * breakfast.serving +
+      lunch.calories * lunch.serving +
+      dinner.calories * dinner.serving;
+
+    // Guard against NaN from any malformed data
+    if (!Number.isFinite(dayCalories)) {
+      dayCalories = 0;
+    }
+
+    // If under 1200, incrementally increase servings: dinner → lunch → breakfast
+    if (dayCalories < 1200) {
+      // Increase dinner first
+      while (dayCalories < 1200 && dinner.serving < 100) {
+        dinner.serving = Math.min(100, dinner.serving + 0.5);
+        dayCalories =
+          breakfast.calories * breakfast.serving +
+          lunch.calories * lunch.serving +
+          dinner.calories * dinner.serving;
+      }
+
+      // Then lunch if still needed
+      while (dayCalories < 1200 && lunch.serving < 100) {
+        lunch.serving = Math.min(100, lunch.serving + 0.5);
+        dayCalories =
+          breakfast.calories * breakfast.serving +
+          lunch.calories * lunch.serving +
+          dinner.calories * dinner.serving;
+      }
+
+      // Finally breakfast as last resort
+      while (dayCalories < 1200 && breakfast.serving < 100) {
+        breakfast.serving = Math.min(100, breakfast.serving + 0.5);
+        dayCalories =
+          breakfast.calories * breakfast.serving +
+          lunch.calories * lunch.serving +
+          dinner.calories * dinner.serving;
+      }
+
+      // Final guard: if still under 1200 after maxing out servings, log warning
+      if (dayCalories < 1200) {
+        console.warn(
+          `Warning: Unable to reach 1200 calories (got ${dayCalories}). All servings at max (100).`
+        );
+      }
+    }
+
+    console.log(
+      "total calories for day: " +
+        totalCalories +
+        "\ntotal calorie planned : " +
+        dayCalories
+    );
 
     const dayPlan: Day = {
       date: { ...currentDate },
@@ -64,7 +123,6 @@ export async function mealAlgorithm(
       lunch,
       dinner,
     };
-
     plan.push(dayPlan);
 
     // Increment date for next day
@@ -132,8 +190,8 @@ export async function pickMeal(
 
   let selectedMeal: Meal = candidates[0]; // fallback
 
-  // Try up to 10 times to find a meal with < 4 occurrences
-  for (let attempt = 0; attempt < 10; attempt++) {
+  // Try up to 50 times to find a meal with < 4 occurrences
+  for (let attempt = 0; attempt < 50; attempt++) {
     const randomValue = Math.random();
 
     // 60% from candidates, 40% from preferred
@@ -146,13 +204,18 @@ export async function pickMeal(
     }
 
     // Accept if occurrences < 4, or if this is our last attempt
-    if (selectedMeal.occurrences < 4 || attempt >= 9) {
+    if (selectedMeal.occurrences < 4 || attempt >= 50) {
       selectedMeal.occurrences += 1;
       break;
     }
   }
 
-  return selectedMeal;
+  // Return a deep clone to avoid mutating the shared meal object
+  return {
+    ...selectedMeal,
+    serving: 1, // Reset serving to 1 for each new meal instance
+    occurrences: selectedMeal.occurrences, // Keep the updated occurrence count
+  }; //TODO FIGURE OUT THIS LOGIC 
 }
 
 export async function mockMealAlgorithm(): Promise<Day[]> {
@@ -196,7 +259,6 @@ export async function mockMealAlgorithm(): Promise<Day[]> {
     },
   ];
 }
-
 
 // export async function mockMealAlgorithm(
 //   dailyCalories: number,
