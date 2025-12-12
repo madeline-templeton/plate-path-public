@@ -1,0 +1,8 @@
+{
+  "vitest.enable": true,
+  "vitest.configFile": "frontend/vitest.config.ts",
+  "vitest.nodeEnv": {
+    "NODE_ENV": "test"
+  },
+  "testing.automaticallyOpenPeekView": "never"
+}
