@@ -475,6 +475,11 @@ export default function GeneratePlan() {
       <main role="main" className="generate-plan-page">
         <h1 id="generate-plan-title" className="plan-title">Generate Your Plan</h1>
         
+        <div style={{ width: '100%', maxWidth: 700, textAlign: 'left', margin: 0, padding: 0 }}>
+          <small aria-hidden="true" className="required-disclaimer">
+            <span className="asterisk">*</span> indicates a required field.
+          </small>
+        </div>
         <form className="plan-form" aria-labelledby="generate-plan-title">
           {/* Age Section */}
 
