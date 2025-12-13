@@ -43,7 +43,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
   describe('Page Structure', () => {
     /**
      * Tests that modal has proper role="dialog".
-     * (Real: Dialog role for modal)
      */
     it('should have role="dialog" when open', () => {
       renderWithRouter(
@@ -56,7 +55,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that modal has aria-modal="true" to indicate it's a modal dialog.
-     * (Real: ARIA modal attribute)
      */
     it('should have aria-modal="true"', () => {
       renderWithRouter(
@@ -69,7 +67,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that modal is properly labeled via aria-labelledby.
-     * (Real: ARIA labelledby pointing to title)
      */
     it('should have aria-labelledby pointing to modal title', () => {
       renderWithRouter(
@@ -85,7 +82,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that modal has aria-describedby connecting to description.
-     * (Real: ARIA describedby for modal description)
      */
     it('should have aria-describedby pointing to modal description', () => {
       renderWithRouter(
@@ -101,7 +97,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that modal doesn't render when isOpen is false.
-     * (Real: Conditional rendering)
      */
     it('should not render when isOpen is false', () => {
       renderWithRouter(
@@ -120,7 +115,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
   describe('Heading Hierarchy', () => {
     /**
      * Tests that modal has proper h1 → h2 hierarchy.
-     * (Real: Heading levels)
      */
     it('should have proper heading hierarchy from h1 to h2', () => {
       renderWithRouter(
@@ -136,7 +130,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that h1 has proper id for aria-labelledby.
-     * (Real: ID attribute on h1)
      */
     it('should have h1 with id="modal-title"', () => {
       renderWithRouter(
@@ -149,7 +142,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that h2 has proper id for aria-labelledby on section.
-     * (Real: ID attribute on h2)
      */
     it('should have h2 with id="personal-info-heading"', () => {
       renderWithRouter(
@@ -168,7 +160,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
   describe('ARIA Labels and Attributes', () => {
     /**
      * Tests that close button has descriptive aria-label.
-     * (Real: ARIA label on close button)
      */
     it('should have descriptive aria-label on close button', () => {
       renderWithRouter(
@@ -181,7 +172,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that Accept button has descriptive aria-label.
-     * (Real: ARIA label on Accept button)
      */
     it('should have descriptive aria-label on Accept button', () => {
       renderWithRouter(
@@ -194,7 +184,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that Reject button has descriptive aria-label.
-     * (Real: ARIA label on Reject button)
      */
     it('should have descriptive aria-label on Reject button', () => {
       renderWithRouter(
@@ -207,7 +196,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that Account links have descriptive aria-labels.
-     * (Real: ARIA labels on links)
      */
     it('should have descriptive aria-labels on Account links', () => {
       renderWithRouter(
@@ -224,7 +212,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that button group has proper role="group" with aria-label.
-     * (Real: Group role on button container)
      */
     it('should have button group with role="group" and aria-label', () => {
       renderWithRouter(
@@ -237,7 +224,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that decorative dividers have aria-hidden="true".
-     * (Real: ARIA hidden on decorative elements)
      */
     it('should hide decorative dividers from screen readers', () => {
       renderWithRouter(
@@ -250,7 +236,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that section has aria-labelledby connecting to h2.
-     * (Real: ARIA labelledby on section)
      */
     it('should connect section to h2 with aria-labelledby', () => {
       renderWithRouter(
@@ -269,7 +254,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
   describe('Keyboard Navigation', () => {
     /**
      * Tests that Accept button receives focus when modal opens.
-     * (Real: Auto-focus on Accept button)
      */
     it('should auto-focus on Accept button when modal opens', () => {
       renderWithRouter(
@@ -282,7 +266,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that all buttons are keyboard accessible.
-     * (Real: Button elements can receive focus)
      */
     it('should allow keyboard navigation to all buttons', () => {
       renderWithRouter(
@@ -299,7 +282,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that links are keyboard accessible.
-     * (Real: Link elements can receive focus)
      */
     it('should allow keyboard navigation to Account links', () => {
       renderWithRouter(
@@ -316,7 +298,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that clicking Accept button triggers callback.
-     * (Real: Button interaction)
      */
     it('should trigger onAccept when Accept button is clicked', async () => {
       const user = userEvent.setup();
@@ -332,7 +313,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that clicking Reject button triggers callback.
-     * (Real: Button interaction)
      */
     it('should trigger onReject when Reject button is clicked', async () => {
       const user = userEvent.setup();
@@ -348,7 +328,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that clicking close button triggers onReject callback.
-     * (Real: Close button interaction)
      */
     it('should trigger onReject when close button is clicked', async () => {
       const user = userEvent.setup();
@@ -370,7 +349,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
   describe('Content and Text', () => {
     /**
      * Tests that modal title and subtitle render correctly.
-     * (Real: Text content)
      */
     it('should render modal title and subtitle', () => {
       renderWithRouter(
@@ -383,7 +361,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that main consent question renders.
-     * (Real: Text content)
      */
     it('should render consent question', () => {
       renderWithRouter(
@@ -395,7 +372,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that privacy statement renders.
-     * (Real: Text content)
      */
     it('should render privacy statement', () => {
       renderWithRouter(
@@ -407,7 +383,6 @@ describe('PrivacyConsentModal - Accessibility Tests', () => {
 
     /**
      * Tests that button text renders correctly.
-     * (Real: Button text content)
      */
     it('should render button text', () => {
       renderWithRouter(

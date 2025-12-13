@@ -21,10 +21,8 @@ export default function OurStory() {
     const isNewSignup = localStorage.getItem('showPrivacyConsent');
     const hasSeenConsent = localStorage.getItem('privacyConsentSeen');
     
-    // Show modal only if this is a new signup AND they haven't seen it before
     if (isNewSignup === 'true' && !hasSeenConsent) {
       setShowModal(true);
-      // Clear the signup flag so modal doesn't show on subsequent visits
       localStorage.removeItem('showPrivacyConsent');
     }
   }, []);
@@ -34,7 +32,6 @@ export default function OurStory() {
    * Updates local storage and sends consent status to backend.
    */
   const handleAccept = async () => {
-    // Save that user has seen the modal and accepted
     localStorage.setItem('privacyConsentSeen', 'true');
     await updateConsent(true, true);
     setShowModal(false);
@@ -45,7 +42,6 @@ export default function OurStory() {
    * Updates local storage and sends consent status to backend.
    */
   const handleReject = async () => {
-    // Save that user has seen the modal and rejected
     localStorage.setItem('privacyConsentSeen', 'true');
     await updateConsent(false, true);
     setShowModal(false);

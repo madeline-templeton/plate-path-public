@@ -1,3 +1,17 @@
+.calendar-instruction {
+  width: 95%;
+  max-width: 1200px;
+  text-align: left;
+  margin-top: 0.01rem;
+  margin-bottom: 0.5rem;
+  margin-left: 38px;
+  padding-left: 0;
+}
+
+.calendar-instruction small {
+  color: #000;
+  font-family: 'Quicksand', 'Trebuchet MS', 'Lucida Sans', sans-serif;
+}
 .no-meal-plan-message {
   color: #333;
   font-weight: 500;
@@ -25,7 +39,7 @@
 .calendar-page {
   width: 100%;
   min-height: calc(100vh - 180px);
-  padding: 50px 40px 40px 40px;
+  padding: 35px 40px 40px 40px; /* slightly increased top padding */
   display: flex;
   flex-direction: row;
   background-color: #f0faf0;
@@ -49,6 +63,7 @@
   font-weight: 700;
   color: #000000;
   margin-bottom: 5px;
+  margin-top: 0;
   width: 95%;
   max-width: 1200px;
   text-align: left;

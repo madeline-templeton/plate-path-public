@@ -9,7 +9,6 @@
   text-align: center;
 }
 
-/* Main and Section Structure */
 main[role="main"] {
   width: 100%;
   display: flex;
@@ -72,7 +71,6 @@ main[role="main"] {
   border-radius: 2px;
 }
 
-/* About Us Section */
 .about-us-section {
   margin-top: 100px;
   width: 100%;
@@ -86,7 +84,6 @@ main[role="main"] {
   margin-bottom: 30px;
 }
 
-/* Team Members */
 .team-members {
   display: flex;
   justify-content: center;
@@ -142,7 +139,6 @@ main[role="main"] {
   margin: 0;
 }
 
-/* Bio Text */
 .bio-text {
   margin-top: 50px;
   text-align: left;

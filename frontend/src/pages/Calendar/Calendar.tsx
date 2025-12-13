@@ -252,7 +252,12 @@ export default function Calendar() {
       <>
         <Header />
         <div className="calendar-page">
-          <h1 className="calendar-title">Your Meal Calender</h1>
+      <h1 className="calendar-title" style={{ marginTop: '1.5rem' }}>Your Meal Calender</h1>
+      <div className="calendar-instruction">
+        <small aria-label="Click on a meal to learn more about it!">
+          Click on a meal to learn more about it!
+        </small>
+      </div>
           <div className="calendar-container">
             <p style={{ textAlign: 'center', padding: '40px', fontFamily: 'Quicksand, sans-serif', fontSize: '1.2rem' }}>
               Loading your meal plan...
@@ -270,6 +275,11 @@ export default function Calendar() {
         <Header />
         <div className="calendar-page">
           <h1 className="calendar-title">Your Meal Calender</h1>
+          <div className="calendar-instruction">
+            <small aria-label="Click on a meal to learn more about it!">
+              Click on a meal to learn more about it!
+            </small>
+          </div>
           <div className="calendar-container">
               <div
                 className="no-meal-plan-message"
@@ -298,6 +308,11 @@ export default function Calendar() {
       <div className={`calendar-page ${displayMealPopUp ? 'with-sidebar' : ''}`}>
         <div className="calendar-content">
           <h1 className="calendar-title">Your Meal Calender</h1>
+          <div className="calendar-instruction">
+            <small aria-label="Click on a meal to learn more about it!">
+              Click on a meal to learn more about it!
+            </small>
+          </div>
           
           <div className="calendar-container">
             <div className="calendar-header" role="toolbar" aria-label="Calendar navigation">

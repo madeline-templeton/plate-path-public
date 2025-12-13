@@ -167,7 +167,6 @@
   outline-offset: 2px;
 }
 
-/* Scrollbar styling for modal content */
 .modal-content::-webkit-scrollbar {
   width: 8px;
 }

@@ -11,6 +11,7 @@ import { BrowserRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import Account from './Account';
 
+
 // Mock AuthContext to return an authenticated user
 vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({ 
@@ -32,29 +33,25 @@ vi.mock('../../services/firebase', () => ({
   },
 }));
 
-// Mock axios to prevent real HTTP requests
+// Mock axios to prevent real HTTP requests (mock planner check, mock user info check, mock meal preferneces, mock consent)
 vi.mock('axios', () => ({
   default: {
     get: vi.fn((url: string) => {
-      // Mock planner check
       if (url.includes('/checkUserPlannerExists/')) {
         return Promise.resolve({
           data: { success: true, exists: true }
         });
       }
-      // Mock user info check
       if (url.includes('/checkIfInfoInStorage/')) {
         return Promise.resolve({
           data: { success: true, exists: true }
         });
       }
-      // Mock meal preferences check
       if (url.includes('/checkUserMealVotes/')) {
         return Promise.resolve({
           data: { success: true, exists: true }
         });
       }
-      // Mock consent check
       if (url.includes('/getUserConsent/')) {
         return Promise.resolve({
           data: {
@@ -81,6 +78,7 @@ vi.mock('axios', () => ({
 const renderWithRouter = (component: React.ReactElement) => {
   return render(<BrowserRouter>{component}</BrowserRouter>);
 };
+
 
 /**
  * TESTING SUITE
@@ -246,7 +244,8 @@ describe('Account - Accessibility Tests', () => {
     });
 
     /**
-     * Tests that consent status messages have aria-live="polite".
+     * Tests that consent status messages have aria-live="polite" so screenreader 
+     * doesn't interrupt what they are saying but still announces it
      * (Mocked: Auth, Firebase, Axios)
      * (Real: ARIA live regions)
      */
@@ -260,7 +259,7 @@ describe('Account - Accessibility Tests', () => {
     });
 
     /**
-     * Tests that decorative status dots have aria-hidden="true".
+     * Tests that decorative status dots have aria-hidden="true"
      * (Mocked: Auth, Firebase, Axios)
      * (Real: ARIA hidden on decorative elements)
      */
@@ -352,7 +351,6 @@ describe('Account - Accessibility Tests', () => {
       
       await user.click(generalSwitch);
       
-      // Switch should be toggleable
       expect(generalSwitch.tagName).toBe('INPUT');
     });
   });

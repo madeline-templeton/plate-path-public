@@ -11,6 +11,7 @@ import { BrowserRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import Header from './Header';
 
+
 // Mock Firebase
 vi.mock('../../services/firebase', () => ({
   auth: {

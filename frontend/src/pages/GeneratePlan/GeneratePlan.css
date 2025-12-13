@@ -28,7 +28,6 @@
   margin-bottom: 50px;
 }
 
-/* Remove fieldset default styling */
 fieldset.form-section {
   border: none;
   padding: 0;
@@ -58,7 +57,6 @@ fieldset.form-section {
   font-style: italic;
 }
 
-/* Radio buttons and checkboxes */
 .radio-group,
 .checkbox-group {
   display: flex;
@@ -135,7 +133,6 @@ fieldset.form-section {
   user-select: none;
 }
 
-/* Height inputs */
 .height-inputs {
   display: flex;
   gap: 20px;
@@ -195,7 +192,6 @@ fieldset.form-section {
   color: #000000;
 }
 
-/* Weight input */
 .weight-input {
   display: flex;
   align-items: center;
@@ -216,7 +212,6 @@ fieldset.form-section {
   border-color: #a8d5a8;
 }
 
-/* Weight error messages */
 .weight-error {
   margin-top: 10px;
   padding: 10px;
@@ -241,7 +236,6 @@ fieldset.form-section {
   font-style: italic;
 }
 
-/* Field-level error messages */
 .field-error {
   color: #ff0000;
   font-family: 'Quicksand', sans-serif;
@@ -250,7 +244,6 @@ fieldset.form-section {
   font-weight: 500;
 }
 
-/* Main validation error message above button */
 .main-error-message {
   color: #ff0000;
   font-family: 'Quicksand', sans-serif;
@@ -264,7 +257,6 @@ fieldset.form-section {
   border-radius: 6px;
 }
 
-/* Generate Plan Button */
 .generate-plan-button {
   width: 100%;
   padding: 15px;
@@ -288,7 +280,6 @@ fieldset.form-section {
   background-color: #b56c38;
 }
 
-/* Remove default number input arrows */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;

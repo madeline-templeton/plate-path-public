@@ -31,7 +31,6 @@ export default function Login() {
     try {
       if (isRegistering) {
         await createUserWithEmailAndPassword(auth, email, password);
-        // Set flag to show privacy consent modal for new users
         localStorage.setItem('showPrivacyConsent', 'true');
         alert("Account created successfully!");
       } else {

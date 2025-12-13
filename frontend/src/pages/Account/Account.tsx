@@ -75,7 +75,6 @@ export default function Account(){
                 setUserInfoInStorage(true);
             }
         } catch (error) {
-            // Silently fail - user info will show as not existing
         }
     }
 
@@ -118,7 +117,6 @@ export default function Account(){
                 setPreferencesExist(true);
             }
         } catch (error) {
-            // Silently fail - preferences will show as not existing
         }
     }
 
@@ -202,7 +200,6 @@ export default function Account(){
                 }
             } 
         } catch(error){
-            // Silently fail - consent toggles will remain in default state
         }
     }
 

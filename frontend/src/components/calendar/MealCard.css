@@ -215,7 +215,6 @@
   cursor: pointer;
 }
 
-/* Scrollbar styling */
 .meal-card::-webkit-scrollbar {
   width: 8px;
 }
@@ -234,7 +233,6 @@
   background: #8bc58b;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .meal-card {
     padding: 20px;

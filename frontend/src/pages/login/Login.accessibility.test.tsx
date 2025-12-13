@@ -242,7 +242,6 @@ describe('Login - Accessibility Tests', () => {
       
       await user.click(toggleLink);
       
-      // Should switch to register mode
       expect(screen.getByRole('heading', { level: 1, name: /create account/i })).toBeInTheDocument();
     });
   });

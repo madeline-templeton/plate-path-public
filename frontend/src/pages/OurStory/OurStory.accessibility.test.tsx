@@ -21,7 +21,7 @@ vi.mock('../../contexts/AuthContext', () => ({
 
 /**
  * Mock Firebase auth service to prevent real Firebase initialization.
- * No actual authentication or token retrieval happens in tests.
+ * No actual authentication or token retrieval happens in tests. 
  */
 vi.mock('../../services/firebase', () => ({
   auth: {
