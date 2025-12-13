@@ -15,6 +15,7 @@ export async function mealAlgorithm(
   // Load all meals from CSV (cached after first load)
   const allMeals = loadMealsFromCSV();
   console.log(`Loaded ${allMeals.length} meals from CSV`);
+  console.log(`[mealAlgorithm] Received totalCalories parameter: ${totalCalories}`);
   // Apply global filters (calories will be applied per meal time in pickMeal)
   const baseFilteredMeals = applyAllFilters(allMeals, {
     dietaryRestrictions,
@@ -23,8 +24,10 @@ export async function mealAlgorithm(
   });
 
   if (totalCalories < 1400) {
+    console.log(`[mealAlgorithm] WARNING: totalCalories ${totalCalories} was below 1400, clamping to 1400`);
     totalCalories = 1400;
   }
+  console.log(`[mealAlgorithm] Final totalCalories to use: ${totalCalories}`); // totalCalories is being computed correctly 
 
   // Get preferred meals from filtered set
   const preferredMeals = getPreferredMeals(baseFilteredMeals, preferredMealIds);
@@ -213,7 +216,7 @@ export async function pickMeal(
   // Return a deep clone to avoid mutating the shared meal object
   return {
     ...selectedMeal,
-    serving: 1, // Reset serving to 1 for each new meal instance
+    serving: selectedMeal.serving, // Reset serving to 1 for each new meal instance
     occurrences: selectedMeal.occurrences, // Keep the updated occurrence count
   }; //TODO FIGURE OUT THIS LOGIC 
 }

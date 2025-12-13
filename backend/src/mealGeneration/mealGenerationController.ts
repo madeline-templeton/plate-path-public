@@ -15,9 +15,11 @@ export async function mealController(constraints: UserConstraints):
         
         // Compute the base calories
         const baseCalories = baseCalorieCalculator(constraints);
+        console.log(`[mealController] Base calories: ${baseCalories}`);
 
         // Compute the adjusted calories
         const adjustedCalories = exerciseAdjustedCalorieCalculator(constraints, baseCalories);
+        console.log(`[mealController] Adjusted calories (to pass to algorithm): ${adjustedCalories}`);
 
         // Call the meal algorithm to generate the meal plan
         const generatedMeals = await mealAlgorithm (

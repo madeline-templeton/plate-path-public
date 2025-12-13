@@ -58,13 +58,16 @@ export function baseCalorieCalculator(constraints: UserConstraints): number {
     calories -= 161;
   }
 
-  return calories * activityLevelMultiplier;
+  const finalCalories = calories * activityLevelMultiplier;
+  console.log(`[baseCalorieCalculator] BMR: ${calories.toFixed(1)}, Activity: ${activityLevelMultiplier}, Final: ${finalCalories.toFixed(1)}`);
+  return finalCalories;
 }
 
 export function exerciseAdjustedCalorieCalculator(
   constraints: UserConstraints,
   baseCalories: number
 ): number {
+  console.log(`[exerciseAdjustedCalorieCalculator] Input baseCalories: ${baseCalories}, weightGoal: ${constraints.weightGoal}`);
   let adjustedCalories = baseCalories;
 
   // Check all the different goals available
@@ -119,6 +122,7 @@ export function exerciseAdjustedCalorieCalculator(
 
     case "maintain": {
       adjustedCalories = baseCalories;
+      break;
     }
 
     case "weight-gain":
@@ -143,11 +147,12 @@ export function exerciseAdjustedCalorieCalculator(
       // For all others add 300
       else {
         adjustedCalories += 300;
-      }
       break;
   }
 
+  console.log(`[exerciseAdjustedCalorieCalculator] Output adjustedCalories: ${adjustedCalories}`);
   return adjustedCalories;
+} return adjustedCalories;
 }
 
 /**
