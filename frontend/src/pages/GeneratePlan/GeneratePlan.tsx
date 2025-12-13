@@ -485,7 +485,7 @@ export default function GeneratePlan() {
 
           {/* Current Age Section */}
           <div className="form-section">
-            <h2 className="section-label">Age <span style={{ color: 'red' }} aria-hidden="true">*</span></h2>
+            <label htmlFor="age-input" className="section-label">Age <span style={{ color: 'red' }} aria-hidden="true">*</span></label>
             <p className="field-hint" id="age-hint">Used to calculate your metabolic rate</p>
             <div className="weight-input">
               <input
@@ -520,8 +520,9 @@ export default function GeneratePlan() {
             <legend className="section-label">Sex <span style={{ color: 'red' }} aria-hidden="true">*</span></legend>
             <p className="field-hint" id="sex-hint">Affects calorie needs</p>
             <div className="radio-group">
-              <label className="radio-option">
+              <label className="radio-option" htmlFor="sex-male">
                 <input
+                  id="sex-male"
                   type="radio"
                   name="sex"
                   value="M"
@@ -531,8 +532,9 @@ export default function GeneratePlan() {
                 />
                 <span>Male</span>
               </label>
-              <label className="radio-option">
+              <label className="radio-option" htmlFor="sex-female">
                 <input
+                  id="sex-female"
                   type="radio"
                   name="sex"
                   value="F"
@@ -582,13 +584,14 @@ export default function GeneratePlan() {
             {heightUnit === 'ft-in' ? (
               <div className="height-inputs">
                 <div className="height-field">
+                  <label htmlFor="height-feet" className="unit-label">Height Feet</label>
                   <select
+                    id="height-feet"
                     value={heightFeet}
                     onChange={(e) => setHeightFeet(e.target.value)}
                     className="height-select"
                     aria-required="true"
                     aria-describedby="height-hint"
-                    aria-label="Height feet"
                   >
                     <option value="">-</option>
                     <option value="4">4</option>
@@ -599,13 +602,14 @@ export default function GeneratePlan() {
                   <span className="unit-label">ft</span>
                 </div>
                 <div className="height-field">
+                  <label htmlFor="height-inches" className="unit-label">Height Inches</label>
                   <select
+                    id="height-inches"
                     value={heightInches}
                     onChange={(e) => setHeightInches(e.target.value)}
                     className="height-select"
                     aria-required="true"
                     aria-describedby="height-hint"
-                    aria-label="Height inches"
                   >
                     <option value="">-</option>
                     {Array.from({ length: 12 }, (_, i) => i).map(inch => (
@@ -617,7 +621,9 @@ export default function GeneratePlan() {
               </div>
             ) : (
               <div className="weight-input">
+                <label htmlFor="height-cm" className="unit-label">Centimeters</label>
                 <input
+                  id="height-cm"
                   type="number"
                   value={heightValue}
                   onChange={(e) => handleHeightChange(e.target.value)}
@@ -648,7 +654,7 @@ export default function GeneratePlan() {
 
           {/* Current Weight Section */}
           <div className="form-section">
-            <h2 className="section-label">Current Weight <span style={{ color: 'red' }} aria-hidden="true">*</span></h2>
+            <label htmlFor="weight-input" className="section-label">Current Weight <span style={{ color: 'red' }} aria-hidden="true">*</span></label>
             <p className="field-hint" id="weight-hint">For calorie target calculation</p>
 
             {/* Unit selector */}
@@ -683,6 +689,7 @@ export default function GeneratePlan() {
 
             <div className="weight-input">
               <input
+                id="weight-input"
                 type="number"
                 value={weight}
                 onChange={(e) => handleWeightChange(e.target.value)}
@@ -867,29 +874,11 @@ export default function GeneratePlan() {
               <label className="checkbox-option">
                 <input
                   type="checkbox"
-                  checked={dietaryRestrictions.includes('dairy-free')}
-                  onChange={() => handleDietaryChange('dairy-free')}
-                  aria-describedby="dietary-restrictions-hint"
-                />
-                <span>Dairy Free</span>
-              </label>
-              <label className="checkbox-option">
-                <input
-                  type="checkbox"
                   checked={dietaryRestrictions.includes('nut-free')}
                   onChange={() => handleDietaryChange('nut-free')}
                   aria-describedby="dietary-restrictions-hint"
                 />
                 <span>Nut Free</span>
-              </label>
-              <label className="checkbox-option">
-                <input
-                  type="checkbox"
-                  checked={dietaryRestrictions.includes('gluten-free')}
-                  onChange={() => handleDietaryChange('gluten-free')}
-                  aria-describedby="dietary-restrictions-hint"
-                />
-                <span>Gluten Free</span>
               </label>
             </div>
           </fieldset>
