@@ -15,7 +15,9 @@ export async function mealAlgorithm(
   // Load all meals from CSV (cached after first load)
   const allMeals = loadMealsFromCSV();
   console.log(`Loaded ${allMeals.length} meals from CSV`);
-  console.log(`[mealAlgorithm] Received totalCalories parameter: ${totalCalories}`);
+  console.log(
+    `[mealAlgorithm] Received totalCalories parameter: ${totalCalories}`
+  );
   // Apply global filters (calories will be applied per meal time in pickMeal)
   const baseFilteredMeals = applyAllFilters(allMeals, {
     dietaryRestrictions,
@@ -24,10 +26,12 @@ export async function mealAlgorithm(
   });
 
   if (totalCalories < 1400) {
-    console.log(`[mealAlgorithm] WARNING: totalCalories ${totalCalories} was below 1400, clamping to 1400`);
+    console.log(
+      `[mealAlgorithm] WARNING: totalCalories ${totalCalories} was below 1400, clamping to 1400`
+    );
     totalCalories = 1400;
   }
-  console.log(`[mealAlgorithm] Final totalCalories to use: ${totalCalories}`); // totalCalories is being computed correctly 
+  console.log(`[mealAlgorithm] Final totalCalories to use: ${totalCalories}`); // totalCalories is being computed correctly
 
   // Get preferred meals from filtered set
   const preferredMeals = getPreferredMeals(baseFilteredMeals, preferredMealIds);
@@ -65,7 +69,7 @@ export async function mealAlgorithm(
       dinnerCalories
     );
 
-    // End-of-day correction: ensure total >= 1200 by adjusting servings
+    // End-of-day correction: ensure total is within 10% of target (and >= 1200 minimum)
     let dayCalories =
       breakfast.calories * breakfast.serving +
       lunch.calories * lunch.serving +
@@ -76,48 +80,118 @@ export async function mealAlgorithm(
       dayCalories = 0;
     }
 
-    // If under 1200, incrementally increase servings: dinner → lunch → breakfast
-    if (dayCalories < 1200) {
-      // Increase dinner first
-      while (dayCalories < 1200 && dinner.serving < 100) {
-        dinner.serving = Math.min(100, dinner.serving + 0.5);
-        dayCalories =
-          breakfast.calories * breakfast.serving +
-          lunch.calories * lunch.serving +
-          dinner.calories * dinner.serving;
+    const minCalories = Math.max(1200, totalCalories * 0.9); // 90% of target or 1200, whichever is higher
+    const maxCalories = totalCalories * 1.1; // 110% of target
+
+    // Adjust servings to get within target range
+    const MAX_ADJUSTMENT_ITERATIONS = 50;
+    let adjustmentAttempts = 0;
+
+    while (
+      adjustmentAttempts < MAX_ADJUSTMENT_ITERATIONS &&
+      (dayCalories < minCalories || dayCalories > maxCalories)
+    ) {
+      adjustmentAttempts++;
+
+      if (dayCalories < minCalories) {
+        // Need to increase calories - prioritize dinner, then lunch, then breakfast
+        const deficit = minCalories - dayCalories;
+
+        // Try increasing dinner first
+        if (dinner.serving < 100) {
+          const increment = Math.min(0.5, deficit / (2 * dinner.calories)); // Conservative increment
+          dinner.serving = Math.min(
+            100,
+            dinner.serving + Math.max(0.5, increment)
+          );
+        }
+        // Then lunch
+        else if (lunch.serving < 100) {
+          const increment = Math.min(0.5, deficit / (2 * lunch.calories));
+          lunch.serving = Math.min(
+            100,
+            lunch.serving + Math.max(0.5, increment)
+          );
+        }
+        // Finally breakfast
+        else if (breakfast.serving < 100) {
+          const increment = Math.min(0.5, deficit / (2 * breakfast.calories));
+          breakfast.serving = Math.min(
+            100,
+            breakfast.serving + Math.max(0.5, increment)
+          );
+        } else {
+          // All at max, can't increase further
+          console.warn(
+            `Warning: Cannot reach minCalories ${minCalories} (got ${dayCalories}). All servings at max.`
+          );
+          break;
+        }
+      } else if (dayCalories > maxCalories) {
+        // Need to decrease calories - prioritize dinner, then lunch, then breakfast
+        const excess = dayCalories - maxCalories;
+
+        // Try decreasing dinner first
+        if (dinner.serving > 0.5) {
+          const decrement = Math.min(0.5, excess / (2 * dinner.calories));
+          dinner.serving = Math.max(
+            0.5,
+            dinner.serving - Math.max(0.5, decrement)
+          );
+        }
+        // Then lunch
+        else if (lunch.serving > 0.5) {
+          const decrement = Math.min(0.5, excess / (2 * lunch.calories));
+          lunch.serving = Math.max(
+            0.5,
+            lunch.serving - Math.max(0.5, decrement)
+          );
+        }
+        // Finally breakfast
+        else if (breakfast.serving > 0.5) {
+          const decrement = Math.min(0.5, excess / (2 * breakfast.calories));
+          breakfast.serving = Math.max(
+            0.5,
+            breakfast.serving - Math.max(0.5, decrement)
+          );
+        } else {
+          // All at minimum, can't decrease further
+          console.warn(
+            `Warning: Cannot reduce to maxCalories ${maxCalories} (got ${dayCalories}). All servings at minimum.`
+          );
+          break;
+        }
       }
 
-      // Then lunch if still needed
-      while (dayCalories < 1200 && lunch.serving < 100) {
-        lunch.serving = Math.min(100, lunch.serving + 0.5);
-        dayCalories =
-          breakfast.calories * breakfast.serving +
-          lunch.calories * lunch.serving +
-          dinner.calories * dinner.serving;
-      }
-
-      // Finally breakfast as last resort
-      while (dayCalories < 1200 && breakfast.serving < 100) {
-        breakfast.serving = Math.min(100, breakfast.serving + 0.5);
-        dayCalories =
-          breakfast.calories * breakfast.serving +
-          lunch.calories * lunch.serving +
-          dinner.calories * dinner.serving;
-      }
-
-      // Final guard: if still under 1200 after maxing out servings, log warning
-      if (dayCalories < 1200) {
-        console.warn(
-          `Warning: Unable to reach 1200 calories (got ${dayCalories}). All servings at max (100).`
-        );
-      }
+      // Recalculate day calories
+      dayCalories =
+        breakfast.calories * breakfast.serving +
+        lunch.calories * lunch.serving +
+        dinner.calories * dinner.serving;
     }
 
+    // Final validation
+    if (dayCalories < minCalories || dayCalories > maxCalories) {
+      console.warn(
+        `Warning: Day ${i + 1} calories ${dayCalories.toFixed(
+          0
+        )} outside target range [${minCalories.toFixed(
+          0
+        )}, ${maxCalories.toFixed(0)}] (${(
+          (dayCalories / totalCalories) *
+          100
+        ).toFixed(1)}% of target)`
+      );
+    }
+
+    const percentOfTarget = ((dayCalories / totalCalories) * 100).toFixed(1);
     console.log(
-      "total calories for day: " +
-        totalCalories +
-        "\ntotal calorie planned : " +
-        dayCalories
+      `Day ${i + 1}: Target=${totalCalories} cal, Actual=${dayCalories.toFixed(
+        0
+      )} cal (${percentOfTarget}% of target) - ` +
+        `B:${(breakfast.calories * breakfast.serving).toFixed(0)} L:${(
+          lunch.calories * lunch.serving
+        ).toFixed(0)} D:${(dinner.calories * dinner.serving).toFixed(0)}`
     );
 
     const dayPlan: Day = {
@@ -216,9 +290,9 @@ export async function pickMeal(
   // Return a deep clone to avoid mutating the shared meal object
   return {
     ...selectedMeal,
-    serving: selectedMeal.serving, // Reset serving to 1 for each new meal instance
+    serving: selectedMeal.serving, // Reset serving for new meal instances
     occurrences: selectedMeal.occurrences, // Keep the updated occurrence count
-  }; //TODO FIGURE OUT THIS LOGIC 
+  };
 }
 
 export async function mockMealAlgorithm(): Promise<Day[]> {
