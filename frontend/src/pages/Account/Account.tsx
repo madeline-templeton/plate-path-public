@@ -6,7 +6,13 @@ import { useEffect, useState } from "react";
 import { auth } from "../../services/firebase";
 import "./Account.css";
 
-
+/**
+ * Account component displays user account information and privacy settings.
+ * Allows users to manage their meal plans, personal data, meal preferences,
+ * and privacy consent settings.
+ * 
+ * @returns {JSX.Element} The Account page component
+ */
 export default function Account(){
     const [plannerExists, setPlannerExists] = useState<boolean>(false);
     const [userInfoInStorage, setUserInfoInStorage] = useState<boolean>(false);
@@ -15,19 +21,25 @@ export default function Account(){
     const [preferencesExist, setPreferencesExist] = useState<boolean>(false);
     const { user: currentUser } = useAuth();
 
+    /**
+     * Checks if a meal planner exists for the current user in the backend.
+     * Updates plannerExists state based on the result.
+     */
     const checkPlanner = async () => {
         try{
             const response = await axios.get(`http://localhost:8080/checkUserPlannerExists/${currentUser?.id}`);
 
             if (response.data.success && response.data.exists){
-                console.log("Planner in Storage");
                 setPlannerExists(true);
             }
         } catch(error){
-            console.error(error, "Failed to check planner")
         }
     }
 
+    /**
+     * Deletes the user's meal planner from the backend after confirmation.
+     * Displays success/error messages to the user.
+     */
     const deletePlanner = async () => {
         if (!window.confirm("Are you sure you want to delete your meal plan? This action cannot be undone.")) {
             return;
@@ -47,25 +59,30 @@ export default function Account(){
                 setPlannerExists(false);
             }
         } catch(error){
-            console.error(error, "Failed to get planner");
             alert("Failed to delete planner. Please try again.");
-
         }
     }
 
+    /**
+     * Checks if user information (personal data) exists in storage for the current user.
+     * Updates userInfoInStorage state based on the result.
+     */
     const checkUserInfo = async () => {
         try{
             const response = await axios.get(`http://localhost:8080/checkIfInfoInStorage/${currentUser?.id}`);
 
             if (response.data.success && response.data.exists){
-                console.log("User Info in Storage");
                 setUserInfoInStorage(true);
             }
         } catch (error) {
-            console.error(error, "Failed to check userInfo")
+            // Silently fail - user info will show as not existing
         }
     }
 
+    /**
+     * Deletes the user's personal information from the backend after confirmation.
+     * Displays success/error messages to the user.
+     */
     const deleteUserInfo = async () => {
         if (!window.confirm("Are you sure you want to delete your saved information? This action cannot be undone.")) {
             return;
@@ -86,23 +103,29 @@ export default function Account(){
             }
         } catch (error) {
             alert("Failed to delete stored information");
-            console.error(error, "Failed to delete userInfo. Please try again.");
         }
     }
 
+    /**
+     * Checks if user meal preferences (liked/disliked meals) exist in storage.
+     * Updates preferencesExist state based on the result.
+     */
     const checkUserMealPreferences = async () => {
         try{
             const response = await axios.get(`http://localhost:8080/checkUserMealVotes/${currentUser?.id}`);
 
             if (response.data.success && response.data.exists){
-                console.log("Meal preferences in storage");
                 setPreferencesExist(true);
             }
         } catch (error) {
-            console.error(error, "Failed to check meal preferences")
+            // Silently fail - preferences will show as not existing
         }
     }
 
+    /**
+     * Deletes the user's meal voting preferences from the backend after confirmation.
+     * Displays success/error messages to the user.
+     */
     const deleteMealPreferences = async () => {
         if (!window.confirm("Are you sure you want to delete your liked and disliked meals? This action cannot be undone.")) {
             return;
@@ -123,10 +146,16 @@ export default function Account(){
             }
         } catch (error) {
             alert("Failed to delete meal votes");
-            console.error(error, "Failed to delete meal preferences. Please try again.");
         }
     }
 
+    /**
+     * Updates user consent preferences for sensitive and general data storage.
+     * Updates consent states and sends changes to the backend.
+     * 
+     * @param {boolean} sensitiveConsentGranted - Whether sensitive data consent is granted
+     * @param {boolean} generalConsentGranted - Whether general data consent is granted
+     */
     const updateConsent = async (sensitiveConsentGranted: boolean, generalConsentGranted: boolean) => {
         try{
             const token = await auth.currentUser?.getIdToken();
@@ -144,17 +173,18 @@ export default function Account(){
             if (response.data.success){
                 setSensitiveDataConsent(sensitiveConsentGranted);
                 setGeneralDataConsent(generalConsentGranted);
-                console.log(`Sensitive consent ${sensitiveConsentGranted ? 'granted' : 'revoked'}`);
-                console.log(`General consent ${generalConsentGranted ? 'granted' : 'revoked'}`);
             } else {
                 alert("Error while updating consent. Please try again.");
             }
         } catch(error){
-            console.error(error, "Error while updating consent");
             alert("Error while updating consent. Please try again.");
         }
     }
 
+    /**
+     * Fetches the user's current consent preferences from the backend.
+     * Updates sensitiveDataConsent and generalDataConsent states.
+     */
     const getConsent = async () => {
         try{
             const response = await axios.get(`http://localhost:8080/getUserConsent/${currentUser?.id}`);
@@ -170,10 +200,9 @@ export default function Account(){
                 } else{
                     setGeneralDataConsent(false);
                 }
-                console.log("Consent updated successfully");
             } 
         } catch(error){
-            console.error(error, "Error while fetching consent")
+            // Silently fail - consent toggles will remain in default state
         }
     }
 

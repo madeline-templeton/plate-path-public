@@ -7,14 +7,20 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from "../../services/firebase";
 import { useAuth } from '../../contexts/AuthContext';
 
+/**
+ * GeneratePlan component provides a form for users to input their personal information
+ * and dietary preferences to generate a personalized meal plan.
+ * Handles form validation, user data persistence, and meal plan generation.
+ * 
+ * @returns {JSX.Element} The GeneratePlan page component
+ */
 export default function GeneratePlan() {
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
 
-  // Get current date for defaults
   const today = new Date();
   const currentDay = today.getDate();
-  const currentMonth = today.getMonth() + 1; // JavaScript months are 0-indexed
+  const currentMonth = today.getMonth() + 1; 
   const currentYear = today.getFullYear();
 
   const [selectedAge, setSelectedAge] = useState('');
@@ -30,12 +36,10 @@ export default function GeneratePlan() {
   const [heightValue, setHeightValue] = useState("");
   const [weightUnit, setWeightUnit] = useState<"kg" | "lb">("lb");
   
-  // Start date dropdowns with current date as default
   const [selectedDay, setSelectedDay] = useState(currentDay.toString());
   const [selectedMonth, setSelectedMonth] = useState(currentMonth.toString());
   const [selectedYear, setSelectedYear] = useState(currentYear.toString());
   
-  // Validation errors
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [ageError, setAgeError] = useState<'too-low' | 'too-high' | null>(null);
   const [ageInputError, setAgeInputError] = useState(false);
@@ -60,14 +64,15 @@ export default function GeneratePlan() {
   const [likedMeals, setLikedMeals] = useState([]);
   const [disLikedMeals, setDisLikedMeals] = useState([]);
 
-
-
+  /**
+   * Handles weight input changes and validates the value based on the selected unit.
+   * Sets appropriate error states if weight is outside acceptable ranges.
+   * 
+   * @param {string} value - The weight value entered by the user
+   */
   const handleWeightChange = (value: string) => {
-    console.log("Prev weight", weight);
-    console.log("New weight", value);
     setWeight(value);
     const numValue = parseFloat(value);
-    console.log("Parsed", numValue);
     
     if (value === '' || isNaN(numValue)) {
       setWeightError(null);
@@ -92,13 +97,15 @@ export default function GeneratePlan() {
     }
   };
 
+  /**
+   * Handles height input changes (for cm unit) and validates the value.
+   * Sets appropriate error states if height is outside acceptable ranges.
+   * 
+   * @param {string} value - The height value entered by the user in centimeters
+   */
   const handleHeightChange = (value: string) => {
-    console.log("Prev height", heightValue);
-    console.log("New height", value);
     setHeightValue(value);
     const numValue = parseFloat(value);
-    console.log("Parsed", numValue);
-
     
     if (value === '' || isNaN(numValue)) {
       setHeightError(null);
@@ -115,12 +122,15 @@ export default function GeneratePlan() {
     }
   };
 
+  /**
+   * Handles age input changes and validates the value.
+   * Sets error states if age is below 18 or above 120.
+   * 
+   * @param {string} value - The age value entered by the user
+   */
   const handleAgeChange = (value: string) => {
-    console.log("Prev age", selectedAge);
-    console.log("New age", value);
     setSelectedAge(value);
     const numValue = parseFloat(value);
-    console.log("Parsed", numValue);
     
     if (value === '' || isNaN(numValue)) {
       setAgeError(null);
@@ -133,6 +143,11 @@ export default function GeneratePlan() {
     }
   };
 
+  /**
+   * Toggles a dietary restriction on or off in the user's selection.
+   * 
+   * @param {string} restriction - The dietary restriction to toggle
+   */
   const handleDietaryChange = (restriction: string) => {
     if (dietaryRestrictions.includes(restriction)) {
       setDietaryRestrictions(dietaryRestrictions.filter(r => r !== restriction));
@@ -141,8 +156,11 @@ export default function GeneratePlan() {
     }
   };
 
+  /**
+   * Validates all form fields and initiates meal plan generation if valid.
+   * Sets appropriate error states for any invalid or missing fields.
+   */
   const handleGeneratePlan = async () => {
-    // Reset errors
     setShowValidationErrors(false);
     setAgeInputError(false);
     setHeightFeetError(false);
@@ -154,11 +172,13 @@ export default function GeneratePlan() {
     setStartDateError(false);
     setSexError(false);
 
-    // Validate all required fields
     let hasErrors = false;
 
     if (!selectedAge) {
       setAgeInputError(true);
+      hasErrors = true;
+    } else if (ageError) {
+      // Age has validation error (too low or too high)
       hasErrors = true;
     }
 
@@ -178,7 +198,10 @@ export default function GeneratePlan() {
       }
     } else {
       if (!heightValue) {
-        setHeightFeetError(true); // Reuse this error state
+        setHeightFeetError(true); 
+        hasErrors = true;
+      } else if (heightError) {
+        // Height has validation error (too low or too high)
         hasErrors = true;
       }
     } 
@@ -187,7 +210,6 @@ export default function GeneratePlan() {
       setWeightInputError(true);
       hasErrors = true;
     } else if (weightError) {
-      // Weight has validation error (too low or too high)
       hasErrors = true;
     }
 
@@ -214,13 +236,18 @@ export default function GeneratePlan() {
     if (hasErrors) {
       setShowValidationErrors(true);
     } else {
-      // Form is valid - functionality to be added later
-      console.log('Form is valid, ready to generate plan');
       await getPlan();
     }
   
   };
 
+  /**
+   * Generates a meal plan by sending user constraints to the backend API.
+   * If consent is granted, updates user info and planner data.
+   * Navigates to calendar view on success.
+   * 
+   * @throws {Error} When meal plan generation fails or server is unreachable
+   */
   const getPlan = async () => {
     try{
       let heightValueToSend;
@@ -262,7 +289,6 @@ export default function GeneratePlan() {
       
       if (response.data.success && response.data.planner){
         if (generalConsentGranted){
-          console.log("updating planner")
           await updatePlanner(response.data.planner);
           if (sensitiveConsentGranted){
             await updateUserInfo(constraints);
@@ -273,7 +299,6 @@ export default function GeneratePlan() {
         alert(`Failed to generate meal plan: ${response.data.message || response.data.error || 'Unknown error'}`);
       }
     } catch (error: any){
-      console.error(error);
       if (error.response) {
         alert(`Error generating meal plan: ${error.response.data.message || error.response.data.error || 'Server error'}`);
       } else if (error.request) {
@@ -284,6 +309,12 @@ export default function GeneratePlan() {
     }
   }
 
+  /**
+   * Saves the generated meal planner to the backend for the authenticated user.
+   * 
+   * @param {any} planner - The meal planner object to save
+   * @throws {Error} When planner update fails
+   */
   const updatePlanner = async (planner: any) => {
     try{
       const token = await auth.currentUser?.getIdToken();
@@ -296,16 +327,22 @@ export default function GeneratePlan() {
         }
       });
 
-      if (response.data.success){
-        console.log("planner saved successfully")
+      if (!response.data.success){
+        throw new Error("Failed to save planner");
       }
 
     } catch (error){
-      console.error(error);
+      throw error;
     }
   }
 
-
+  /**
+   * Saves user information (constraints) to the backend for the authenticated user.
+   * Only called if user has granted sensitive data consent.
+   * 
+   * @param {any} userInfo - The user information/constraints object to save
+   * @throws {Error} When user info update fails
+   */
   const updateUserInfo = async (userInfo: any) => {
     try {
       const token = await auth.currentUser?.getIdToken();
@@ -318,20 +355,20 @@ export default function GeneratePlan() {
         }
       });
 
-      if (response.data.success){
-        console.log("User info saved successfully")
-      }
-      else{
-        console.log(response.status);
-        console.error(response.data.message);
+      if (!response.data.success){
+        throw new Error(response.data.message || "Failed to update user information");
       } 
 
     } catch (error){
-      console.error(error, "Failed to update userInformation");
+      throw error;
     }
   }
   
-
+  /**
+   * Fetches previously saved user information from the backend.
+   * Pre-populates form fields with saved data if available.
+   * Sets hasLoadedUserInfo flag when complete.
+   */
   const getUserInfo = async () => {
     try{
       const response = await axios.get(`http://localhost:8080/getUserInformation/${currentUser?.id}`);
@@ -355,7 +392,6 @@ export default function GeneratePlan() {
           setHeightUnit("cm");
           setHeightValue(response.data.userInfo.height.value[0]);
         } 
-        console.log(response.data.userInfo.weight.value[0]);
         if (response.data.userInfo.weight.unit === "kg"){
           setWeightUnit("kg");
           setWeight(response.data.userInfo.weight.value);
@@ -365,17 +401,17 @@ export default function GeneratePlan() {
         } 
 
         setHasLoadedUserInfo(true);
-      } else {
-        console.log(`No data in memory for user ${currentUser?.id}`);
       }
     } catch (error: any){
-      console.error(error, "Failed to get userInformation");
       setHasLoadedUserInfo(true);
-
     }
   }
 
-  
+  /**
+   * Fetches the user's meal voting history (liked and disliked meals) from the backend.
+   * Used to personalize future meal plan generation.
+   * Sets hasLoadedMealPreferences flag when complete.
+   */
   const getUserMealVotes = async () => {
     try{
       const response = await axios.get(`http://localhost:8080/getUserMealVotes/${currentUser?.id}`);
@@ -389,17 +425,10 @@ export default function GeneratePlan() {
           setDisLikedMeals(response.data.disliked);
         } 
 
-        console.log(response.data);
-
-
         setHasLoadedMealPreferences(true);
-      } else {
-        console.log(`No user votes in memory for user ${currentUser?.id}`);
       }
     } catch (error: any){
-      console.error(error, "Failed to get userInformation");
       setHasLoadedMealPreferences(true);
-
     }
   }
 
@@ -411,10 +440,14 @@ export default function GeneratePlan() {
     }
   }, [currentUser]);
 
+  /**
+   * Fetches the user's consent preferences from the backend.
+   * Determines whether sensitive and general data can be stored.
+   * Sets hasLoadedSensitiveConsent and hasLoadedGeneralConsent flags when complete.
+   */
   const getConsent = async () => {
     try {
       const response = await axios.get(`http://localhost:8080/getUserConsent/${currentUser?.id}`);
-      console.log(response.data)
 
       if (response.data.success && response.data.exists){
         if (response.data.sensitiveConsent === "granted"){
@@ -431,7 +464,6 @@ export default function GeneratePlan() {
       setHasLoadedGeneralConsent(true);
       setHasLoadedSensitiveConsent(true);
     } catch (error){
-      console.error(error, "Error while fetching consent");
       setHasLoadedGeneralConsent(true);
       setHasLoadedSensitiveConsent(true);
     }
@@ -639,7 +671,7 @@ export default function GeneratePlan() {
                   checked={weightUnit === 'kg'}
                   onChange={(e) => {
                     setWeightUnit(e.target.value as "kg");
-                    handleWeightChange(weight); // Re-validate with new unit
+                    handleWeightChange(weight);
                   }}
                 />
                 <span>Kilograms (kg)</span>

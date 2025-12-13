@@ -43,11 +43,17 @@ interface calendarDate {
   year: string
 }
 
+/**
+ * Calendar component displays the user's meal plan in a monthly calendar view.
+ * Users can navigate between months and click on meals to view detailed information.
+ * Fetches planner data from backend if not provided via navigation state.
+ * 
+ * @returns {JSX.Element} The Calendar page component
+ */
 export default function Calendar() {
   const location = useLocation();
   const { user: currentUser } = useAuth();
   const receivedPlanner = location.state?.planner as Planner | undefined;
-  console.log(receivedPlanner, "received");
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [displayMealPopUp, setDisplayMealPopUp] = useState<boolean>(false);
@@ -61,28 +67,36 @@ export default function Calendar() {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  // Get the first day of the month and total days
   const firstDayOfMonth = new Date(year, month, 1);
   const lastDayOfMonth = new Date(year, month + 1, 0);
   const daysInMonth = lastDayOfMonth.getDate();
-  const startingDayOfWeek = firstDayOfMonth.getDay(); // 0 = Sunday
+  const startingDayOfWeek = firstDayOfMonth.getDay(); 
 
-  // Month names
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  // Navigate to previous month
+  /**
+   * Navigates to the previous month in the calendar view.
+   */
   const goToPreviousMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
   };
 
-  // Navigate to next month
+  /**
+   * Navigates to the next month in the calendar view.
+   */
   const goToNextMonth = () => {
     setCurrentDate(new Date(year, month + 1, 1));
   };
 
+  /**
+   * Retrieves meal data for a specific date from the planner.
+   * 
+   * @param {number} day - The day of the month to get meals for
+   * @returns {Day | null} The day's meal data or null if not found
+   */
   const getMealsForDate = (day: number) => {
     if (!planner || !planner.meals) return null;
 
@@ -96,8 +110,13 @@ export default function Calendar() {
     return dayData;
   }
 
+  /**
+   * Fetches the user's meal planner from the backend.
+   * Sets loading state while fetching and updates planner state on success.
+   * 
+   * @throws {Error} When planner fetch fails
+   */
   const fetchPlanner = async () => {
-    console.log("called")
     setLoading(true);
     try{
       const response = await axios.get(`http://localhost:8080/getPlannerForUser/${currentUser?.id}`);
@@ -105,19 +124,23 @@ export default function Calendar() {
       if (response.data.success){
         setPlanner(response.data.planner)
       } else{
-        console.error("Error while fetching Planner", response.status)
+        throw new Error("Failed to fetch planner");
       }
     } catch(error){
-      console.error(error, "Error while fetching Planner")
+      throw error;
     } finally{
       setLoading(false);
     }
   }
 
+  /**
+   * Fetches the user's general consent status from the backend.
+   * Determines whether meal voting/feedback features should be enabled.
+   * Sets hasLoadedConsentGranted flag when complete.
+   */
   const getConsent = async () => {
     try {
       const response = await axios.get(`http://localhost:8080/getUserConsent/${currentUser?.id}`);
-      console.log(response.data)
 
       if (response.data.success && response.data.exists){
         if (response.data.generalConsent === "granted"){
@@ -128,22 +151,23 @@ export default function Calendar() {
       } 
       setHasLoadedConsentGranted(true);
     } catch (error){
-      console.error(error, "Error while fetching consent");
       setHasLoadedConsentGranted(true);
     }
   }
 
-  // Generate calendar days
+  /**
+   * Renders the calendar grid with all days of the month.
+   * Includes empty cells for days before/after the month and meal data for each day.
+   * 
+   * @returns {JSX.Element[]} Array of calendar day elements
+   */
   const renderCalendarDays = () => {
-    console.log(planner)
     const days = [];
     
-    // Empty cells for days before the month starts
     for (let i = 0; i < startingDayOfWeek; i++) {
       days.push(<div key={`empty-start-${i}`} className="calendar-day empty" role="gridcell" aria-hidden="true"></div>);
     }
     
-    // Actual days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const dayMeals = getMealsForDate(day);
       const lunchMeal = dayMeals ? ('main' in dayMeals.lunch ? dayMeals.lunch.main : dayMeals.lunch) : null;
@@ -189,7 +213,6 @@ export default function Calendar() {
       );
     }
     
-    // Empty cells to fill out the rest of the grid (to complete the last week)
     const totalCells = startingDayOfWeek + daysInMonth;
     const remainingCells = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
     for (let i = 0; i < remainingCells; i++) {
@@ -199,10 +222,18 @@ export default function Calendar() {
     return days;
   };
 
+  /**
+   * Closes the meal detail popup/sidebar.
+   */
   const onClose = () => {
     setDisplayMealPopUp(false);
   }
 
+  /**
+   * Opens the meal detail popup/sidebar for a selected meal.
+   * 
+   * @param {Meal} meal - The meal to display details for
+   */
   const onMealClick = (meal: Meal) => {
     setSelectedMeal(meal);
     setDisplayMealPopUp(true);

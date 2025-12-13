@@ -1,21 +1,31 @@
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import { useState } from 'react';
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-} from "firebase/auth";
+import {signInWithEmailAndPassword, createUserWithEmailAndPassword,} from "firebase/auth";
 import { auth } from '../../services/firebase';
 import SimpleHeader from '../../components/simpleHeader/simpleHeader';
 
-
-
+/**
+ * Login component handles user authentication (sign in and registration).
+ * Displays a form for email/password authentication and toggles between
+ * login and registration modes.
+ * 
+ * @returns {JSX.Element} The Login page component
+ */
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
   const navigate = useNavigate();
 
+  /**
+   * Handles authentication form submission for both sign in and registration.
+   * For new registrations, sets a flag to show the privacy consent modal.
+   * Navigates to home page on successful authentication.
+   * 
+   * @param {React.FormEvent} e - The form submission event
+   * @throws {Error} When authentication fails (displays error message to user)
+   */
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -31,8 +41,8 @@ export default function Login() {
 
       navigate("/");
     } catch (error: any) {
-      console.error("Auth error:", error);
       alert(error.message || "Authentication failed.");
+      throw error;
     }
   };
 

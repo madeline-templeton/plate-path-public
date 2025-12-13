@@ -6,13 +6,18 @@ import { auth } from '../../services/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
 
+/**
+ * OurStory component displays the landing page with team information
+ * and handles privacy consent modal for new users.
+ * 
+ * @returns {JSX.Element} The OurStory page component
+ */
 export default function OurStory() {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const { user: currentUser } = useAuth();
 
   useEffect(() => {
-    // Check if this is a new signup (flag set during account creation)
     const isNewSignup = localStorage.getItem('showPrivacyConsent');
     const hasSeenConsent = localStorage.getItem('privacyConsentSeen');
     
@@ -24,6 +29,10 @@ export default function OurStory() {
     }
   }, []);
 
+  /**
+   * Handles user acceptance of privacy consent.
+   * Updates local storage and sends consent status to backend.
+   */
   const handleAccept = async () => {
     // Save that user has seen the modal and accepted
     localStorage.setItem('privacyConsentSeen', 'true');
@@ -31,6 +40,10 @@ export default function OurStory() {
     setShowModal(false);
   };
 
+  /**
+   * Handles user rejection of privacy consent.
+   * Updates local storage and sends consent status to backend.
+   */
   const handleReject = async () => {
     // Save that user has seen the modal and rejected
     localStorage.setItem('privacyConsentSeen', 'true');
@@ -38,6 +51,13 @@ export default function OurStory() {
     setShowModal(false);
   };
 
+  /**
+   * Updates user consent preferences in the backend.
+   * 
+   * @param {boolean} sensitiveConsentGranted - Whether sensitive data consent was granted
+   * @param {boolean} generalConsentGranted - Whether general data consent was granted
+   * @throws {Error} When consent update fails or user is not authenticated
+   */
   const updateConsent = async (sensitiveConsentGranted: boolean, generalConsentGranted: boolean) => {
     try{
         const token = await auth.currentUser?.getIdToken();
@@ -52,15 +72,13 @@ export default function OurStory() {
             }
         });
 
-        if (response.data.success){
-            console.log(`General consent ${generalConsentGranted ? 'granted' : 'revoked'}`);
-            console.log(`Sensitive consent ${sensitiveConsentGranted ? 'granted' : 'revoked'}`);
-        } else {
-            alert("Error while updating consent. Please try again.");
+        if (!response.data.success){
+            throw new Error("Failed to update consent preferences");
         }
     } catch(error){
-        console.error(error, "Error while updating consent");
+        console.error("Error while updating consent:", error);
         alert("Error while updating consent. Please try again.");
+        throw error;
     }
   }
 
