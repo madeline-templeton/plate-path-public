@@ -6,11 +6,21 @@ import { auth } from '../../../services/firebase';
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 
-
+/**
+ * LoginButton component displays a dynamic button that toggles between
+ * "Sign In" and "Sign Out" based on the user's authentication state.
+ * Navigates to login page when signed out, or signs out when signed in.
+ * 
+ * @returns {JSX.Element} The LoginButton component
+ */
 export default function LoginButton() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
 
+  /**
+   * Handles button click - navigates to login page if signed out,
+   * or initiates sign out if signed in.
+   */
   const handleClick = () => {
     if (user) {
       handleSignOut();
@@ -26,12 +36,17 @@ export default function LoginButton() {
     return unsubscribe;
   }, []);
 
+  /**
+   * Signs out the current user from Firebase authentication.
+   * Displays success/error toast notifications.
+   * 
+   * @throws {Error} When sign out fails
+   */
   const handleSignOut = async () => {
     try {
       await signOut(auth);
       toast.success("Signed out successfully!");
     } catch (error) {
-      console.error("Error signing out:", error);
       toast.error("Failed to sign out.");
     }
   };

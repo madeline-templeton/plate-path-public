@@ -3,8 +3,13 @@ import './Header.css';
 import LoginButton from './LoginButton/LoginButton';
 import ProfileIcon from './ProfileIcon/ProfileIcon';
 
- 
-
+/**
+ * Header component displays the main navigation bar for the application.
+ * Includes the PlatePath logo, main navigation links (Our Story, Generate Your Plan,
+ * Your Calendar), and user account actions (Login/Logout button and Profile icon).
+ * 
+ * @returns {JSX.Element} The Header component
+ */
 export default function Header() {
   const navigate = useNavigate();
 

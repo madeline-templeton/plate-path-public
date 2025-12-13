@@ -1,8 +1,18 @@
 import { useNavigate } from 'react-router-dom';
 import './ProfileIcon.css';
 
+/**
+ * ProfileIcon component displays a clickable profile icon button
+ * that navigates to the user's account page.
+ * 
+ * @returns {JSX.Element} The ProfileIcon component
+ */
 export default function ProfileIcon() {
   const navigate = useNavigate();
+  
+  /**
+   * Handles click event to navigate to the account page.
+   */
   const handleClick = () => {
     navigate("/account");
   };

@@ -11,23 +11,36 @@ interface MealCardProps {
   consentGranted: boolean
 }
 
+/**
+ * MealCard component displays detailed information about a selected meal
+ * in a modal/sidebar view. Shows ingredients, recipe link, nutritional info,
+ * and voting options (if consent is granted).
+ * 
+ * @param {MealCardProps} props - Component props
+ * @param {Function} props.onClose - Callback to close the meal card
+ * @param {Meal} props.meal - The meal object to display
+ * @param {boolean} props.consentGranted - Whether user has granted consent for voting
+ * @returns {JSX.Element} The MealCard component
+ */
 export default function MealCard({ onClose, meal, consentGranted }: MealCardProps) {
   const [isLiked, setIsLiked] = useState<boolean | null>(null);
   const { user: currentUser } = useAuth();
   const [hasLoadedPreference, setHasLoadedPreference] = useState(false);
-  // Parse comma-separated ingredients into an array
   const ingredientsList = meal.ingredients
     .split(",")
     .map((ingredient) => ingredient.trim())
     .filter((ingredient) => ingredient.length > 0);
 
+  /**
+   * Fetches the user's existing vote (like/dislike) for this meal from the backend.
+   * Updates the isLiked state to reflect current preference.
+   * Sets hasLoadedPreference flag when complete.
+   */
   const getMealVote = async () => {
     try {
-      console.log("HERE");
       const response = await axios.get(
         `http://localhost:8080/checkIfMealVoted/${currentUser?.id}?mealId=${meal.id}`
       );
-      console.log(response.data);
 
       if (
         response.data.success &&
@@ -40,15 +53,19 @@ export default function MealCard({ onClose, meal, consentGranted }: MealCardProp
       }
       setHasLoadedPreference(true);
     } catch (error) {
-      console.error(error, "Error while fetching vote");
       setHasLoadedPreference(true);
     }
   };
 
+  /**
+   * Updates the user's vote (like/dislike) for this meal.
+   * If the same vote already exists, it removes the vote (toggles to neutral).
+   * 
+   * @param {boolean} liked - True for upvote, false for downvote
+   */
   const updateMealVote = async (liked: boolean) => {
     try {
       const token = await auth.currentUser?.getIdToken();
-      console.log({ mealId: meal.id, mealName: meal.name, liked: liked });
 
       const response = await axios.put(
         `http://localhost:8080/updateUserMealVote`,
@@ -63,7 +80,6 @@ export default function MealCard({ onClose, meal, consentGranted }: MealCardProp
           },
         }
       );
-      console.log(response.data);
 
       if (response.data.success) {
         if (response.data.alreadyExisted) {
@@ -73,7 +89,6 @@ export default function MealCard({ onClose, meal, consentGranted }: MealCardProp
         }
       }
     } catch (error) {
-      console.error(error, "Error while updating vote");
     }
   };
 

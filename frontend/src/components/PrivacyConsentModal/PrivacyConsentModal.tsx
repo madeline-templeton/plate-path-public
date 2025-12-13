@@ -8,6 +8,17 @@ interface PrivacyConsentModalProps {
   onReject: () => void;
 }
 
+/**
+ * PrivacyConsentModal component displays a modal dialog for new users
+ * to grant or revoke consent for storing their personal information.
+ * Implements focus trapping, ESC key handling, and keyboard navigation.
+ * 
+ * @param {PrivacyConsentModalProps} props - Component props
+ * @param {boolean} props.isOpen - Whether the modal is visible
+ * @param {Function} props.onAccept - Callback when user accepts consent
+ * @param {Function} props.onReject - Callback when user rejects consent
+ * @returns {JSX.Element | null} The modal component or null if not open
+ */
 export const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({
   isOpen,
   onAccept,
@@ -17,18 +28,15 @@ export const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null);
   const acceptButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Focus trap and ESC key handler
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // ESC key closes modal (counts as reject)
       if (e.key === 'Escape') {
         onReject();
         return;
       }
 
-      // Tab key focus trap
       if (e.key === 'Tab') {
         const focusableElements = modalRef.current?.querySelectorAll(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -50,7 +58,6 @@ export const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({
 
     document.addEventListener('keydown', handleKeyDown);
     
-    // Focus on Accept button when modal opens
     acceptButtonRef.current?.focus();
 
     return () => {
@@ -58,7 +65,10 @@ export const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({
     };
   }, [isOpen, onReject]);
 
-  // Prevent body scroll when modal is open
+  /**
+   * Prevents body scroll when modal is open for better UX.
+   * Restores scroll on unmount.
+   */
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -70,10 +80,16 @@ export const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({
     };
   }, [isOpen]);
 
+  /**
+   * Handles clicks on Account page links within the modal.
+   * Closes the modal (counts as reject) and navigates to account page.
+   * 
+   * @param {React.MouseEvent} e - The click event
+   */
   const handleProfileClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    onReject(); // Close modal
-    navigate('/account'); // Navigate to profile page
+    onReject();
+    navigate('/account');
   };
 
   if (!isOpen) return null;
