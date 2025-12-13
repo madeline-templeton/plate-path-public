@@ -325,12 +325,12 @@ export default function GeneratePlan() {
         }
       });
 
-      if (!response.data.success){
-        throw new Error("Failed to save planner");
-      }
+      if (response.data.success){
+        console.log("Planner updated successfully");
+      } 
 
     } catch (error){
-      throw error;
+      console.error("Error while updating planner", error);
     }
   }
 
@@ -353,12 +353,12 @@ export default function GeneratePlan() {
         }
       });
 
-      if (!response.data.success){
-        throw new Error(response.data.message || "Failed to update user information");
+      if (response.data.success){
+        console.log("User Info updated successfully");
       } 
 
     } catch (error){
-      throw error;
+      console.error("Error while updating userInfo", error);
     }
   }
   

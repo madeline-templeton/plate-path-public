@@ -128,7 +128,7 @@ export default function Calendar() {
         throw new Error("Failed to fetch planner");
       }
     } catch(error){
-      throw error;
+      console.error("Error while fetching planner", error);
     } finally{
       setLoading(false);
     }
@@ -152,6 +152,7 @@ export default function Calendar() {
       } 
       setHasLoadedConsentGranted(true);
     } catch (error){
+      console.error("Error while fetching consent", error);
       setHasLoadedConsentGranted(true);
     }
   }
