@@ -88,7 +88,8 @@ const mockMeals: Meal[] = [
     name: "Chicken Caesar Salad",
     mealTime: "lunch",
     diet: "none",
-    ingredients: "chicken breast, romaine lettuce, parmesan, croutons, caesar dressing",
+    ingredients:
+      "chicken breast, romaine lettuce, parmesan, croutons, caesar dressing",
     website: "http://example.com/7",
     calories: 450,
     serving: 1,
@@ -155,7 +156,8 @@ const mockMeals: Meal[] = [
     name: "Beef Tacos",
     mealTime: "dinner",
     diet: "none",
-    ingredients: "ground beef, taco shells, cheese, lettuce, tomato, sour cream",
+    ingredients:
+      "ground beef, taco shells, cheese, lettuce, tomato, sour cream",
     website: "http://example.com/13",
     calories: 650,
     serving: 1,
@@ -177,7 +179,8 @@ const mockMeals: Meal[] = [
     name: "Chickpea Curry",
     mealTime: "dinner",
     diet: "vegan",
-    ingredients: "chickpeas, coconut milk, curry powder, tomatoes, spinach, rice",
+    ingredients:
+      "chickpeas, coconut milk, curry powder, tomatoes, spinach, rice",
     website: "http://example.com/15",
     calories: 500,
     serving: 1,
@@ -335,10 +338,12 @@ const mockMeals: Meal[] = [
 describe("filterByDietaryRestrictions", () => {
   it("filters meals by single dietary restriction (vegan)", () => {
     const result = filterByDietaryRestrictions(mockMeals, ["vegan"]);
-    
+
     // Should include only vegan meals
     expect(result.length).toBe(11);
-    expect(result.every((meal) => meal.diet.toLowerCase().includes("vegan"))).toBe(true);
+    expect(
+      result.every((meal) => meal.diet.toLowerCase().includes("vegan"))
+    ).toBe(true);
     expect(result.map((m) => m.id)).toContain(1); // Vegan Oatmeal Bowl
     expect(result.map((m) => m.id)).toContain(6); // Vegan Buddha Bowl
     expect(result.map((m) => m.id)).not.toContain(2); // Scrambled Eggs (vegetarian)
@@ -346,47 +351,55 @@ describe("filterByDietaryRestrictions", () => {
 
   it("filters meals by single dietary restriction (vegetarian)", () => {
     const result = filterByDietaryRestrictions(mockMeals, ["vegetarian"]);
-    
+
     // Should include vegetarian meals
     expect(result.length).toBe(9);
-    expect(result.every((meal) => meal.diet.toLowerCase().includes("vegetarian"))).toBe(true);
+    expect(
+      result.every((meal) => meal.diet.toLowerCase().includes("vegetarian"))
+    ).toBe(true);
     expect(result.map((m) => m.id)).toContain(2); // Scrambled Eggs
     expect(result.map((m) => m.id)).toContain(8); // Margherita Pizza
   });
 
   it("filters meals by dietary restriction (none)", () => {
     const result = filterByDietaryRestrictions(mockMeals, ["none"]);
-    
+
     // Should include meals with no dietary restrictions
     expect(result.length).toBe(8);
-    expect(result.every((meal) => meal.diet.toLowerCase().includes("none"))).toBe(true);
+    expect(
+      result.every((meal) => meal.diet.toLowerCase().includes("none"))
+    ).toBe(true);
     expect(result.map((m) => m.id)).toContain(3); // Bacon and Eggs
     expect(result.map((m) => m.id)).toContain(7); // Chicken Caesar Salad
   });
 
   it("handles empty restrictions array (defaults to 'none')", () => {
     const result = filterByDietaryRestrictions(mockMeals, []);
-    
+
     // Should default to "none" restriction
     expect(result.length).toBe(8);
-    expect(result.every((meal) => meal.diet.toLowerCase().includes("none"))).toBe(true);
+    expect(
+      result.every((meal) => meal.diet.toLowerCase().includes("none"))
+    ).toBe(true);
   });
 
   it("is case-insensitive for dietary restrictions", () => {
     const resultUpper = filterByDietaryRestrictions(mockMeals, ["VEGAN"]);
     const resultLower = filterByDietaryRestrictions(mockMeals, ["vegan"]);
     const resultMixed = filterByDietaryRestrictions(mockMeals, ["VeGaN"]);
-    
+
     expect(resultUpper.length).toBe(resultLower.length);
     expect(resultUpper.length).toBe(resultMixed.length);
-    expect(resultUpper.map((m) => m.id).sort()).toEqual(resultLower.map((m) => m.id).sort());
+    expect(resultUpper.map((m) => m.id).sort()).toEqual(
+      resultLower.map((m) => m.id).sort()
+    );
   });
 });
 
 describe("filterByAllergies", () => {
   it("filters out meals containing single allergen (peanut)", () => {
     const result = filterByAllergies(mockMeals, ["peanut"]);
-    
+
     // Should exclude meals with peanut
     expect(result.map((m) => m.id)).not.toContain(4); // Peanut Butter Toast
     expect(result.map((m) => m.id)).not.toContain(22); // Peanut Noodles
@@ -396,7 +409,7 @@ describe("filterByAllergies", () => {
 
   it("filters out meals containing multiple allergens", () => {
     const result = filterByAllergies(mockMeals, ["peanut", "shrimp"]);
-    
+
     // Should exclude meals with peanut OR shrimp
     expect(result.map((m) => m.id)).not.toContain(4); // Peanut Butter Toast
     expect(result.map((m) => m.id)).not.toContain(22); // Peanut Noodles
@@ -406,7 +419,7 @@ describe("filterByAllergies", () => {
 
   it("handles empty allergens array (returns all meals)", () => {
     const result = filterByAllergies(mockMeals, []);
-    
+
     expect(result.length).toBe(mockMeals.length);
     expect(result).toEqual(mockMeals);
   });
@@ -415,15 +428,17 @@ describe("filterByAllergies", () => {
     const resultUpper = filterByAllergies(mockMeals, ["PEANUT"]);
     const resultLower = filterByAllergies(mockMeals, ["peanut"]);
     const resultMixed = filterByAllergies(mockMeals, ["PeAnUt"]);
-    
+
     expect(resultUpper.length).toBe(resultLower.length);
     expect(resultUpper.length).toBe(resultMixed.length);
-    expect(resultUpper.map((m) => m.id).sort()).toEqual(resultLower.map((m) => m.id).sort());
+    expect(resultUpper.map((m) => m.id).sort()).toEqual(
+      resultLower.map((m) => m.id).sort()
+    );
   });
 
   it("handles allergen strings with whitespace", () => {
     const result = filterByAllergies(mockMeals, ["  peanut  ", " shrimp "]);
-    
+
     // Should trim and filter correctly
     expect(result.map((m) => m.id)).not.toContain(4); // Peanut Butter Toast
     expect(result.map((m) => m.id)).not.toContain(22); // Peanut Noodles
@@ -433,7 +448,7 @@ describe("filterByAllergies", () => {
 
   it("filters partial matches in ingredient strings", () => {
     const result = filterByAllergies(mockMeals, ["almond"]);
-    
+
     // Should exclude meals with almond (including "almond milk" and "almonds")
     expect(result.map((m) => m.id)).not.toContain(1); // Vegan Oatmeal Bowl (almond milk)
     expect(result.map((m) => m.id)).not.toContain(24); // Almond Crusted Chicken
@@ -444,14 +459,14 @@ describe("filterByAllergies", () => {
 describe("removeDownvotedMeals", () => {
   it("removes meals by single downvoted ID", () => {
     const result = removeDownvotedMeals(mockMeals, [1]);
-    
+
     expect(result.map((m) => m.id)).not.toContain(1);
     expect(result.length).toBe(27);
   });
 
   it("removes meals by multiple downvoted IDs", () => {
     const result = removeDownvotedMeals(mockMeals, [1, 5, 10, 15]);
-    
+
     expect(result.map((m) => m.id)).not.toContain(1);
     expect(result.map((m) => m.id)).not.toContain(5);
     expect(result.map((m) => m.id)).not.toContain(10);
@@ -461,21 +476,21 @@ describe("removeDownvotedMeals", () => {
 
   it("handles empty downvoted IDs array (returns all meals)", () => {
     const result = removeDownvotedMeals(mockMeals, []);
-    
+
     expect(result.length).toBe(mockMeals.length);
     expect(result).toEqual(mockMeals);
   });
 
   it("handles non-existent downvoted IDs gracefully", () => {
     const result = removeDownvotedMeals(mockMeals, [999, 1000]);
-    
+
     // Should not remove any meals
     expect(result.length).toBe(mockMeals.length);
   });
 
   it("handles mix of existing and non-existing IDs", () => {
     const result = removeDownvotedMeals(mockMeals, [1, 999, 5, 1000]);
-    
+
     expect(result.map((m) => m.id)).not.toContain(1);
     expect(result.map((m) => m.id)).not.toContain(5);
     expect(result.length).toBe(26);
@@ -485,7 +500,7 @@ describe("removeDownvotedMeals", () => {
 describe("filterByMealTime", () => {
   it("filters meals by breakfast", () => {
     const result = filterByMealTime(mockMeals, "breakfast");
-    
+
     // Should include breakfast meals and multi-meal time options
     expect(result.map((m) => m.id)).toContain(1); // Vegan Oatmeal Bowl
     expect(result.map((m) => m.id)).toContain(19); // Avocado Toast (breakfast, lunch)
@@ -497,7 +512,7 @@ describe("filterByMealTime", () => {
 
   it("filters meals by lunch", () => {
     const result = filterByMealTime(mockMeals, "lunch");
-    
+
     // Should include lunch meals and multi-meal time options
     expect(result.map((m) => m.id)).toContain(6); // Vegan Buddha Bowl
     expect(result.map((m) => m.id)).toContain(19); // Avocado Toast (breakfast, lunch)
@@ -509,7 +524,7 @@ describe("filterByMealTime", () => {
 
   it("filters meals by dinner", () => {
     const result = filterByMealTime(mockMeals, "dinner");
-    
+
     // Should include dinner meals and multi-meal time options
     expect(result.map((m) => m.id)).toContain(11); // Grilled Salmon
     expect(result.map((m) => m.id)).toContain(20); // Grilled Cheese (lunch, dinner)
@@ -520,7 +535,7 @@ describe("filterByMealTime", () => {
 
   it("filters meals by dessert", () => {
     const result = filterByMealTime(mockMeals, "dessert");
-    
+
     // Should include only dessert meals
     expect(result.map((m) => m.id)).toContain(16); // Chocolate Cake
     expect(result.map((m) => m.id)).toContain(17); // Vegan Brownie
@@ -533,17 +548,17 @@ describe("filterByMealTime", () => {
     const breakfastResult = filterByMealTime(mockMeals, "breakfast");
     const lunchResult = filterByMealTime(mockMeals, "lunch");
     const dinnerResult = filterByMealTime(mockMeals, "dinner");
-    
+
     // Avocado Toast (id 19) should be in both breakfast and lunch
     expect(breakfastResult.map((m) => m.id)).toContain(19);
     expect(lunchResult.map((m) => m.id)).toContain(19);
     expect(dinnerResult.map((m) => m.id)).not.toContain(19);
-    
+
     // Grilled Cheese (id 20) should be in both lunch and dinner
     expect(lunchResult.map((m) => m.id)).toContain(20);
     expect(dinnerResult.map((m) => m.id)).toContain(20);
     expect(breakfastResult.map((m) => m.id)).not.toContain(20);
-    
+
     // Fruit Salad (id 21) should be in breakfast, lunch, and dinner
     expect(breakfastResult.map((m) => m.id)).toContain(21);
     expect(lunchResult.map((m) => m.id)).toContain(21);
@@ -554,7 +569,7 @@ describe("filterByMealTime", () => {
 describe("getPreferredMeals", () => {
   it("returns meals matching single preferred ID", () => {
     const result = getPreferredMeals(mockMeals, [1]);
-    
+
     expect(result.length).toBe(1);
     expect(result[0].id).toBe(1);
     expect(result[0].name).toBe("Vegan Oatmeal Bowl");
@@ -562,35 +577,37 @@ describe("getPreferredMeals", () => {
 
   it("returns meals matching multiple preferred IDs", () => {
     const result = getPreferredMeals(mockMeals, [1, 5, 10, 15]);
-    
+
     expect(result.length).toBe(4);
-    expect(result.map((m) => m.id).sort((a, b) => a - b)).toEqual([1, 5, 10, 15]);
+    expect(result.map((m) => m.id).sort((a, b) => a - b)).toEqual([
+      1, 5, 10, 15,
+    ]);
   });
 
   it("handles empty preferred IDs array (returns empty array)", () => {
     const result = getPreferredMeals(mockMeals, []);
-    
+
     expect(result.length).toBe(0);
     expect(result).toEqual([]);
   });
 
   it("handles non-existent preferred IDs gracefully", () => {
     const result = getPreferredMeals(mockMeals, [999, 1000]);
-    
+
     expect(result.length).toBe(0);
     expect(result).toEqual([]);
   });
 
   it("handles mix of existing and non-existing IDs", () => {
     const result = getPreferredMeals(mockMeals, [1, 999, 5, 1000]);
-    
+
     expect(result.length).toBe(2);
     expect(result.map((m) => m.id).sort()).toEqual([1, 5]);
   });
 
   it("maintains original meal order", () => {
     const result = getPreferredMeals(mockMeals, [10, 5, 1]);
-    
+
     // Should return in order they appear in original array, not request order
     expect(result.map((m) => m.id)).toEqual([1, 5, 10]);
   });
@@ -603,9 +620,9 @@ describe("adjustServings", () => {
       { ...mockMeals[1], calories: 250 }, // Can reach 500 with 2 servings
       { ...mockMeals[2], calories: 450 }, // Can reach 500 with 1 serving
     ];
-    
+
     const result = adjustServings(testMeals, 500);
-    
+
     // All returned meals should be within 20% (400-600 calories)
     result.forEach((meal) => {
       const totalCalories = meal.calories * meal.serving;
@@ -618,9 +635,9 @@ describe("adjustServings", () => {
     const testMeals: Meal[] = [
       { ...mockMeals[0], calories: 300, id: 100 }, // Target 500: 1.5 servings = 450 (diff 50)
     ];
-    
+
     const result = adjustServings(testMeals, 500);
-    
+
     expect(result.length).toBe(1);
     expect(result[0].serving).toBeCloseTo(1.5, 1); // Should pick 1.5 servings (450 cal)
     expect(result[0].calories * result[0].serving).toBeCloseTo(450, 1);
@@ -630,11 +647,11 @@ describe("adjustServings", () => {
     const testMeals: Meal[] = [
       { ...mockMeals[0], calories: 100, id: 100 }, // Target 500: even 10 servings = 1000 (too high)
       { ...mockMeals[1], calories: 300, id: 101 }, // Can reach 500
-      { ...mockMeals[2], calories: 50, id: 102 },  // Target 500: 10 servings = 500 (perfect)
+      { ...mockMeals[2], calories: 50, id: 102 }, // Target 500: 10 servings = 500 (perfect)
     ];
-    
+
     const result = adjustServings(testMeals, 500);
-    
+
     // Should include meals that can reach target within tolerance
     expect(result.length).toBeGreaterThan(0);
     result.forEach((meal) => {
@@ -649,9 +666,9 @@ describe("adjustServings", () => {
     const testMeals: Meal[] = [
       { ...mockMeals[0], calories: 100, id: 100 }, // Target 500: 5 servings = 500
     ];
-    
+
     const result = adjustServings(testMeals, 500);
-    
+
     expect(result.length).toBe(1);
     expect(result[0].serving).toBeCloseTo(5, 1); // Should find 5 servings = 500
   });
@@ -660,9 +677,9 @@ describe("adjustServings", () => {
     const testMeals: Meal[] = [
       { ...mockMeals[0], calories: 800, id: 100 }, // Target 500: 0.5 servings = 400
     ];
-    
+
     const result = adjustServings(testMeals, 500);
-    
+
     expect(result.length).toBe(1);
     expect(result[0].serving).toBeGreaterThanOrEqual(0.5);
     expect(result[0].calories * result[0].serving).toBeGreaterThanOrEqual(400); // 80% of 500
@@ -673,9 +690,9 @@ describe("adjustServings", () => {
     const testMeals: Meal[] = [
       { ...mockMeals[0], calories: 60, id: 100 }, // Target 500: 8.5 servings = 510
     ];
-    
+
     const result = adjustServings(testMeals, 500);
-    
+
     expect(result.length).toBe(1);
     expect(result[0].serving).toBeLessThanOrEqual(10);
     expect(result[0].calories * result[0].serving).toBeGreaterThanOrEqual(400);
@@ -688,15 +705,15 @@ describe("adjustServings", () => {
       { ...mockMeals[1], calories: 400, id: 101 },
       { ...mockMeals[2], calories: 500, id: 102 },
     ];
-    
+
     const target = 500;
     const result = adjustServings(testMeals, target);
-    
+
     result.forEach((meal) => {
       const totalCalories = meal.calories * meal.serving;
       const lowerBound = target * 0.8; // 400
       const upperBound = target * 1.2; // 600
-      
+
       expect(totalCalories).toBeGreaterThanOrEqual(lowerBound);
       expect(totalCalories).toBeLessThanOrEqual(upperBound);
     });
@@ -706,9 +723,9 @@ describe("adjustServings", () => {
     const testMeals: Meal[] = [
       { ...mockMeals[0], calories: 300, id: 100, serving: 1 },
     ];
-    
+
     const result = adjustServings(testMeals, 500);
-    
+
     expect(result.length).toBe(1);
     expect(result[0].serving).not.toBe(1); // Should be modified from default
     expect(result[0].serving).toBeCloseTo(1.5, 1); // Should be ~1.5 for 450 calories
@@ -720,8 +737,10 @@ describe("applyAllFilters", () => {
     const result = applyAllFilters(mockMeals, {
       dietaryRestrictions: ["vegan"],
     });
-    
-    expect(result.every((meal) => meal.diet.toLowerCase().includes("vegan"))).toBe(true);
+
+    expect(
+      result.every((meal) => meal.diet.toLowerCase().includes("vegan"))
+    ).toBe(true);
     expect(result.length).toBe(11);
   });
 
@@ -729,7 +748,7 @@ describe("applyAllFilters", () => {
     const result = applyAllFilters(mockMeals, {
       allergyIngredients: ["peanut"],
     });
-    
+
     expect(result.map((m) => m.id)).not.toContain(4); // Peanut Butter Toast
     expect(result.map((m) => m.id)).not.toContain(22); // Peanut Noodles
     expect(result.length).toBe(26);
@@ -739,7 +758,7 @@ describe("applyAllFilters", () => {
     const result = applyAllFilters(mockMeals, {
       downvotedIds: [1, 5, 10],
     });
-    
+
     expect(result.map((m) => m.id)).not.toContain(1);
     expect(result.map((m) => m.id)).not.toContain(5);
     expect(result.map((m) => m.id)).not.toContain(10);
@@ -750,8 +769,10 @@ describe("applyAllFilters", () => {
     const result = applyAllFilters(mockMeals, {
       mealTime: "breakfast",
     });
-    
-    expect(result.every((meal) => meal.mealTime.toLowerCase().includes("breakfast"))).toBe(true);
+
+    expect(
+      result.every((meal) => meal.mealTime.toLowerCase().includes("breakfast"))
+    ).toBe(true);
     expect(result.length).toBe(9);
   });
 
@@ -759,7 +780,7 @@ describe("applyAllFilters", () => {
     const result = applyAllFilters(mockMeals, {
       targetCalories: 500,
     });
-    
+
     // All meals should have adjusted servings within 20% of 500 (400-600)
     result.forEach((meal) => {
       const totalCalories = meal.calories * meal.serving;
@@ -777,14 +798,14 @@ describe("applyAllFilters", () => {
       mealTime: "breakfast",
       targetCalories: 300,
     });
-    
+
     // Should be vegan breakfast meals without peanut, not downvoted, with ~300 calories
     result.forEach((meal) => {
       expect(meal.diet.toLowerCase()).toContain("vegan");
       expect(meal.ingredients.toLowerCase()).not.toContain("peanut");
       expect(meal.id).not.toBe(1);
       expect(meal.mealTime.toLowerCase()).toContain("breakfast");
-      
+
       const totalCalories = meal.calories * meal.serving;
       expect(totalCalories).toBeGreaterThanOrEqual(240); // 80% of 300
       expect(totalCalories).toBeLessThanOrEqual(360); // 120% of 300
@@ -797,10 +818,14 @@ describe("applyAllFilters", () => {
       dietaryRestrictions: ["vegan"],
       mealTime: "breakfast",
     });
-    
+
     // Should only have vegan breakfast meals
-    expect(result.every((meal) => meal.diet.toLowerCase().includes("vegan"))).toBe(true);
-    expect(result.every((meal) => meal.mealTime.toLowerCase().includes("breakfast"))).toBe(true);
+    expect(
+      result.every((meal) => meal.diet.toLowerCase().includes("vegan"))
+    ).toBe(true);
+    expect(
+      result.every((meal) => meal.mealTime.toLowerCase().includes("breakfast"))
+    ).toBe(true);
     expect(result.map((m) => m.id)).toContain(1); // Vegan Oatmeal Bowl
     expect(result.map((m) => m.id)).toContain(4); // Peanut Butter Toast
     expect(result.map((m) => m.id)).not.toContain(2); // Scrambled Eggs (vegetarian)
@@ -811,10 +836,14 @@ describe("applyAllFilters", () => {
       dietaryRestrictions: ["vegan"],
       allergyIngredients: ["peanut"],
     });
-    
+
     // Should have vegan meals without peanut
-    expect(result.every((meal) => meal.diet.toLowerCase().includes("vegan"))).toBe(true);
-    expect(result.every((meal) => !meal.ingredients.toLowerCase().includes("peanut"))).toBe(true);
+    expect(
+      result.every((meal) => meal.diet.toLowerCase().includes("vegan"))
+    ).toBe(true);
+    expect(
+      result.every((meal) => !meal.ingredients.toLowerCase().includes("peanut"))
+    ).toBe(true);
     expect(result.map((m) => m.id)).not.toContain(4); // Peanut Butter Toast (vegan but has peanut)
     expect(result.map((m) => m.id)).toContain(1); // Vegan Oatmeal Bowl (vegan, no peanut)
   });
@@ -824,7 +853,7 @@ describe("applyAllFilters", () => {
       allergyIngredients: ["peanut"],
       downvotedIds: [1, 6],
     });
-    
+
     // Should exclude peanut meals and downvoted meals
     expect(result.map((m) => m.id)).not.toContain(1); // Downvoted
     expect(result.map((m) => m.id)).not.toContain(4); // Peanut Butter Toast
@@ -837,9 +866,11 @@ describe("applyAllFilters", () => {
       downvotedIds: [1, 2],
       mealTime: "breakfast",
     });
-    
+
     // Should have breakfast meals excluding downvoted
-    expect(result.every((meal) => meal.mealTime.toLowerCase().includes("breakfast"))).toBe(true);
+    expect(
+      result.every((meal) => meal.mealTime.toLowerCase().includes("breakfast"))
+    ).toBe(true);
     expect(result.map((m) => m.id)).not.toContain(1); // Vegan Oatmeal Bowl (downvoted)
     expect(result.map((m) => m.id)).not.toContain(2); // Scrambled Eggs (downvoted)
     expect(result.map((m) => m.id)).toContain(3); // Bacon and Eggs (breakfast, not downvoted)
@@ -850,11 +881,11 @@ describe("applyAllFilters", () => {
       mealTime: "lunch",
       targetCalories: 500,
     });
-    
+
     // Should have lunch meals with adjusted servings for ~500 calories
     result.forEach((meal) => {
       expect(meal.mealTime.toLowerCase()).toContain("lunch");
-      
+
       const totalCalories = meal.calories * meal.serving;
       expect(totalCalories).toBeGreaterThanOrEqual(400);
       expect(totalCalories).toBeLessThanOrEqual(600);
@@ -870,19 +901,19 @@ describe("applyAllFilters", () => {
       mealTime: "dinner",
       targetCalories: 500,
     });
-    
+
     // Expected: Should have vegan dinner meals without chickpeas, not id 12, ~500 cal
     result.forEach((meal) => {
       expect(meal.diet.toLowerCase()).toContain("vegan");
       expect(meal.ingredients.toLowerCase()).not.toContain("chickpeas");
       expect(meal.id).not.toBe(12);
       expect(meal.mealTime.toLowerCase()).toContain("dinner");
-      
+
       const totalCalories = meal.calories * meal.serving;
       expect(totalCalories).toBeGreaterThanOrEqual(400);
       expect(totalCalories).toBeLessThanOrEqual(600);
     });
-    
+
     // Should NOT include id 6 (Buddha Bowl - has chickpeas)
     expect(result.map((m) => m.id)).not.toContain(6);
     // Should NOT include id 12 (Vegetable Stir Fry - downvoted)
@@ -897,16 +928,18 @@ describe("applyAllFilters", () => {
       allergyIngredients: [],
       downvotedIds: [],
     });
-    
+
     // With empty arrays, should return meals filtered only by defaults
     // dietaryRestrictions: [] defaults to ["none"]
     expect(result.length).toBe(8);
-    expect(result.every((meal) => meal.diet.toLowerCase().includes("none"))).toBe(true);
+    expect(
+      result.every((meal) => meal.diet.toLowerCase().includes("none"))
+    ).toBe(true);
   });
 
   it("returns all meals when no filters are specified", () => {
     const result = applyAllFilters(mockMeals, {});
-    
+
     // No filters applied - should return all meals since dietaryRestrictions is not provided
     expect(result.length).toBe(28);
   });

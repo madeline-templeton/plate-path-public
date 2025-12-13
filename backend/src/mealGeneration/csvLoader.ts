@@ -3,8 +3,6 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { Meal, mealSchema } from "../../globals";
 
-//for commiting
-
 // ESM-compatible __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -86,7 +84,7 @@ export function loadMealsFromCSV(): Meal[] {
 /**
  * Parse a CSV line handling quoted fields with commas
  */
-function parseCSVLine(line: string): string[] {
+export function parseCSVLine(line: string): string[] {
   const result: string[] = [];
   let current = "";
   let inQuotes = false;
