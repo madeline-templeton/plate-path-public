@@ -44,7 +44,7 @@ describe("Calorie Calculator Tests", () => {
       const constraints: UserConstraints = {
         age: 25,
         sex: "F",
-        height: { unit: "m", value: 1.65 },
+        height: { unit: "m", value: [1.65] },
         weight: { unit: "kg", value: 60 },
         activityLevel: "active",
         weightGoal: "maintain",

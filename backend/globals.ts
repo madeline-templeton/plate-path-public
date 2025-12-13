@@ -12,7 +12,7 @@ export const userConstraintsSchema = z.object({
         value: z.coerce.number().positive(),
         unit: z.enum(["kg", "lb"])
     }),
-    activityLevel: z.enum(["not-active", "lightly-active", "moderately-active", "active", "very-active"]),
+    activityLevel: z.enum(["sedentary","not-active", "lightly-active", "moderately-active", "active", "very-active"]),
     weightGoal: z.enum(["extreme-loss", "weight-loss", "maintain", "weight-gain", "extreme-gain"]),
     dietaryRestrictions: z.array(z.string()),
     // excludeIngredients: z.array(z.string()),,
