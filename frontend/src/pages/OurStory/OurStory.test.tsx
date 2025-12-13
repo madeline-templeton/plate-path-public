@@ -13,16 +13,12 @@ import OurStory from './OurStory';
 import axios from 'axios';
 import '@testing-library/jest-dom';
 
-/**
- * Mock axios to prevent real HTTP requests.
- * API calls to /updateUserConsent are intercepted and don't hit the backend.
- */
+
+ // Mock axios to prevent real HTTP requests so that API calls to /updateUserConsent are intercepted and don't hit the backend.
 vi.mock('axios');
 
-/**
- * Mock Firebase auth service to prevent real authentication.
- * Provides a mock token for authorization headers in API calls.
- */
+
+ // Mock Firebase auth service to prevent real authentication that provides a mock token for authorization headers in API calls.
 vi.mock('../../services/firebase', () => ({
   auth: {
     currentUser: {
@@ -31,20 +27,15 @@ vi.mock('../../services/firebase', () => ({
   }
 }));
 
-/**
- * Mock AuthContext to return a test user.
- * This prevents real authentication logic from running during tests.
- */
+
+ // Mock AuthContext to return a test user to prevent real authentication logic from running during tests.
 vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({
     user: { id: 'test-user-123', email: 'test@example.com' }
   })
 }));
 
-/**
- * Mock React Router navigation.
- * Navigation calls are intercepted so we can verify they were called with correct routes.
- */
+ // Mock React Router navigation that intercepts navigation calls so we can verify they were called with correct routes.
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -56,7 +47,6 @@ vi.mock('react-router-dom', async () => {
 
 /**
  * Helper function to render components with React Router context.
- * OurStory uses React Router's navigate() function, so we need BrowserRouter wrapping.
  * 
  * @param component - The React component to render
  * @returns The render result from React Testing Library
@@ -71,10 +61,8 @@ const renderWithRouter = (component: React.ReactElement) => {
  * All tests use MOCKED backend/auth but test REAL component logic, user interactions, and UI state.
  */
 describe('OurStory - Functional Tests', () => {
-  /**
-   * Reset all mocks and clear localStorage before each test.
-   * Ensures clean state and prevents tests from affecting each other.
-   */
+
+   // Reset all mocks and clear localStorage before each test to prevent tests from affecting each other
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
@@ -82,8 +70,8 @@ describe('OurStory - Functional Tests', () => {
   });
 
   /**
+   * CONTENT RENDERING
    * Tests for content rendering and text accuracy.
-   * Confirms: All static page content (text, images, team info) renders correctly.
    */
   describe('Content Rendering', () => {
     /**
@@ -163,8 +151,8 @@ describe('OurStory - Functional Tests', () => {
   });
 
   /**
-   * Tests for navigation functionality.
-   * Confirms: Clickable links and keyboard navigation work correctly.
+   * NAVIGATION FUNCTIONALITY
+   * Tests for clickable links and keyboard navigation work correctly.
    */
   describe('Navigation Functionality', () => {
     /**
@@ -184,7 +172,6 @@ describe('OurStory - Functional Tests', () => {
 
     /**
      * Tests that pressing Enter on "Generate your plan now" link navigates to /generate-plan.
-     * Verifies keyboard accessibility for users who cannot use a mouse.
      * (Mocked: React Router navigation)
      * (Real: Keyboard event handling)
      */
@@ -216,7 +203,6 @@ describe('OurStory - Functional Tests', () => {
 
     /**
      * Tests that pressing Enter on "calendar" link navigates to /calendar.
-     * Verifies keyboard accessibility for users who cannot use a mouse.
      * (Mocked: React Router navigation)
      * (Real: Keyboard event handling)
      */
@@ -233,8 +219,8 @@ describe('OurStory - Functional Tests', () => {
   });
 
   /**
-   * Tests for privacy consent modal display logic.
-   * Confirms: Modal shows/hides based on localStorage flags.
+   * PRIVACY CONSENT MODAL --> DISPLAY LOGIC
+   * Tests for privacy consent modal display logic (that is appears/doesn't appear under correct conditions).
    */
   describe('Privacy Consent Modal - Display Logic', () => {
     /**
@@ -250,7 +236,6 @@ describe('OurStory - Functional Tests', () => {
 
     /**
      * Tests that modal does not appear if user has already seen it.
-     * Both showPrivacyConsent and privacyConsentSeen flags are set.
      * (Mocked: Auth, Firebase, Axios)
      * (Real: localStorage flag checking)
      */
@@ -279,7 +264,6 @@ describe('OurStory - Functional Tests', () => {
 
     /**
      * Test: showPrivacyConsent flag is cleared from localStorage after modal is displayed.
-     * Prevents modal from showing again on subsequent page loads.
      * (Real:) localStorage flag management
      */
     it('should clear showPrivacyConsent flag when modal is shown', async () => {
@@ -296,9 +280,8 @@ describe('OurStory - Functional Tests', () => {
   });
 
   /**
-   * ACCEPT FUNCTIONALITY
-   * Test suite for accepting privacy consent.
-   * Verifies modal closes, localStorage updates, and API is called correctly.
+   * PRIVACY CONSENT MODAL --> ACCEPT FUNCTIONALITY
+   * Test suite for accepting privacy consent that verifies modal closes, localStorage updates, and API is called correctly.
    * (Real:) User click interaction, modal state change, localStorage update
    * (Mocked:) API call to /updateUserConsent intercepted
    */
@@ -360,9 +343,8 @@ describe('OurStory - Functional Tests', () => {
   });
 
   /**
-   * REJECT FUNCTIONALITY
-   * Test suite for rejecting privacy consent.
-   * Verifies modal closes, localStorage updates, and API is called with revoked status.
+   * PRIVACY CONSENT MODAL -->REJECT FUNCTIONALITY
+   * Test suite for rejecting privacy consent that verifies modal closes, localStorage updates, and API is called with revoked status.
    * (Real:) User click interaction, modal closes, localStorage updated
    * (Mocked:) API call intercepted
    */
@@ -424,9 +406,8 @@ describe('OurStory - Functional Tests', () => {
   });
 
   /**
-   * ERROR HANDLING
-   * Test suite for consent API error handling.
-   * Verifies appropriate error messages are displayed when API fails.
+   * PRIVACY CONSENT MODAL --> ERROR HANDLING
+   * Test suite for consent API error handling that verifies appropriate error messages are displayed when API fails.
    * (Mocked:) API returns failure response or throws error
    * (Real:) Error handling logic displays alert
    */
@@ -490,7 +471,7 @@ describe('OurStory - Functional Tests', () => {
   });
 
   /**
-   * IMAGE LOADING
+   * PRIVACY CONSENT MODAL -->IMAGE LOADING
    * Test suite for image asset loading.
    * Verifies that team member photos have correct src attributes.
    * (Real:) Verifies img src attributes point to correct asset paths

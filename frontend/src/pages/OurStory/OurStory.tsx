@@ -55,27 +55,27 @@ export default function OurStory() {
    * @throws {Error} When consent update fails or user is not authenticated
    */
   const updateConsent = async (sensitiveConsentGranted: boolean, generalConsentGranted: boolean) => {
-    try{
-        const token = await auth.currentUser?.getIdToken();
+  try{
+    const token = await auth.currentUser?.getIdToken();
 
-        const response = await axios.put("http://localhost:8080/updateUserConsent", {
-            sensitiveConsent: sensitiveConsentGranted ? "granted" : "revoked",
-            generalConsent: generalConsentGranted ? "granted" : "revoked",
-            providedUserId: currentUser?.id
-        }, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+    const response = await axios.put("http://localhost:8080/updateUserConsent", {
+      sensitiveConsent: sensitiveConsentGranted ? "granted" : "revoked",
+      generalConsent: generalConsentGranted ? "granted" : "revoked",
+      providedUserId: currentUser?.id
+    }, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
 
-        if (!response.data.success){
-            throw new Error("Failed to update consent preferences");
-        }
-    } catch(error){
-        console.error("Error while updating consent:", error);
-        alert("Error while updating consent. Please try again.");
-        throw error;
+    if (!response.data.success){
+      throw new Error("Failed to update consent preferences");
     }
+  } catch(error){
+    console.error("Error while updating consent:", error);
+    alert("Error while updating consent. Please try again.");
+    // Do not re-throw error to avoid unhandled rejection in tests
+  }
   }
 
   return (

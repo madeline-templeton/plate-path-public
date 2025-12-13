@@ -13,6 +13,14 @@ import Account from './Account';
 import axios from 'axios';
 import '@testing-library/jest-dom';
 
+vi.mock('firebase/auth', () => ({
+  onAuthStateChanged: (auth: any, callback: any) => {
+    callback({ uid: 'mock-user', email: 'mockuser@example.com' });
+    return () => {};
+  },
+  signOut: vi.fn().mockResolvedValue(undefined),
+}));
+
 // Mock axios to prevent real HTTP requests so API calls to backend are intercepted and don't hit the backend.
 vi.mock('axios');
 

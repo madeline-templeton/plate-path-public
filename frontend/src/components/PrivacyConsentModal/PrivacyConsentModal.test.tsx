@@ -7,6 +7,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { PrivacyConsentModal } from './PrivacyConsentModal';
 
@@ -23,7 +24,9 @@ describe('PrivacyConsentModal - Functional UI Tests', () => {
    */
   it('should render modal with title, subtitle, and action buttons when open', () => {
     render(
-      <PrivacyConsentModal isOpen={true} onAccept={() => {}} onReject={() => {}} />
+      <BrowserRouter>
+        <PrivacyConsentModal isOpen={true} onAccept={() => {}} onReject={() => {}} />
+      </BrowserRouter>
     );
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText(/Welcome to PlatePath!/i)).toBeInTheDocument();
@@ -41,7 +44,9 @@ describe('PrivacyConsentModal - Functional UI Tests', () => {
     const onAccept = vi.fn();
     const onReject = vi.fn();
     render(
-      <PrivacyConsentModal isOpen={true} onAccept={onAccept} onReject={onReject} />
+      <BrowserRouter>
+        <PrivacyConsentModal isOpen={true} onAccept={onAccept} onReject={onReject} />
+      </BrowserRouter>
     );
     await userEvent.click(screen.getByRole('button', { name: /accept/i }));
     expect(onAccept).toHaveBeenCalled();
@@ -56,7 +61,9 @@ describe('PrivacyConsentModal - Functional UI Tests', () => {
    */
   it('should not render modal when isOpen is false', () => {
     render(
-      <PrivacyConsentModal isOpen={false} onAccept={() => {}} onReject={() => {}} />
+      <BrowserRouter>
+        <PrivacyConsentModal isOpen={false} onAccept={() => {}} onReject={() => {}} />
+      </BrowserRouter>
     );
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
