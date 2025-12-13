@@ -178,7 +178,6 @@ export default function GeneratePlan() {
       setAgeInputError(true);
       hasErrors = true;
     } else if (ageError) {
-      // Age has validation error (too low or too high)
       hasErrors = true;
     }
 
@@ -201,7 +200,6 @@ export default function GeneratePlan() {
         setHeightFeetError(true); 
         hasErrors = true;
       } else if (heightError) {
-        // Height has validation error (too low or too high)
         hasErrors = true;
       }
     } 
@@ -1011,6 +1009,21 @@ export default function GeneratePlan() {
           >
             Generate Plan
           </button>
+          <div
+            aria-hidden="true"
+            style={{
+              fontSize: '0.9em',
+              color: '#666',
+              marginTop: '0.5em',
+              textAlign: 'center',
+              position: 'relative',
+              top: '0.5em',
+              lineHeight: 1.2,
+              paddingBottom: 0,
+            }}
+          >
+            Generate Plan and go to your customized meal calender!
+          </div>
         </form>
       </main>
       <Footer />

@@ -3,6 +3,7 @@ import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import './Calendar.css';
 import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import MealCard from '../../components/calendar/MealCard';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
@@ -270,9 +271,20 @@ export default function Calendar() {
         <div className="calendar-page">
           <h1 className="calendar-title">Your Meal Calender</h1>
           <div className="calendar-container">
-            <p style={{ textAlign: 'center', padding: '40px', fontFamily: 'Quicksand, sans-serif', fontSize: '1.2rem' }}>
-              No meal plan found. Please generate a plan first.
-            </p>
+              <div
+                className="no-meal-plan-message"
+                aria-label="No meal plan found. Please generate a plan first."
+              >
+                No meal plan found. Please{' '}
+                <Link
+                  to="/generate-plan"
+                  className="generate-plan-link"
+                  aria-label="Go to Generate Plan page to create your meal plan"
+                >
+                  generate your plan
+                </Link>
+                {' '}first.
+              </div>
           </div>
         </div>
         <Footer />

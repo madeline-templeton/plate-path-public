@@ -1,3 +1,28 @@
+/* No meal plan message styles */
+.no-meal-plan-message {
+  color: #333;
+  font-weight: 500;
+  font-size: 1.1rem;
+  text-align: center;
+  background: #ffd39f;
+  padding: 0.5em 0;
+  margin: 0.5em 0 0 0;
+  border-radius: 6px;
+  font-family: 'Quicksand', 'Trebuchet MS', 'Lucida Sans', sans-serif;
+  display: block;
+  white-space: normal;
+}
+
+.generate-plan-link {
+  text-decoration: underline;
+  color: #222;
+  font-weight: 600;
+  font-family: 'Quicksand', 'Trebuchet MS', 'Lucida Sans', sans-serif;
+  font-size: 1.1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
 .calendar-page {
   width: 100%;
   min-height: calc(100vh - 180px);
@@ -130,7 +155,6 @@
   margin-bottom: 5px;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .calendar-container {
     padding: 15px;
