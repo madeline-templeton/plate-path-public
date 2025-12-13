@@ -4,26 +4,7 @@ const BASE_URL = "http://localhost:8080";
 
 
 
-
 test.describe("Successful voting information block", async () => {
-    test.afterAll(async ({ request }) => {
-        console.log('Done with tests');
-
-        const users = ["test-user-456", "test-user-123", "test-user-789", "test-user-abc", "test-user-def", "test-user-check"]
-
-        for (const user of users){
-            const response = await request.delete(`${BASE_URL}/deleteUserMealVotes`, {
-                headers: {
-                    'x-test-user-id': user
-                }
-            });
-            const body = await response.json();
-            if (!body.success){
-                console.log("Problem");
-            }
-        }
-        
-    });
 
     // Test PUT endpoint 
     test.describe("updateUserMealVote successful updating", () => {
@@ -44,6 +25,14 @@ test.describe("Successful voting information block", async () => {
             const body = await response.json();
             expect(body.success).toBe(true);
             expect(body.message).toBe(`Meal voting for user test-user-456 created successfully`);
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deleteUserMealVotes`, {
+                headers: {
+                    'x-test-user-id': 'test-user-456'
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
         });
 
         test("successful disliked meal vote creation", async ({ request }) => {
@@ -63,6 +52,14 @@ test.describe("Successful voting information block", async () => {
             const body = await response.json();
             expect(body.success).toBe(true);
             expect(body.message).toBe(`Meal voting for user test-user-123 created successfully`);
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deleteUserMealVotes`, {
+                headers: {
+                    'x-test-user-id': 'test-user-123'
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
         });
 
 
@@ -101,6 +98,15 @@ test.describe("Successful voting information block", async () => {
             expect(updatingBody.success).toBe(true);
             expect(updatingBody.alreadyExisted).toBe(false);
             expect(updatingBody.message).toBe("Liked meal updated successfully");
+
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deleteUserMealVotes`, {
+                headers: {
+                    'x-test-user-id': 'test-user-789'
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
         });
 
         test("create a vote and then remove it", async ({ request }) => {
@@ -138,6 +144,15 @@ test.describe("Successful voting information block", async () => {
             expect(updatingBody.success).toBe(true);
             expect(updatingBody.alreadyExisted).toBe(true);
             expect(updatingBody.message).toBe("Liked meal updated successfully");
+
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deleteUserMealVotes`, {
+                headers: {
+                    'x-test-user-id': 'test-user-abc'
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
         });
     });
 
@@ -166,6 +181,14 @@ test.describe("Successful voting information block", async () => {
             expect(body.success).toBe(true);
             expect(body).toHaveProperty("liked");
             expect(body).toHaveProperty("disliked");
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deleteUserMealVotes`, {
+                headers: {
+                    'x-test-user-id': 'test-user-def'
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
         });
     });
 
@@ -194,6 +217,14 @@ test.describe("Successful voting information block", async () => {
             expect(body.hasVotes).toBe(true);
             expect(body.mealPresent).toBe(true);
             expect(body.liked).toBe(true);
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deleteUserMealVotes`, {
+                headers: {
+                    'x-test-user-id': 'test-user-check'
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
         });
     });
 

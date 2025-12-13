@@ -30,25 +30,7 @@ const mockUserInfo = {
 
 
 
-
 test.describe("Successful user information block", async () => {
-    test.afterAll(async ({ request }) => {
-        console.log('Done with tests');
-
-        const users = ["test-create-user-info", "test-update-user-info", "test-get-user-info", "test-user-delete-info", "test-user-check-info-exists"];
-
-        for (const user of users){
-            const response = await request.delete(`${BASE_URL}/deleteUserInfo`, {
-                headers: {
-                    'x-test-user-id': user
-                }
-            });
-            const body = await response.json();
-            if (!body.success){
-                console.log("Problem");
-            }
-        }
-    });
 
     test.describe("test the update endpoint with valid input", async () => {
         test("successful user info creation", async ({ request }) => {
@@ -70,6 +52,14 @@ test.describe("Successful user information block", async () => {
             const body = await response.json();
             expect(body.success).toBe(true);
             expect(body.message).toBe("User Information doc created successfully");
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deleteUserInfo`, {
+                headers: {
+                    'x-test-user-id': "test-create-user-info"
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
         });
 
         test("successful user info update", async ({ request }) => {
@@ -106,11 +96,16 @@ test.describe("Successful user information block", async () => {
                 }
             });
 
+            
+
             expect(response.status()).toBe(200);
 
             const body = await response.json();
             expect(body.success).toBe(true);
             expect(body.message).toBe("User Information doc updated successfully");
+
+            // Add small delay to ensure Firestore write completes
+            await new Promise(resolve => setTimeout(resolve, 100));
 
             // Get the data and check that is was updated correctly
             const getResponse = await request.get(`${BASE_URL}/getUserInformation/test-update-user-info`);
@@ -123,6 +118,14 @@ test.describe("Successful user information block", async () => {
             expect(getBody.userInfo.weight.value).toBe(175);
             expect(getBody.userInfo.weight.unit).toBe("lb");
             expect(getBody.userInfo.dietaryRestrictions).toStrictEqual(["vegetarian"]);
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deleteUserInfo`, {
+                headers: {
+                    'x-test-user-id': "test-update-user-info"
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
 
         });
     });
@@ -144,6 +147,9 @@ test.describe("Successful user information block", async () => {
                 }
             });
 
+            // Add small delay to ensure Firestore write completes
+            await new Promise(resolve => setTimeout(resolve, 100));
+
             // Then retrieve it
             const response = await request.get(`${BASE_URL}/getUserInformation/test-get-user-info`);
 
@@ -154,6 +160,14 @@ test.describe("Successful user information block", async () => {
             expect(body).toHaveProperty("userInfo");
             expect(body.userInfo.age).toBe(updatedInfo.age);
             expect(body.userInfo.sex).toBe("M");
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deleteUserInfo`, {
+                headers: {
+                    'x-test-user-id': "test-get-user-info"
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
         });
     });
 
@@ -177,6 +191,10 @@ test.describe("Successful user information block", async () => {
                 }
             });
 
+            // Add small delay to ensure Firestore write completes
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+
             // Check that it is stored
             const initialGetResponse = await request.get(`${BASE_URL}/checkIfInfoInStorage/${testUserId}`);
 
@@ -199,6 +217,9 @@ test.describe("Successful user information block", async () => {
             expect(body.success).toBe(true);
             expect(body.message).toBe("User information deleted successfully");
 
+            // Add small delay to ensure Firestore write completes
+            await new Promise(resolve => setTimeout(resolve, 100));
+
             // Check that it isn't in storage anymore
             const getResponse = await request.get(`${BASE_URL}/checkIfInfoInStorage/${testUserId}`);
 
@@ -207,6 +228,7 @@ test.describe("Successful user information block", async () => {
             const getBody = await getResponse.json();
             expect(getBody.success).toBe(true);
             expect(getBody.exists).toBe(false);
+
         });
 
     });
@@ -238,6 +260,14 @@ test.describe("Successful user information block", async () => {
             const body = await response.json();
             expect(body.success).toBe(true);
             expect(body.exists).toBe(true);
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deleteUserInfo`, {
+                headers: {
+                    'x-test-user-id': testUserId
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
         });
     });
 

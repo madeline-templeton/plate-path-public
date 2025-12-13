@@ -50,27 +50,8 @@ const mockPlanner = {
 };
 
 
+
 test.describe("Successful Planner block", async () => {
-
-    test.afterAll(async ({ request }) => {
-        console.log('Done with tests');
-
-        const users = ["test-user-456", "test-user-123", "test-user-get-planner", "test-user-planner", "test-user-check-exists"];
-
-        for (const user of users){
-            const response = await request.delete(`${BASE_URL}/deletePlannerForUser`, {
-                headers: {
-                    'x-test-user-id': user
-                }
-            });
-            const body = await response.json();
-            if (!body.success){
-                console.log("Problem");
-            }
-        }
-    });
-
-
 
     test.describe("test valid put endpoint calls", async () => {
         test("successful planner creation", async ({ request }) => {
@@ -96,6 +77,14 @@ test.describe("Successful Planner block", async () => {
             expect(body.success).toBe(true);
             expect(body.message).toBe("New planner created successfully");
             expect(body.plannerId).toBe("test-user-456");
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deletePlannerForUser`, {
+                headers: {
+                    'x-test-user-id': updatedUser
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
         });
 
         test("successful planner update", async ({ request }) => {
@@ -137,6 +126,14 @@ test.describe("Successful Planner block", async () => {
             const body = await response.json();
             expect(body.success).toBe(true);
             expect(body.message).toBe("Planner for user test-user-123 has been updated");
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deletePlannerForUser`, {
+                headers: {
+                    'x-test-user-id': updatedUser
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
         });
     });
 
@@ -165,6 +162,14 @@ test.describe("Successful Planner block", async () => {
             const body = await response.json();
             expect(body.success).toBe(true);
             expect(body).toHaveProperty("planner");
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deletePlannerForUser`, {
+                headers: {
+                    'x-test-user-id': testUserId
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
         });
 
         test("add, get, update and get planner again", async ({ request }) => {
@@ -178,13 +183,15 @@ test.describe("Successful Planner block", async () => {
                 }
             });
 
+            // Add small delay to ensure Firestore write completes
+            await new Promise(resolve => setTimeout(resolve, 100));
+
             // Then retrieve it
             const initialResponse = await request.get(`${BASE_URL}/getPlannerForUser/test-user-planner`);
 
             expect(initialResponse.status()).toBe(200);
 
             const initialBody = await initialResponse.json();
-            console.log(initialBody)
             expect(initialBody.success).toBe(true);
             expect(initialBody.planner.startDate.day).toBe("1");
             expect(initialBody.planner.startDate.month).toBe("12");
@@ -209,6 +216,9 @@ test.describe("Successful Planner block", async () => {
                 }
             });
 
+            // Add small delay to ensure Firestore write completes
+            await new Promise(resolve => setTimeout(resolve, 100));
+
             // Then retrieve updated one
             const updatedResponse = await request.get(`${BASE_URL}/getPlannerForUser/test-user-planner`);
 
@@ -220,13 +230,21 @@ test.describe("Successful Planner block", async () => {
             expect(updatedBody.planner.startDate.month).toBe("03");
             expect(updatedBody.planner.startDate.year).toBe("2034");
 
+            const deleteResponse = await request.delete(`${BASE_URL}/deletePlannerForUser`, {
+                headers: {
+                    'x-test-user-id': 'test-user-planner'
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
+
         });
     });
 
 
     test.describe("check planner deletion", async () => {
         test("add and delete a planner", async ({ request }) => {
-            const testUserId = 'test-user-delete-planner';
+            const testUserId = 'test-user-delete-planner-1';
             const testPlanner = {
                 ...mockPlanner,
                 userId: testUserId
@@ -254,17 +272,18 @@ test.describe("Successful Planner block", async () => {
             const body = await response.json();
             expect(body.success).toBe(true);
             expect(body.message).toBe("Planner deleted successfully");
+
         });
 
         test("attempt to get a deleted plan", async ({ request }) => {
-            const testUserId = 'test-user-delete-planner';
+            const testUserId = 'random-user';
             const testPlanner = {
                 ...mockPlanner,
                 userId: testUserId
             };
 
             // First create a planner
-            await request.put(`${BASE_URL}/updatePlanner`, {
+            const putResponse = await request.put(`${BASE_URL}/updatePlanner`, {
                 data: {
                     planner: testPlanner
                 },
@@ -273,16 +292,21 @@ test.describe("Successful Planner block", async () => {
                 }
             });
 
+            const putBody = await putResponse.json();
+
+
             // Then delete it
             const response = await request.delete(`${BASE_URL}/deletePlannerForUser`, {
                 headers: {
                     'x-test-user-id': testUserId
                 }
             });
+            const body = await response.json();
+
 
             expect(response.status()).toBe(200);
 
-            const body = await response.json();
+            
             expect(body.success).toBe(true);
             expect(body.message).toBe("Planner deleted successfully");
 
@@ -324,6 +348,14 @@ test.describe("Successful Planner block", async () => {
             const body = await response.json();
             expect(body.success).toBe(true);
             expect(body.exists).toBe(true);
+
+            const deleteResponse = await request.delete(`${BASE_URL}/deletePlannerForUser`, {
+                headers: {
+                    'x-test-user-id': testUserId
+                }
+            });
+
+            expect(deleteResponse.status()).toBe(200);
         });
     });
 
