@@ -3,7 +3,6 @@
   font-family: 'Quicksand', 'Trebuchet MS', 'Lucida Sans', sans-serif;
   margin-left: 8px;
   display: inline-block;
-  margin-top: -12px;
 }
 .required-disclaimer .asterisk {
   color: red;
