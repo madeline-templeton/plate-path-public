@@ -50,7 +50,7 @@ esessa - Elizabeth Sessa
 Erik Estienne Used LLM for:
 - Generate endpoint tests before manually checking and editing these to ensure they were sufficiently detailed and passed
 - Help with design of protected endpoints to ensure that these could not be accessed unless the user was properly authenticated
-- Come with meal preferences endpoint storage functionality
+- Help with meal preferences endpoint storage functionality
 
 
 Elizabeth Sessa Used LLM for:
