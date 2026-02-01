@@ -57,5 +57,9 @@ Elizabeth Sessa Used LLM for:
 - Connecting the frontend and backend after we changed the backend (mostly pinpointing where we needed to change things in the frontend to accomodate and error navigation with that)
 - Explaining how accessibility requirements will look for those who use them and implementing those into our frontend application
 
+Madeline Templeton Used LLM for: 
+- Implementing of an automated, property-based test suite for the meal-generation algorithm
+- Also used extensively for debugging
+
 #### Total estimated time it took to complete project: 
 #### Link to GitHub Repo: https://github.com/cs0320-f25/term-project-metemple-eestienn-esessa
