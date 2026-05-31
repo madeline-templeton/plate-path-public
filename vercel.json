@@ -10,7 +10,7 @@
       "root": "backend",
       "routePrefix": "/_/backend",
       "framework": "node",
-      "entrypoint": "backend/dist/src/server.js"
+      "entrypoint": "backend/src/server.ts"
     }
   }
 }
